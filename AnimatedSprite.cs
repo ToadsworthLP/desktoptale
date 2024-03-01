@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Desktoptale;
 
-public class AnimatedSprite
+public class AnimatedSprite : IAnimatedSprite
 {
     public bool Playing { get; private set; } = false;
     public bool Loop { get; set; } = false;

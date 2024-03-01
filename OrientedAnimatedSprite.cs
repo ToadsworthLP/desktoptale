@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Desktoptale;
 
-public class OrientedAnimatedSprite
+public class OrientedAnimatedSprite : IAnimatedSprite
 {
     public Orientation Orientation
     {

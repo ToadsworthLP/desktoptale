@@ -5,18 +5,30 @@ namespace Desktoptale;
 
 public class InputManager
 {
-    private Game game;
-
     public InputManager(Game game)
     {
         this.game = game;
     }
 
-    public Vector2 DirectionalInput => GetKeyboardInputVector();
+    public Vector2 DirectionalInput { get; private set; }
+    public Point PointerPosition { get; private set; }
+    public bool LeftClickPressed { get; private set; }
+    public bool LeftClickJustPressed { get; private set; }
+    public bool RightClickPressed { get; private set; }
+    public bool RightClickJustPressed { get; private set; }
 
-    private Vector2 GetKeyboardInputVector()
+    private bool previousFrameLeftClick, previousFrameRightClick;
+    private Game game;
+
+    public void Update()
     {
-        if (!game.IsActive) return Vector2.Zero;
+        UpdateKeyboardInput();
+        UpdateMouseInput();
+    }
+    
+    private void UpdateKeyboardInput()
+    {
+        if (!game.IsActive) DirectionalInput = Vector2.Zero;
         
         KeyboardState keyboardState = Keyboard.GetState();
 
@@ -33,6 +45,22 @@ public class InputManager
         if (keyboardState.IsKeyDown(Keys.Right)) input.X += 1f;
 
         if(input.LengthSquared() > float.Epsilon) input.Normalize();
-        return input;
+        DirectionalInput = input;
+    }
+
+    private void UpdateMouseInput()
+    {
+        previousFrameLeftClick = LeftClickPressed;
+        previousFrameRightClick = RightClickPressed;
+        
+        MouseState mouseState = Mouse.GetState();
+        
+        LeftClickPressed = mouseState.LeftButton == ButtonState.Pressed;
+        if (LeftClickPressed) LeftClickJustPressed = !previousFrameLeftClick;
+        
+        RightClickPressed = mouseState.RightButton == ButtonState.Pressed;
+        if (RightClickPressed) RightClickJustPressed = !previousFrameRightClick;
+
+        PointerPosition = mouseState.Position;
     }
 }

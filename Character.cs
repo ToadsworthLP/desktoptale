@@ -1,20 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
+using Desktoptale.Messages;
+using Messaging;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using SharpDX.Direct2D1.Effects;
 
 namespace Desktoptale;
 
 public class Character : IGameObject
 {
+    public float MovementSpeed { get; set; }
+    
     private GameWindow window;
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
     private InputManager inputManager;
 
-    private OrientedAnimatedSprite sprite;
+    private IAnimatedSprite sprite;
     private Vector2 previousVelocity = Vector2.Zero;
+    private Vector2 scale;
+    private bool dragging;
 
     public Character(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager)
     {
@@ -24,46 +31,56 @@ public class Character : IGameObject
         this.window = window;
     }
 
+    public void Initialize()
+    {
+        MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
+        
+        MovementSpeed = 100;
+    }
+
     public void LoadContent(ContentManager contentManager)
     {
-        sprite = new OrientedAnimatedSprite();
-        sprite.Loop = true;
-        sprite.Framerate = 5;
-        sprite.Orientation = Orientation.Down;
+        OrientedAnimatedSprite animatedSprite = new OrientedAnimatedSprite();
+        animatedSprite.Loop = true;
+        animatedSprite.Framerate = 5;
+        animatedSprite.Orientation = Orientation.Down;
         
-        LoadOrientedSpriteFrames(contentManager, sprite, Orientation.Up, 
+        LoadOrientedSpriteFrames(contentManager, animatedSprite, Orientation.Up, 
             "Characters/Clover/Spr_Clover_Idle_Up",
             "Characters/Clover/Spr_Clover_Walk_0_Up",
             "Characters/Clover/Spr_Clover_Idle_Up",
             "Characters/Clover/Spr_Clover_Walk_1_Up"
         );
         
-        LoadOrientedSpriteFrames(contentManager, sprite, Orientation.Down, 
+        LoadOrientedSpriteFrames(contentManager, animatedSprite, Orientation.Down, 
             "Characters/Clover/Spr_Clover_Idle_Down",
             "Characters/Clover/Spr_Clover_Walk_0_Down",
             "Characters/Clover/Spr_Clover_Idle_Down",
             "Characters/Clover/Spr_Clover_Walk_1_Down"
         );
         
-        LoadOrientedSpriteFrames(contentManager, sprite, Orientation.Left, 
+        LoadOrientedSpriteFrames(contentManager, animatedSprite, Orientation.Left, 
             "Characters/Clover/Spr_Clover_Idle_Left",
             "Characters/Clover/Spr_Clover_Walk_Left"
         );
         
-        LoadOrientedSpriteFrames(contentManager, sprite, Orientation.Right, 
+        LoadOrientedSpriteFrames(contentManager, animatedSprite, Orientation.Right, 
             "Characters/Clover/Spr_Clover_Idle_Right",
             "Characters/Clover/Spr_Clover_Walk_Right"
         );
+
+        sprite = animatedSprite;
     }
     
     public void Update(GameTime gameTime)
     {
         sprite.Update(gameTime);
         
-        Vector2 velocity = inputManager.DirectionalInput * 4;
+        Vector2 velocity = inputManager.DirectionalInput * MovementSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+        velocity *= MathF.Min(scale.X, scale.Y);
 
         Orientation? updatedOrientation = GetOrientationFromVelocity(velocity);
-        if (updatedOrientation != null) sprite.Orientation = updatedOrientation.Value;
+        if (updatedOrientation != null && sprite is OrientedAnimatedSprite animatedSprite) animatedSprite.Orientation = updatedOrientation.Value;
 
         if (previousVelocity != velocity)
         {
@@ -84,6 +101,8 @@ public class Character : IGameObject
         window.Position = position;
 
         previousVelocity = velocity;
+        
+        DragCharacter();
     }
 
     public void Draw(GameTime gameTime)
@@ -91,7 +110,6 @@ public class Character : IGameObject
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         Vector2 center = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height / 2f);
         Vector2 origin = new Vector2(sprite.CurrentFrame.Width / 2f, sprite.CurrentFrame.Height / 2f);
-        Vector2 scale = new Vector2(3, 3);
         sprite.Draw(spriteBatch, center, null, Color.White, 0, origin, scale, SpriteEffects.None, 0);
         spriteBatch.End();
     }
@@ -104,6 +122,25 @@ public class Character : IGameObject
         if (input.X > 0) return Orientation.Right;
 
         return null;
+    }
+
+    private void DragCharacter()
+    {
+        if (inputManager.LeftClickJustPressed &&
+            graphics.GraphicsDevice.Viewport.Bounds.Contains(inputManager.PointerPosition))
+        {
+            dragging = true;
+        } else if (!inputManager.LeftClickPressed)
+        {
+            dragging = false;
+        }
+
+        if (dragging)
+        {
+            Point windowCenter = window.Position -
+                                 new Point(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
+            window.Position = windowCenter + inputManager.PointerPosition;
+        }
     }
 
     private void LoadOrientedSpriteFrames(ContentManager contentManager, OrientedAnimatedSprite sprite, params string[] basePaths)
@@ -123,5 +160,14 @@ public class Character : IGameObject
         {
             sprite.Add(orientation, contentManager.Load<Texture2D>(path));
         }
+    }
+
+    private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
+    {
+        scale = new Vector2(message.ScaleFactor, message.ScaleFactor);
+        
+        graphics.PreferredBackBufferWidth = (int)(20 * message.ScaleFactor);
+        graphics.PreferredBackBufferHeight = (int)(30 * message.ScaleFactor);
+        graphics.ApplyChanges();
     }
 }

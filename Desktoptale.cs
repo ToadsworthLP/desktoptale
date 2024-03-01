@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
+using Desktoptale.Messages;
+using Messaging;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace Desktoptale
 {
-    public class Desktoptale : TransparentWindowGame
+    public class Desktoptale : Game
     {
+        private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private InputManager inputManager;
         private IList<IGameObject> gameObjects;
@@ -14,14 +17,12 @@ namespace Desktoptale
         public Desktoptale()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 60;
-            graphics.PreferredBackBufferHeight = 90;
             Window.Title = "Clover";
             
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             
-            PrepareFullScreenOverlayGame();
+            WindowsUtils.MakeWindowOverlay(Window);
         }
 
         /// <summary>
@@ -33,13 +34,20 @@ namespace Desktoptale
         protected override void Initialize()
         {
             inputManager = new InputManager(this);
-            
             spriteBatch = new SpriteBatch(GraphicsDevice);
             
             gameObjects = new List<IGameObject>();
             gameObjects.Add(new Character(graphics, Window, spriteBatch, inputManager));
+            gameObjects.Add(new ContextMenu(Window, inputManager));
             
             base.Initialize();
+            
+            foreach (var gameObject in gameObjects)
+            {
+                gameObject.Initialize();
+            }
+            
+            MessageBus.Send(new ScaleChangeRequestedMessage {ScaleFactor = 2});
         }
 
         /// <summary>
@@ -70,11 +78,15 @@ namespace Desktoptale
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            inputManager.Update();
+            
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Update(gameTime);
             }
 
+            WindowsUtils.MakeTopmostWindow(Window);
+            
             base.Update(gameTime);
         }
 
