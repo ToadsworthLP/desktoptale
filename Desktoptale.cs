@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Desktoptale.Characters;
 using Desktoptale.Messages;
 using Messaging;
 using Microsoft.Xna.Framework;
@@ -37,7 +38,7 @@ namespace Desktoptale
             spriteBatch = new SpriteBatch(GraphicsDevice);
             
             gameObjects = new List<IGameObject>();
-            gameObjects.Add(new Character(graphics, Window, spriteBatch, inputManager));
+            gameObjects.Add(new Clover(graphics, Window, spriteBatch, inputManager));
             gameObjects.Add(new ContextMenu(Window, inputManager));
             
             base.Initialize();

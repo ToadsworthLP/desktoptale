@@ -1,136 +1,127 @@
 ﻿using System;
 using Desktoptale.Messages;
+using Desktoptale.States.Common;
 using Messaging;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using SharpDX.Direct2D1.Effects;
 
 namespace Desktoptale;
 
-public class Character : IGameObject
+public abstract class Character : IGameObject
 {
-    public float MovementSpeed { get; set; }
+    public Vector2 Position;
+    public Vector2 Velocity;
+    public Vector2 Scale;
+    public float MovementSpeed = 100f;
+    
+    public InputManager InputManager { get; }
+    public StateMachine<Character> StateMachine { get; protected set; }
+    public IState<Character> IdleState { get; protected set; }
+    public IState<Character> WalkState { get; protected set; }
+    
+    public IAnimatedSprite IdleSprite { get; protected set; }
+    public IAnimatedSprite WalkSprite { get; protected set; }
+    public IAnimatedSprite CurrentSprite { get; set; }
+
+    protected virtual IState<Character> InitialState => IdleState;
     
     private GameWindow window;
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
-    private InputManager inputManager;
 
-    private IAnimatedSprite sprite;
-    private Vector2 previousVelocity = Vector2.Zero;
-    private Vector2 scale;
     private bool dragging;
 
     public Character(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager)
     {
         this.spriteBatch = spriteBatch;
-        this.inputManager = inputManager;
+        this.InputManager = inputManager;
         this.graphics = graphics;
         this.window = window;
     }
 
-    public void Initialize()
+    public void UpdateSprite(IAnimatedSprite sprite)
+    {
+        CurrentSprite?.Stop();
+        CurrentSprite = sprite;
+    }
+
+    public virtual void Initialize()
     {
         MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
+
+        IdleState = new IdleState();
+        WalkState = new WalkState();
         
-        MovementSpeed = 100;
+        StateMachine = new StateMachine<Character>(this, InitialState);
+        StateMachine.StateChanged += (state, newState) => UpdateOrientation();
+
+        Point screenSize = GetScreenSize();
+        Position = new Vector2(screenSize.X / 2.0f, screenSize.Y / 2.0f);
     }
 
-    public void LoadContent(ContentManager contentManager)
-    {
-        OrientedAnimatedSprite animatedSprite = new OrientedAnimatedSprite();
-        animatedSprite.Loop = true;
-        animatedSprite.Framerate = 5;
-        animatedSprite.Orientation = Orientation.Down;
-        
-        LoadOrientedSpriteFrames(contentManager, animatedSprite, Orientation.Up, 
-            "Characters/Clover/Spr_Clover_Idle_Up",
-            "Characters/Clover/Spr_Clover_Walk_0_Up",
-            "Characters/Clover/Spr_Clover_Idle_Up",
-            "Characters/Clover/Spr_Clover_Walk_1_Up"
-        );
-        
-        LoadOrientedSpriteFrames(contentManager, animatedSprite, Orientation.Down, 
-            "Characters/Clover/Spr_Clover_Idle_Down",
-            "Characters/Clover/Spr_Clover_Walk_0_Down",
-            "Characters/Clover/Spr_Clover_Idle_Down",
-            "Characters/Clover/Spr_Clover_Walk_1_Down"
-        );
-        
-        LoadOrientedSpriteFrames(contentManager, animatedSprite, Orientation.Left, 
-            "Characters/Clover/Spr_Clover_Idle_Left",
-            "Characters/Clover/Spr_Clover_Walk_Left"
-        );
-        
-        LoadOrientedSpriteFrames(contentManager, animatedSprite, Orientation.Right, 
-            "Characters/Clover/Spr_Clover_Idle_Right",
-            "Characters/Clover/Spr_Clover_Walk_Right"
-        );
-
-        sprite = animatedSprite;
-    }
+    public virtual void LoadContent(ContentManager contentManager) { }
     
-    public void Update(GameTime gameTime)
+    public virtual void Update(GameTime gameTime)
     {
-        sprite.Update(gameTime);
+        StateMachine.Update(gameTime);
         
-        Vector2 velocity = inputManager.DirectionalInput * MovementSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-        velocity *= MathF.Min(scale.X, scale.Y);
-
-        Orientation? updatedOrientation = GetOrientationFromVelocity(velocity);
-        if (updatedOrientation != null && sprite is OrientedAnimatedSprite animatedSprite) animatedSprite.Orientation = updatedOrientation.Value;
-
-        if (previousVelocity != velocity)
-        {
-            if (velocity.LengthSquared() > float.Epsilon)
-            {
-                sprite.Play();
-                sprite.CurrentFrameIndex = 1;
-            }
-            else
-            {
-                sprite.Stop();
-            }
-        }
+        UpdateOrientation();
         
-        Point position = window.Position;
-        position.X += (int)Math.Round(velocity.X);
-        position.Y += (int)Math.Round(velocity.Y);
-        window.Position = position;
-
-        previousVelocity = velocity;
+        Position.X += (int)Math.Round(Velocity.X);
+        Position.Y += (int)Math.Round(Velocity.Y);
         
         DragCharacter();
+        
+        PreventLeavingScreenArea();
+
+        window.Position = new Point((int)Position.X, (int)Position.Y);
+        
+        CurrentSprite.Update(gameTime);
     }
 
-    public void Draw(GameTime gameTime)
+    public virtual void Draw(GameTime gameTime)
     {
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         Vector2 center = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height / 2f);
-        Vector2 origin = new Vector2(sprite.CurrentFrame.Width / 2f, sprite.CurrentFrame.Height / 2f);
-        sprite.Draw(spriteBatch, center, null, Color.White, 0, origin, scale, SpriteEffects.None, 0);
+        Vector2 origin = new Vector2(CurrentSprite.CurrentFrame.Width / 2f, CurrentSprite.CurrentFrame.Height / 2f);
+        CurrentSprite.Draw(spriteBatch, center, null, Color.White, 0, origin, Scale, SpriteEffects.None, 0);
         spriteBatch.End();
+    }
+
+    private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
+    {
+        Scale = new Vector2(message.ScaleFactor, message.ScaleFactor);
+        
+        Point windowSize = GetWindowSize();
+        graphics.PreferredBackBufferWidth = windowSize.X;
+        graphics.PreferredBackBufferHeight = windowSize.Y;
+        graphics.ApplyChanges();
+    }
+
+    private void UpdateOrientation()
+    {
+        Orientation? updatedOrientation = GetOrientationFromVelocity(Velocity);
+        if (updatedOrientation != null && CurrentSprite is OrientedAnimatedSprite animatedSprite) animatedSprite.Orientation = updatedOrientation.Value;
     }
 
     private Orientation? GetOrientationFromVelocity(Vector2 input)
     {
-        if (input.Y < 0) return Orientation.Up;
-        if (input.Y > 0) return Orientation.Down;
-        if (input.X < 0) return Orientation.Left;
-        if (input.X > 0) return Orientation.Right;
+        if (input.Y < -float.Epsilon) return Orientation.Up;
+        if (input.Y > float.Epsilon) return Orientation.Down;
+        if (input.X < -float.Epsilon) return Orientation.Left;
+        if (input.X > float.Epsilon) return Orientation.Right;
 
         return null;
     }
 
     private void DragCharacter()
     {
-        if (inputManager.LeftClickJustPressed &&
-            graphics.GraphicsDevice.Viewport.Bounds.Contains(inputManager.PointerPosition))
+        if (InputManager.LeftClickJustPressed &&
+            graphics.GraphicsDevice.Viewport.Bounds.Contains(InputManager.PointerPosition))
         {
             dragging = true;
-        } else if (!inputManager.LeftClickPressed)
+        } else if (!InputManager.LeftClickPressed)
         {
             dragging = false;
         }
@@ -139,35 +130,29 @@ public class Character : IGameObject
         {
             Point windowCenter = window.Position -
                                  new Point(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
-            window.Position = windowCenter + inputManager.PointerPosition;
+            Position = (windowCenter + InputManager.PointerPosition).ToVector2();
         }
     }
 
-    private void LoadOrientedSpriteFrames(ContentManager contentManager, OrientedAnimatedSprite sprite, params string[] basePaths)
+    private void PreventLeavingScreenArea()
     {
-        foreach (string basePath in basePaths)
-        {
-            sprite.Add(Orientation.Down, contentManager.Load<Texture2D>($"{basePath}_Down"));
-            sprite.Add(Orientation.Up, contentManager.Load<Texture2D>($"{basePath}_Up"));
-            sprite.Add(Orientation.Left, contentManager.Load<Texture2D>($"{basePath}_Left"));
-            sprite.Add(Orientation.Right, contentManager.Load<Texture2D>($"{basePath}_Right"));
-        }
-    }
-    
-    private void LoadOrientedSpriteFrames(ContentManager contentManager, OrientedAnimatedSprite sprite, Orientation orientation, params string[] paths)
-    {
-        foreach (string path in paths)
-        {
-            sprite.Add(orientation, contentManager.Load<Texture2D>(path));
-        }
+        Point screenSize = GetScreenSize();
+        Point windowSize = GetWindowSize();
+
+        if (Position.X < -windowSize.X) Position.X = -windowSize.X;
+        if (Position.Y < -windowSize.Y) Position.Y = -windowSize.Y;
+        if (Position.X > screenSize.X) Position.X = screenSize.X;
+        if (Position.Y > screenSize.Y) Position.Y = screenSize.Y;
     }
 
-    private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
+    private Point GetScreenSize()
     {
-        scale = new Vector2(message.ScaleFactor, message.ScaleFactor);
-        
-        graphics.PreferredBackBufferWidth = (int)(20 * message.ScaleFactor);
-        graphics.PreferredBackBufferHeight = (int)(30 * message.ScaleFactor);
-        graphics.ApplyChanges();
+        return new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
+            GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
+    }
+
+    private Point GetWindowSize()
+    {
+        return new Point((int)(20 * Scale.X), (int)(30 * Scale.Y));
     }
 }

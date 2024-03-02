@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Desktoptale;
@@ -106,6 +107,25 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         float layerDepth)
     {
         SpriteForOrientation(Orientation).Draw(spriteBatch, position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
+    }
+
+    public void LoadOrientedSpriteFrames(ContentManager contentManager, Orientation orientation, params string[] paths)
+    {
+        foreach (string path in paths)
+        {
+            Add(orientation, contentManager.Load<Texture2D>(path));
+        }
+    }
+
+    public void LoadOrientedSpriteFrames(ContentManager contentManager, params string[] basePaths)
+    {
+        foreach (string basePath in basePaths)
+        {
+            Add(Orientation.Down, contentManager.Load<Texture2D>($"{basePath}_Down"));
+            Add(Orientation.Up, contentManager.Load<Texture2D>($"{basePath}_Up"));
+            Add(Orientation.Left, contentManager.Load<Texture2D>($"{basePath}_Left"));
+            Add(Orientation.Right, contentManager.Load<Texture2D>($"{basePath}_Right"));
+        }
     }
 
     private void UpdateOrientation(Orientation oldValue, Orientation newValue)
