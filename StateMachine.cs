@@ -9,6 +9,7 @@ public class StateMachine<T>
     private IState<T> currentState;
     private TimeSpan currentTime;
     private TimeSpan lastStateChangeTime;
+    private StateUpdateContext<T> lastUpdateContext;
 
     public delegate void StateChangedEventHandler(IState<T> oldState, IState<T> newState);
     public event StateChangedEventHandler StateChanged; 
@@ -31,13 +32,16 @@ public class StateMachine<T>
     public void Update(GameTime gameTime)
     {
         currentTime = gameTime.TotalGameTime;
-        currentState.Update(new StateUpdateContext<T>()
+        
+        lastUpdateContext = new StateUpdateContext<T>
         {
             Time = gameTime,
             LastStateChangeTime = lastStateChangeTime,
             StateMachine = this,
             Target = target
-        });
+        };
+        
+        currentState.Update(lastUpdateContext);
     }
 
     public void ChangeState(IState<T> newState)
@@ -61,7 +65,9 @@ public class StateMachine<T>
             Target = target
         });
 
-        StateChanged(previousState, newState);
+        StateChanged?.Invoke(previousState, newState);
+        
+        currentState.Update(lastUpdateContext);
     }
 }
 

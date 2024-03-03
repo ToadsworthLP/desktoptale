@@ -3,8 +3,6 @@ using Desktoptale.Messages;
 using Messaging;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Input;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
 namespace Desktoptale;
 
@@ -56,4 +54,5 @@ public class ContextMenu : IGameObject
 
     public void LoadContent(ContentManager contentManager) {}
     public void Draw(GameTime gameTime) {}
+    public void Dispose() {}
 }

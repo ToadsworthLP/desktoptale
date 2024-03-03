@@ -13,7 +13,9 @@ namespace Desktoptale
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private InputManager inputManager;
-        private IList<IGameObject> gameObjects;
+
+        private Character character;
+        private ISet<IGameObject> gameObjects;
         
         public Desktoptale()
         {
@@ -36,9 +38,10 @@ namespace Desktoptale
         {
             inputManager = new InputManager(this);
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            character = new Clover(graphics, Window, spriteBatch, inputManager);
             
-            gameObjects = new List<IGameObject>();
-            gameObjects.Add(new Clover(graphics, Window, spriteBatch, inputManager));
+            gameObjects = new HashSet<IGameObject>();
+            gameObjects.Add(character);
             gameObjects.Add(new ContextMenu(Window, inputManager));
             
             base.Initialize();

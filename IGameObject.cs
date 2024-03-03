@@ -1,9 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 
 namespace Desktoptale;
 
-public interface IGameObject
+public interface IGameObject : IDisposable
 {
     void Initialize();
     void LoadContent(ContentManager contentManager);

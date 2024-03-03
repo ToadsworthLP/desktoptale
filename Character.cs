@@ -13,15 +13,16 @@ public abstract class Character : IGameObject
     public Vector2 Position;
     public Vector2 Velocity;
     public Vector2 Scale;
-    public float MovementSpeed = 100f;
     
     public InputManager InputManager { get; }
     public StateMachine<Character> StateMachine { get; protected set; }
     public IState<Character> IdleState { get; protected set; }
     public IState<Character> WalkState { get; protected set; }
+    public IState<Character> RunState { get; protected set; }
     
     public IAnimatedSprite IdleSprite { get; protected set; }
     public IAnimatedSprite WalkSprite { get; protected set; }
+    public IAnimatedSprite RunSprite { get; protected set; }
     public IAnimatedSprite CurrentSprite { get; set; }
 
     protected virtual IState<Character> InitialState => IdleState;
@@ -31,6 +32,8 @@ public abstract class Character : IGameObject
     private SpriteBatch spriteBatch;
 
     private bool dragging;
+
+    private Subscription scaleChangeRequestedSubscription;
 
     public Character(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager)
     {
@@ -48,10 +51,11 @@ public abstract class Character : IGameObject
 
     public virtual void Initialize()
     {
-        MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
+        scaleChangeRequestedSubscription = MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
 
         IdleState = new IdleState();
-        WalkState = new WalkState();
+        WalkState = new WalkState(100f);
+        RunState = new RunState(200f);
         
         StateMachine = new StateMachine<Character>(this, InitialState);
         StateMachine.StateChanged += (state, newState) => UpdateOrientation();
@@ -87,6 +91,11 @@ public abstract class Character : IGameObject
         Vector2 origin = new Vector2(CurrentSprite.CurrentFrame.Width / 2f, CurrentSprite.CurrentFrame.Height / 2f);
         CurrentSprite.Draw(spriteBatch, center, null, Color.White, 0, origin, Scale, SpriteEffects.None, 0);
         spriteBatch.End();
+    }
+
+    public virtual void Dispose()
+    {
+        MessageBus.Unsubscribe(scaleChangeRequestedSubscription);
     }
 
     private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
@@ -153,6 +162,6 @@ public abstract class Character : IGameObject
 
     private Point GetWindowSize()
     {
-        return new Point((int)(20 * Scale.X), (int)(30 * Scale.Y));
+        return new Point((int)(CurrentSprite.CurrentFrame.Width * Scale.X), (int)(CurrentSprite.CurrentFrame.Height * Scale.Y));
     }
 }

@@ -11,11 +11,19 @@ public class Clover : Character
     public override void LoadContent(ContentManager contentManager)
     {
         base.LoadContent(contentManager);
+        
+        OrientedAnimatedSprite idleSprite = new OrientedAnimatedSprite();
+        idleSprite.Loop = false;
+        idleSprite.Framerate = 0;
+        idleSprite.Orientation = Orientation.Down;
+        idleSprite.LoadOrientedSpriteFrames(contentManager, "Characters/Clover/Spr_Clover_Idle");
+        IdleSprite = idleSprite;
 
         OrientedAnimatedSprite walkSprite = new OrientedAnimatedSprite();
         walkSprite.Loop = true;
         walkSprite.Framerate = 5;
         walkSprite.Orientation = Orientation.Down;
+        WalkSprite = walkSprite;
         
         walkSprite.LoadOrientedSpriteFrames(contentManager, Orientation.Up, 
             "Characters/Clover/Spr_Clover_Idle_Up",
@@ -40,14 +48,20 @@ public class Clover : Character
             "Characters/Clover/Spr_Clover_Idle_Right",
             "Characters/Clover/Spr_Clover_Walk_Right"
         );
-
-        WalkSprite = walkSprite;
         
-        OrientedAnimatedSprite idleSprite = new OrientedAnimatedSprite();
-        idleSprite.Loop = false;
-        idleSprite.Framerate = 0;
-        idleSprite.Orientation = Orientation.Down;
-        idleSprite.LoadOrientedSpriteFrames(contentManager, "Characters/Clover/Spr_Clover_Idle");
-        IdleSprite = idleSprite;
+        OrientedAnimatedSprite runSprite = new OrientedAnimatedSprite();
+        runSprite.Loop = true;
+        runSprite.Framerate = 10;
+        runSprite.Orientation = Orientation.Down;
+        RunSprite = runSprite;
+        
+        runSprite.LoadOrientedSpriteFrames(contentManager, 
+            "Characters/Clover/Spr_Clover_Run_0",
+            "Characters/Clover/Spr_Clover_Run_1",
+            "Characters/Clover/Spr_Clover_Run_2",
+            "Characters/Clover/Spr_Clover_Run_3",
+            "Characters/Clover/Spr_Clover_Run_4",
+            "Characters/Clover/Spr_Clover_Run_5"
+        );
     }
 }

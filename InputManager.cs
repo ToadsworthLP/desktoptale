@@ -16,6 +16,7 @@ public class InputManager
     public bool LeftClickJustPressed { get; private set; }
     public bool RightClickPressed { get; private set; }
     public bool RightClickJustPressed { get; private set; }
+    public bool RunButtonPressed { get; private set; }
 
     private bool previousFrameLeftClick, previousFrameRightClick;
     private Game game;
@@ -46,6 +47,8 @@ public class InputManager
 
         if(input.LengthSquared() > float.Epsilon) input.Normalize();
         DirectionalInput = input;
+
+        RunButtonPressed = keyboardState.IsKeyDown(Keys.X) || keyboardState.IsKeyDown(Keys.LeftShift);
     }
 
     private void UpdateMouseInput()

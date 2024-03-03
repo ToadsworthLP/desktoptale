@@ -2,31 +2,28 @@
 
 namespace Desktoptale.States.Common;
 
-public class WalkState : IState<Character>
+public class RunState : WalkState
 {
-    protected float Speed;
-
-    public WalkState(float speed)
+    public RunState(float speed) : base(speed)
     {
-        this.Speed = speed;
     }
 
-    public virtual void Enter(StateEnterContext<Character> context)
+    public override void Enter(StateEnterContext<Character> context)
     {
-        context.Target.UpdateSprite(context.Target.WalkSprite);
+        context.Target.UpdateSprite(context.Target.RunSprite);
         context.Target.CurrentSprite.Play();
     }
 
-    public virtual void Update(StateUpdateContext<Character> context)
+    public override void Update(StateUpdateContext<Character> context)
     {
         if (context.Target.InputManager.DirectionalInput.LengthSquared() < float.Epsilon)
         {
             context.StateMachine.ChangeState(context.Target.IdleState);
         }
         
-        if (context.Target.InputManager.RunButtonPressed)
+        if (!context.Target.InputManager.RunButtonPressed)
         {
-            context.StateMachine.ChangeState(context.Target.RunState);
+            context.StateMachine.ChangeState(context.Target.WalkState);
         }
         
         context.Target.Velocity = 
@@ -34,10 +31,5 @@ public class WalkState : IState<Character>
             Speed *
             (float)context.Time.ElapsedGameTime.TotalSeconds *
             MathF.Min(context.Target.Scale.X, context.Target.Scale.Y);
-    }
-
-    public virtual void Exit(StateExitContext<Character> context)
-    {
-        context.Target.CurrentSprite.Stop();
     }
 }
