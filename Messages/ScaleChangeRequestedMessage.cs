@@ -2,5 +2,5 @@
 
 public class ScaleChangeRequestedMessage
 {
-    public float ScaleFactor { get; set; }
+    public float ScaleFactor { get; init; }
 }

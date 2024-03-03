@@ -14,13 +14,14 @@ namespace Desktoptale
         private SpriteBatch spriteBatch;
         private InputManager inputManager;
 
+        private CharacterFactory characterFactory;
         private Character character;
         private ISet<IGameObject> gameObjects;
         
         public Desktoptale()
         {
             graphics = new GraphicsDeviceManager(this);
-            Window.Title = "Clover";
+            Window.Title = "Desktoptale";
             
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -36,22 +37,22 @@ namespace Desktoptale
         /// </summary>
         protected override void Initialize()
         {
-            inputManager = new InputManager(this);
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            character = new Clover(graphics, Window, spriteBatch, inputManager);
-            
-            gameObjects = new HashSet<IGameObject>();
-            gameObjects.Add(character);
-            gameObjects.Add(new ContextMenu(Window, inputManager));
-            
             base.Initialize();
             
-            foreach (var gameObject in gameObjects)
-            {
-                gameObject.Initialize();
-            }
+            MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
             
-            MessageBus.Send(new ScaleChangeRequestedMessage {ScaleFactor = 2});
+            inputManager = new InputManager(this);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            characterFactory = new CharacterFactory();
+            
+            gameObjects = new HashSet<IGameObject>();
+
+            ContextMenu contextMenu = new ContextMenu(Window, inputManager);
+            contextMenu.Initialize();
+            gameObjects.Add(contextMenu);
+            
+            MessageBus.Send(new CharacterChangeRequestedMessage { Character = CharacterType.Clover });
+            MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = 2 });
         }
 
         /// <summary>
@@ -60,10 +61,7 @@ namespace Desktoptale
         /// </summary>
         protected override void LoadContent()
         {
-            foreach (var gameObject in gameObjects)
-            {
-                gameObject.LoadContent(Content);
-            }
+            
         }
 
         /// <summary>
@@ -108,6 +106,32 @@ namespace Desktoptale
             }
 
             base.Draw(gameTime);
+        }
+        
+        private void OnCharacterChangeRequestedMessage(CharacterChangeRequestedMessage message)
+        {
+            Character newCharacter =
+                characterFactory.Create(message.Character, graphics, Window, spriteBatch, inputManager);
+            
+            newCharacter.LoadContent(Content);
+
+            if (character != null)
+            {
+                newCharacter.Position = character.Position;
+                newCharacter.Scale = character.Scale;
+                gameObjects.Remove(character);
+                character.Dispose();
+            }
+            else
+            {
+                Point screenSize = new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
+                    GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
+                newCharacter.Position = new Vector2(screenSize.X / 2.0f, screenSize.Y / 2.0f);
+            }
+            
+            newCharacter.Initialize();
+            gameObjects.Add(newCharacter);
+            character = newCharacter;
         }
     }
 }

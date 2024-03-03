@@ -47,6 +47,8 @@ public abstract class Character : IGameObject
     {
         CurrentSprite?.Stop();
         CurrentSprite = sprite;
+        
+        UpdateWindowSize();
     }
 
     public virtual void Initialize()
@@ -59,9 +61,6 @@ public abstract class Character : IGameObject
         
         StateMachine = new StateMachine<Character>(this, InitialState);
         StateMachine.StateChanged += (state, newState) => UpdateOrientation();
-
-        Point screenSize = GetScreenSize();
-        Position = new Vector2(screenSize.X / 2.0f, screenSize.Y / 2.0f);
     }
 
     public virtual void LoadContent(ContentManager contentManager) { }
@@ -101,11 +100,7 @@ public abstract class Character : IGameObject
     private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
     {
         Scale = new Vector2(message.ScaleFactor, message.ScaleFactor);
-        
-        Point windowSize = GetWindowSize();
-        graphics.PreferredBackBufferWidth = windowSize.X;
-        graphics.PreferredBackBufferHeight = windowSize.Y;
-        graphics.ApplyChanges();
+        UpdateWindowSize();
     }
 
     private void UpdateOrientation()
@@ -163,5 +158,13 @@ public abstract class Character : IGameObject
     private Point GetWindowSize()
     {
         return new Point((int)(CurrentSprite.CurrentFrame.Width * Scale.X), (int)(CurrentSprite.CurrentFrame.Height * Scale.Y));
+    }
+
+    private void UpdateWindowSize()
+    {
+        Point windowSize = GetWindowSize();
+        graphics.PreferredBackBufferWidth = windowSize.X;
+        graphics.PreferredBackBufferHeight = windowSize.Y;
+        graphics.ApplyChanges();
     }
 }
