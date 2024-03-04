@@ -167,9 +167,27 @@ public abstract class Character : IGameObject
 
     private void UpdateWindowSize()
     {
+        int oldWidth = graphics.PreferredBackBufferWidth;
+        int oldHeight = graphics.PreferredBackBufferHeight;
+        
         Point windowSize = GetWindowSize();
         graphics.PreferredBackBufferWidth = windowSize.X;
         graphics.PreferredBackBufferHeight = windowSize.Y;
         graphics.ApplyChanges();
+
+        if (windowSize.X != 0 && windowSize.Y != 0)
+        {
+            int newWidth = windowSize.X;
+            int newHeight = windowSize.Y;
+
+            int widthDiff = oldWidth - newWidth;
+            int heightDiff = oldHeight - newHeight;
+
+            int xShift = widthDiff / 2;
+            int yShift = heightDiff;
+
+            Position.X += xShift;
+            Position.Y += yShift;
+        }
     }
 }
