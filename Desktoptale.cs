@@ -47,7 +47,7 @@ namespace Desktoptale
             
             gameObjects = new HashSet<IGameObject>();
 
-            ContextMenu contextMenu = new ContextMenu(Window, inputManager);
+            ContextMenu contextMenu = new ContextMenu(Window, inputManager, GraphicsDevice);
             contextMenu.Initialize();
             gameObjects.Add(contextMenu);
             

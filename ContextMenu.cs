@@ -4,6 +4,7 @@ using Desktoptale.Messages;
 using Messaging;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Desktoptale;
 
@@ -11,14 +12,16 @@ public class ContextMenu : IGameObject
 {
     private GameWindow window;
     private InputManager inputManager;
+    private GraphicsDevice graphicsDevice;
     
     private int currentScaleFactor;
     private CharacterType currentCharacter;
 
-    public ContextMenu(GameWindow window, InputManager inputManager)
+    public ContextMenu(GameWindow window, InputManager inputManager, GraphicsDevice graphicsDevice)
     {
         this.window = window;
         this.inputManager = inputManager;
+        this.graphicsDevice = graphicsDevice;
     }
     
     public void Initialize()
@@ -29,7 +32,11 @@ public class ContextMenu : IGameObject
     
     public void Update(GameTime gameTime)
     {
-        if(inputManager.RightClickJustPressed) OpenContextMenu(window.Position + inputManager.PointerPosition);
+        if (inputManager.RightClickJustPressed &&
+            graphicsDevice.Viewport.Bounds.Contains(inputManager.PointerPosition))
+        {
+            OpenContextMenu(window.Position + inputManager.PointerPosition);
+        }
     }
 
     private void OpenContextMenu(Point mousePosition)

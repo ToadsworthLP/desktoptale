@@ -1,15 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Desktoptale;
 
 public class InputManager
 {
-    public InputManager(Game game)
-    {
-        this.game = game;
-    }
-
     public Vector2 DirectionalInput { get; private set; }
     public Point PointerPosition { get; private set; }
     public bool LeftClickPressed { get; private set; }
@@ -20,6 +16,11 @@ public class InputManager
 
     private bool previousFrameLeftClick, previousFrameRightClick;
     private Game game;
+    
+    public InputManager(Game game)
+    {
+        this.game = game;
+    }
 
     public void Update()
     {
@@ -29,7 +30,12 @@ public class InputManager
     
     private void UpdateKeyboardInput()
     {
-        if (!game.IsActive) DirectionalInput = Vector2.Zero;
+        if (!game.IsActive)
+        {
+            DirectionalInput = Vector2.Zero;
+            RunButtonPressed = false;
+            return;
+        }
         
         KeyboardState keyboardState = Keyboard.GetState();
 
@@ -53,6 +59,13 @@ public class InputManager
 
     private void UpdateMouseInput()
     {
+        if (!game.IsActive)
+        {
+            LeftClickPressed = false;
+            RightClickPressed = false;
+            return;
+        }
+        
         previousFrameLeftClick = LeftClickPressed;
         previousFrameRightClick = RightClickPressed;
         
