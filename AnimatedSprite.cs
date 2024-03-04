@@ -7,36 +7,25 @@ namespace Desktoptale;
 
 public class AnimatedSprite : IAnimatedSprite
 {
-    public bool Playing { get; private set; } = false;
-    public bool Loop { get; set; } = false;
+    public bool Playing { get; private set; }
+    public bool Loop { get; set; }
     public double Framerate { get; set; }
-    public Texture2D CurrentFrame => frames[CurrentFrameIndex];
     public int CurrentFrameIndex { get; set; }
+    public Point FrameSize { get; }
 
-    private IList<Texture2D> frames;
+    //private IList<Texture2D> frames;
+    private Texture2D spritesheet;
+    private int frameCount;
     private bool justStarted;
     private TimeSpan nextFrameUpdate;
 
-    public AnimatedSprite()
+    public AnimatedSprite(Texture2D spritesheet, int frameCount)
     {
-        frames = new List<Texture2D>();
-        CurrentFrameIndex = 0;
-    }
-
-    public void Add(Texture2D texture)
-    {
-        frames.Add(texture);
+        this.spritesheet = spritesheet;
+        this.frameCount = frameCount;
+        FrameSize = new Point(spritesheet.Width / frameCount, spritesheet.Height);
     }
     
-    public void Add(params Texture2D[] textures)
-    {
-        foreach (var texture in textures)
-        {
-            frames.Add(texture);
-        }
-    }
-
-
     public void Play()
     {
         Playing = true;
@@ -70,7 +59,7 @@ public class AnimatedSprite : IAnimatedSprite
             {
                 nextFrameUpdate = nextScheduledUpdate;
 
-                if (CurrentFrameIndex < frames.Count - 1)
+                if (CurrentFrameIndex < frameCount - 1)
                 {
                     CurrentFrameIndex++;
                 }
@@ -83,8 +72,7 @@ public class AnimatedSprite : IAnimatedSprite
     }
 
     public void Draw(SpriteBatch spriteBatch,
-        Vector2 position, 
-        Rectangle? sourceRectangle, 
+        Vector2 position,
         Color color, 
         float rotation, 
         Vector2 origin, 
@@ -92,6 +80,7 @@ public class AnimatedSprite : IAnimatedSprite
         SpriteEffects effects, 
         float layerDepth)
     {
-        spriteBatch.Draw(frames[CurrentFrameIndex], position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
+        Rectangle sourceRectangle = new Rectangle(CurrentFrameIndex * FrameSize.X, 0, FrameSize.X, FrameSize.Y);
+        spriteBatch.Draw(spritesheet, position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
     }
 }

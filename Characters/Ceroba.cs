@@ -12,13 +12,34 @@ public class Ceroba : Character
     
     public override void LoadContent(ContentManager contentManager)
     {
-        base.LoadContent(contentManager);
-        
-        OrientedAnimatedSprite idleSprite = new OrientedAnimatedSprite();
+        OrientedAnimatedSprite idleSprite = new OrientedAnimatedSprite(
+            contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Idle_Up"),    
+            contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Idle_Down"),    
+            contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Idle_Left"),    
+            1
+        );
         idleSprite.Loop = false;
         idleSprite.Framerate = 0;
-        idleSprite.Orientation = Orientation.Down;
-        idleSprite.LoadOrientedSpriteFrames(contentManager, "Characters/Ceroba/Spr_Ceroba_Idle");
         IdleSprite = idleSprite;
+
+        OrientedAnimatedSprite walkSprite = new OrientedAnimatedSprite(
+            contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Walk_Up"),
+            contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Walk_Down"),
+            contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Walk_Left"),
+            4
+        );
+        walkSprite.Loop = true;
+        walkSprite.Framerate = 5;
+        WalkSprite = walkSprite;
+
+        OrientedAnimatedSprite runSprite = new OrientedAnimatedSprite(
+            contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Run_Up"),    
+            contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Run_Down"),    
+            contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Run_Left"),    
+            6
+        );
+        runSprite.Loop = true;
+        runSprite.Framerate = 10;
+        RunSprite = runSprite;
     }
 }

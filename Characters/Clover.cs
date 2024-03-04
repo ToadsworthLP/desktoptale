@@ -12,56 +12,33 @@ public class Clover : Character
     {
         base.LoadContent(contentManager);
         
-        OrientedAnimatedSprite idleSprite = new OrientedAnimatedSprite();
+        OrientedAnimatedSprite idleSprite = new OrientedAnimatedSprite(
+            contentManager.Load<Texture2D>("Characters/Clover/Spr_Clover_Idle_Up"),    
+            contentManager.Load<Texture2D>("Characters/Clover/Spr_Clover_Idle_Down"),    
+            contentManager.Load<Texture2D>("Characters/Clover/Spr_Clover_Idle_Left"),    
+            1
+        );
         idleSprite.Loop = false;
         idleSprite.Framerate = 0;
-        idleSprite.Orientation = Orientation.Down;
-        idleSprite.LoadOrientedSpriteFrames(contentManager, "Characters/Clover/Spr_Clover_Idle");
         IdleSprite = idleSprite;
 
-        OrientedAnimatedSprite walkSprite = new OrientedAnimatedSprite();
+        OrientedAnimatedSprite walkSprite = new OrientedAnimatedSprite(
+            contentManager.Load<Texture2D>("Characters/Clover/Spr_Clover_Walk_Up"), 4,
+            contentManager.Load<Texture2D>("Characters/Clover/Spr_Clover_Walk_Down"), 4,
+            contentManager.Load<Texture2D>("Characters/Clover/Spr_Clover_Walk_Left"), 2
+        );
         walkSprite.Loop = true;
         walkSprite.Framerate = 5;
-        walkSprite.Orientation = Orientation.Down;
         WalkSprite = walkSprite;
-        
-        walkSprite.LoadOrientedSpriteFrames(contentManager, Orientation.Up, 
-            "Characters/Clover/Spr_Clover_Idle_Up",
-            "Characters/Clover/Spr_Clover_Walk_0_Up",
-            "Characters/Clover/Spr_Clover_Idle_Up",
-            "Characters/Clover/Spr_Clover_Walk_1_Up"
+
+        OrientedAnimatedSprite runSprite = new OrientedAnimatedSprite(
+            contentManager.Load<Texture2D>("Characters/Clover/Spr_Clover_Run_Up"),    
+            contentManager.Load<Texture2D>("Characters/Clover/Spr_Clover_Run_Down"),    
+            contentManager.Load<Texture2D>("Characters/Clover/Spr_Clover_Run_Left"),    
+            6
         );
-        
-        walkSprite.LoadOrientedSpriteFrames(contentManager, Orientation.Down, 
-            "Characters/Clover/Spr_Clover_Idle_Down",
-            "Characters/Clover/Spr_Clover_Walk_0_Down",
-            "Characters/Clover/Spr_Clover_Idle_Down",
-            "Characters/Clover/Spr_Clover_Walk_1_Down"
-        );
-        
-        walkSprite.LoadOrientedSpriteFrames(contentManager, Orientation.Left, 
-            "Characters/Clover/Spr_Clover_Idle_Left",
-            "Characters/Clover/Spr_Clover_Walk_Left"
-        );
-        
-        walkSprite.LoadOrientedSpriteFrames(contentManager, Orientation.Right, 
-            "Characters/Clover/Spr_Clover_Idle_Right",
-            "Characters/Clover/Spr_Clover_Walk_Right"
-        );
-        
-        OrientedAnimatedSprite runSprite = new OrientedAnimatedSprite();
         runSprite.Loop = true;
         runSprite.Framerate = 10;
-        runSprite.Orientation = Orientation.Down;
         RunSprite = runSprite;
-        
-        runSprite.LoadOrientedSpriteFrames(contentManager, 
-            "Characters/Clover/Spr_Clover_Run_0",
-            "Characters/Clover/Spr_Clover_Run_1",
-            "Characters/Clover/Spr_Clover_Run_2",
-            "Characters/Clover/Spr_Clover_Run_3",
-            "Characters/Clover/Spr_Clover_Run_4",
-            "Characters/Clover/Spr_Clover_Run_5"
-        );
     }
 }

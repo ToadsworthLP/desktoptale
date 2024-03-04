@@ -44,37 +44,66 @@ public class OrientedAnimatedSprite : IAnimatedSprite
             rightSprite.Framerate = value;
         }
     }
-
-    public Texture2D CurrentFrame => SpriteForOrientation(Orientation).CurrentFrame;
+    
     public int CurrentFrameIndex { 
         get => SpriteForOrientation(Orientation).CurrentFrameIndex;
         set => SpriteForOrientation(Orientation).CurrentFrameIndex = value;
     }
 
+    public Point FrameSize => SpriteForOrientation(Orientation).FrameSize;
+    
     private AnimatedSprite upSprite, downSprite, leftSprite, rightSprite;
     private Orientation _orientation;
 
-    public OrientedAnimatedSprite()
+    public OrientedAnimatedSprite(Texture2D upSpritesheet, int upFrameCount, Texture2D downSpritesheet, int downFrameCount, Texture2D leftSpritesheet, int leftFrameCount, Texture2D rightSpritesheet, int rightFrameCount)
     {
-        upSprite = new AnimatedSprite();
-        downSprite = new AnimatedSprite();
-        leftSprite = new AnimatedSprite();
-        rightSprite = new AnimatedSprite();
+        upSprite = new AnimatedSprite(upSpritesheet, upFrameCount);
+        downSprite = new AnimatedSprite(downSpritesheet, downFrameCount);
+        leftSprite = new AnimatedSprite(leftSpritesheet, leftFrameCount);
+        rightSprite = new AnimatedSprite(rightSpritesheet, rightFrameCount);
+
+        Orientation = Orientation.Down;
     }
     
-    public void Add(Orientation orientation, Texture2D texture)
+    public OrientedAnimatedSprite(Texture2D upSpritesheet, int upFrameCount, Texture2D downSpritesheet, int downFrameCount, Texture2D leftSpritesheet, int leftFrameCount)
     {
-        SpriteForOrientation(orientation).Add(texture);
+        upSprite = new AnimatedSprite(upSpritesheet, upFrameCount);
+        downSprite = new AnimatedSprite(downSpritesheet, downFrameCount);
+        leftSprite = new AnimatedSprite(leftSpritesheet, leftFrameCount);
+        rightSprite = new AnimatedSprite(leftSpritesheet, leftFrameCount);
+
+        Orientation = Orientation.Down;
     }
     
-    public void Add(Orientation orientation, params Texture2D[] textures)
+    public OrientedAnimatedSprite(Texture2D upSpritesheet, Texture2D downSpritesheet, Texture2D leftSpritesheet, Texture2D rightSpritesheet, int frameCount)
     {
-        foreach (var texture in textures)
-        {
-            SpriteForOrientation(orientation).Add(texture);
-        }
+        upSprite = new AnimatedSprite(upSpritesheet, frameCount);
+        downSprite = new AnimatedSprite(downSpritesheet, frameCount);
+        leftSprite = new AnimatedSprite(leftSpritesheet, frameCount);
+        rightSprite = new AnimatedSprite(rightSpritesheet, frameCount);
+        
+        Orientation = Orientation.Down;
+    }
+    
+    public OrientedAnimatedSprite(Texture2D upSpritesheet, Texture2D downSpritesheet, Texture2D leftSpritesheet, int frameCount)
+    {
+        upSprite = new AnimatedSprite(upSpritesheet, frameCount);
+        downSprite = new AnimatedSprite(downSpritesheet, frameCount);
+        leftSprite = new AnimatedSprite(leftSpritesheet, frameCount);
+        rightSprite = new AnimatedSprite(leftSpritesheet, frameCount);
+        
+        Orientation = Orientation.Down;
     }
 
+    public OrientedAnimatedSprite(AnimatedSprite upSprite, AnimatedSprite downSprite, AnimatedSprite leftSprite, AnimatedSprite rightSprite)
+    {
+        this.upSprite = upSprite;
+        this.downSprite = downSprite;
+        this.leftSprite = leftSprite;
+        this.rightSprite = rightSprite;
+        
+        Orientation = Orientation.Down;
+    }
 
     public void Play()
     {
@@ -95,10 +124,9 @@ public class OrientedAnimatedSprite : IAnimatedSprite
     {
         SpriteForOrientation(Orientation).Update(gameTime);
     }
-
+    
     public void Draw(SpriteBatch spriteBatch,
-        Vector2 position, 
-        Rectangle? sourceRectangle, 
+        Vector2 position,
         Color color, 
         float rotation, 
         Vector2 origin, 
@@ -106,26 +134,8 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         SpriteEffects effects, 
         float layerDepth)
     {
-        SpriteForOrientation(Orientation).Draw(spriteBatch, position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
-    }
-
-    public void LoadOrientedSpriteFrames(ContentManager contentManager, Orientation orientation, params string[] paths)
-    {
-        foreach (string path in paths)
-        {
-            Add(orientation, contentManager.Load<Texture2D>(path));
-        }
-    }
-
-    public void LoadOrientedSpriteFrames(ContentManager contentManager, params string[] basePaths)
-    {
-        foreach (string basePath in basePaths)
-        {
-            Add(Orientation.Down, contentManager.Load<Texture2D>($"{basePath}_Down"));
-            Add(Orientation.Up, contentManager.Load<Texture2D>($"{basePath}_Up"));
-            Add(Orientation.Left, contentManager.Load<Texture2D>($"{basePath}_Left"));
-            Add(Orientation.Right, contentManager.Load<Texture2D>($"{basePath}_Right"));
-        }
+        if (_orientation == Orientation.Right) effects |= SpriteEffects.FlipHorizontally;
+        SpriteForOrientation(Orientation).Draw(spriteBatch, position, color, rotation, origin, scale, effects, layerDepth);
     }
 
     private void UpdateOrientation(Orientation oldValue, Orientation newValue)

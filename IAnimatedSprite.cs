@@ -9,8 +9,8 @@ public interface IAnimatedSprite
     public bool Playing { get;}
     public bool Loop { get; set; }
     public double Framerate { get; set; }
-    public Texture2D CurrentFrame { get; }
     public int CurrentFrameIndex { get; set; }
+    public Point FrameSize { get; }
 
     public void Play();
     public void Pause();
@@ -18,7 +18,6 @@ public interface IAnimatedSprite
     public void Update(GameTime gameTime);
     public void Draw(SpriteBatch spriteBatch,
         Vector2 position,
-        Rectangle? sourceRectangle,
         Color color,
         float rotation,
         Vector2 origin,

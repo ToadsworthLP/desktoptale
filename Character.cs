@@ -32,7 +32,8 @@ public abstract class Character : IGameObject
     private SpriteBatch spriteBatch;
 
     private bool dragging;
-
+    private Point previousSpriteFrameSize;
+    
     private Subscription scaleChangeRequestedSubscription;
 
     public Character(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager)
@@ -48,7 +49,10 @@ public abstract class Character : IGameObject
         CurrentSprite?.Stop();
         CurrentSprite = sprite;
         
-        UpdateWindowSize();
+        if(previousSpriteFrameSize != sprite.FrameSize)
+            UpdateWindowSize();
+
+        previousSpriteFrameSize = sprite.FrameSize;
     }
 
     public virtual void Initialize()
@@ -56,8 +60,8 @@ public abstract class Character : IGameObject
         scaleChangeRequestedSubscription = MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
 
         IdleState = new IdleState();
-        WalkState = new WalkState(100f);
-        RunState = new RunState(200f);
+        WalkState = new WalkState(90f);
+        RunState = new RunState(180f);
         
         StateMachine = new StateMachine<Character>(this, InitialState);
         StateMachine.StateChanged += (state, newState) => UpdateOrientation();
@@ -87,8 +91,8 @@ public abstract class Character : IGameObject
     {
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         Vector2 center = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height / 2f);
-        Vector2 origin = new Vector2(CurrentSprite.CurrentFrame.Width / 2f, CurrentSprite.CurrentFrame.Height / 2f);
-        CurrentSprite.Draw(spriteBatch, center, null, Color.White, 0, origin, Scale, SpriteEffects.None, 0);
+        Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2f, CurrentSprite.FrameSize.Y / 2f);
+        CurrentSprite.Draw(spriteBatch, center, Color.White, 0, origin, Scale, SpriteEffects.None, 0);
         spriteBatch.End();
     }
 
@@ -106,7 +110,8 @@ public abstract class Character : IGameObject
     private void UpdateOrientation()
     {
         Orientation? updatedOrientation = GetOrientationFromVelocity(Velocity);
-        if (updatedOrientation != null && CurrentSprite is OrientedAnimatedSprite animatedSprite) animatedSprite.Orientation = updatedOrientation.Value;
+        if (updatedOrientation != null && CurrentSprite is OrientedAnimatedSprite animatedSprite)
+            animatedSprite.Orientation = updatedOrientation.Value;
     }
 
     private Orientation? GetOrientationFromVelocity(Vector2 input)
@@ -157,7 +162,7 @@ public abstract class Character : IGameObject
 
     private Point GetWindowSize()
     {
-        return new Point((int)(CurrentSprite.CurrentFrame.Width * Scale.X), (int)(CurrentSprite.CurrentFrame.Height * Scale.Y));
+        return new Point((int)(CurrentSprite.FrameSize.X * Scale.X), (int)(CurrentSprite.FrameSize.Y * Scale.Y));
     }
 
     private void UpdateWindowSize()
