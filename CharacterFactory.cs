@@ -19,6 +19,9 @@ public class CharacterFactory
             case CharacterType.Ceroba:
                 character = new Ceroba(graphics, window, spriteBatch, inputManager);
                 break;
+            case CharacterType.Martlet:
+                character = new Martlet(graphics, window, spriteBatch, inputManager);
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
@@ -27,4 +30,4 @@ public class CharacterFactory
     }
 }
 
-public enum CharacterType { Clover, Ceroba }
+public enum CharacterType { Clover, Ceroba, Martlet }

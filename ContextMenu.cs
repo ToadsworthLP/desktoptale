@@ -52,6 +52,7 @@ public class ContextMenu : IGameObject
         
         characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Clover, "Clover"));
         characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Ceroba, "Ceroba"));
+        characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Martlet, "Martlet"));
         
         contextMenuStrip.Show(mousePosition.X, mousePosition.Y);
     }
