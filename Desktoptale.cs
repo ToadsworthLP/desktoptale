@@ -21,7 +21,7 @@ namespace Desktoptale
         public Desktoptale()
         {
             graphics = new GraphicsDeviceManager(this);
-            Window.Title = "Desktoptale";
+            Window.Title = ProgramInfo.NAME;
             
             Content.RootDirectory = "Content";
             IsMouseVisible = true;

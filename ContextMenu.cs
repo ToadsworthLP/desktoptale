@@ -42,7 +42,7 @@ public class ContextMenu : IGameObject
     private void OpenContextMenu(Point mousePosition)
     {
         ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
-            
+        
         ToolStripMenuItem scaleItem = new ToolStripMenuItem("Scale");
         contextMenuStrip.Items.Add(scaleItem);
 
@@ -60,6 +60,9 @@ public class ContextMenu : IGameObject
         characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Clover, "Clover"));
         characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Ceroba, "Ceroba"));
         characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Martlet, "Martlet"));
+        
+        ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (_, _) => ShowInfoScreen());
+        contextMenuStrip.Items.Add(infoItem);
         
         contextMenuStrip.Show(mousePosition.X, mousePosition.Y);
     }
@@ -79,6 +82,11 @@ public class ContextMenu : IGameObject
     private void OnCharacterChangeRequestedMessage(CharacterChangeRequestedMessage message)
     {
         currentCharacter = message.Character;
+    }
+
+    private void ShowInfoScreen()
+    {
+        MessageBox.Show($"{ProgramInfo.NAME} {ProgramInfo.VERSION}\nCreated by {ProgramInfo.AUTHOR}\n\n{ProgramInfo.DESCRIPTION}", "About");
     }
 
     public void LoadContent(ContentManager contentManager) {}
