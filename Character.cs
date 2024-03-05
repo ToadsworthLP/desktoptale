@@ -65,6 +65,8 @@ public abstract class Character : IGameObject
         
         StateMachine = new StateMachine<Character>(this, InitialState);
         StateMachine.StateChanged += (state, newState) => UpdateOrientation();
+        
+        InputManager.GrabFocus();
     }
 
     public virtual void LoadContent(ContentManager contentManager) { }
@@ -105,6 +107,7 @@ public abstract class Character : IGameObject
     {
         Scale = new Vector2(message.ScaleFactor, message.ScaleFactor);
         UpdateWindowSize();
+        InputManager.GrabFocus();
     }
 
     private void UpdateOrientation()

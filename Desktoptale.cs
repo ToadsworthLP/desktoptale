@@ -41,7 +41,7 @@ namespace Desktoptale
             
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
             
-            inputManager = new InputManager(this);
+            inputManager = new InputManager(this, GraphicsDevice);
             spriteBatch = new SpriteBatch(GraphicsDevice);
             characterFactory = new CharacterFactory();
             

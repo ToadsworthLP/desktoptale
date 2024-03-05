@@ -16,10 +16,14 @@ public class InputManager
 
     private bool previousFrameLeftClick, previousFrameRightClick;
     private Game game;
+    private GraphicsDevice graphics;
+
+    private bool focused = true;
     
-    public InputManager(Game game)
+    public InputManager(Game game, GraphicsDevice graphics)
     {
         this.game = game;
+        this.graphics = graphics;
     }
 
     public void Update()
@@ -27,10 +31,15 @@ public class InputManager
         UpdateKeyboardInput();
         UpdateMouseInput();
     }
+
+    public void GrabFocus()
+    {
+        focused = true;
+    }
     
     private void UpdateKeyboardInput()
     {
-        if (!game.IsActive)
+        if (!game.IsActive || !focused)
         {
             DirectionalInput = Vector2.Zero;
             RunButtonPressed = false;
@@ -78,5 +87,10 @@ public class InputManager
         if (RightClickPressed) RightClickJustPressed = !previousFrameRightClick;
 
         PointerPosition = mouseState.Position;
+
+        if (LeftClickJustPressed || RightClickJustPressed)
+        {
+            focused = graphics.Viewport.Bounds.Contains(PointerPosition);
+        }
     }
 }
