@@ -30,6 +30,7 @@ public class Ceroba : Character
         );
         walkSprite.Loop = true;
         walkSprite.Framerate = 5;
+        walkSprite.StartFrame = 1;
         WalkSprite = walkSprite;
 
         OrientedAnimatedSprite runSprite = new OrientedAnimatedSprite(
@@ -40,6 +41,7 @@ public class Ceroba : Character
         );
         runSprite.Loop = true;
         runSprite.Framerate = 10;
+        runSprite.StartFrame = 1;
         RunSprite = runSprite;
     }
 }

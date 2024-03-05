@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -10,14 +9,25 @@ public class AnimatedSprite : IAnimatedSprite
     public bool Playing { get; private set; }
     public bool Loop { get; set; }
     public double Framerate { get; set; }
+
+    public int StartFrame
+    {
+        get => startFrame;
+        set
+        {
+            startFrame = value;
+            if (!Playing && CurrentFrameIndex == 0) CurrentFrameIndex = value;
+        }
+    }
+
     public int CurrentFrameIndex { get; set; }
     public Point FrameSize { get; }
 
-    //private IList<Texture2D> frames;
     private Texture2D spritesheet;
     private int frameCount;
     private bool justStarted;
     private TimeSpan nextFrameUpdate;
+    private int startFrame;
 
     public AnimatedSprite(Texture2D spritesheet, int frameCount)
     {
@@ -40,7 +50,7 @@ public class AnimatedSprite : IAnimatedSprite
     public void Stop()
     {
         Playing = false;
-        CurrentFrameIndex = 0;
+        CurrentFrameIndex = StartFrame;
     }
 
     public void Update(GameTime gameTime)

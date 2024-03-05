@@ -25,6 +25,9 @@ public class CharacterFactory
             case CharacterType.Axis:
                 character = new Axis(graphics, window, spriteBatch, inputManager);
                 break;
+            case CharacterType.Starlo:
+                character = new Starlo(graphics, window, spriteBatch, inputManager);
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
@@ -33,4 +36,4 @@ public class CharacterFactory
     }
 }
 
-public enum CharacterType { Clover, Ceroba, Martlet, Axis }
+public enum CharacterType { Clover, Ceroba, Martlet, Axis, Starlo }

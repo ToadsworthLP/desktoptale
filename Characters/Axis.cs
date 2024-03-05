@@ -15,7 +15,7 @@ public class Axis : Character
         OrientedAnimatedSprite idleSprite = new OrientedAnimatedSprite(
             contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Up"),    
             contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Down"),    
-            contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Left"),    
+            contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Left"),
             7
         );
         idleSprite.Loop = true;
@@ -25,7 +25,7 @@ public class Axis : Character
         OrientedAnimatedSprite walkSprite = new OrientedAnimatedSprite(
             contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Up"),    
             contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Down"),    
-            contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Left"),    
+            contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Left"),
             7
         );
         walkSprite.Loop = true;
@@ -35,7 +35,7 @@ public class Axis : Character
         OrientedAnimatedSprite runSprite = new OrientedAnimatedSprite(
             contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Up"),    
             contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Down"),    
-            contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Left"),    
+            contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Left"),
             7
         );
         runSprite.Loop = true;

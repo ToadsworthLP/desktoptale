@@ -61,6 +61,7 @@ public class ContextMenu : IGameObject
         characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Ceroba, "Ceroba"));
         characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Martlet, "Martlet"));
         characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Axis, "Axis"));
+        characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Starlo, "Starlo"));
         
         ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (_, _) => ShowInfoScreen());
         contextMenuStrip.Items.Add(infoItem);

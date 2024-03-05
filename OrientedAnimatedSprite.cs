@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Desktoptale;
@@ -45,6 +44,16 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         }
     }
     
+    public int StartFrame {         
+        get => SpriteForOrientation(Orientation).StartFrame;
+        set
+        {
+            upSprite.StartFrame = value;
+            downSprite.StartFrame = value;
+            leftSprite.StartFrame = value;
+            rightSprite.StartFrame = value;
+        } }
+    
     public int CurrentFrameIndex { 
         get => SpriteForOrientation(Orientation).CurrentFrameIndex;
         set => SpriteForOrientation(Orientation).CurrentFrameIndex = value;
@@ -54,6 +63,7 @@ public class OrientedAnimatedSprite : IAnimatedSprite
     
     private AnimatedSprite upSprite, downSprite, leftSprite, rightSprite;
     private Orientation _orientation;
+    private bool flipRightSprite = false;
 
     public OrientedAnimatedSprite(Texture2D upSpritesheet, int upFrameCount, Texture2D downSpritesheet, int downFrameCount, Texture2D leftSpritesheet, int leftFrameCount, Texture2D rightSpritesheet, int rightFrameCount)
     {
@@ -73,6 +83,7 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         rightSprite = new AnimatedSprite(leftSpritesheet, leftFrameCount);
 
         Orientation = Orientation.Down;
+        flipRightSprite = true;
     }
     
     public OrientedAnimatedSprite(Texture2D upSpritesheet, Texture2D downSpritesheet, Texture2D leftSpritesheet, Texture2D rightSpritesheet, int frameCount)
@@ -93,6 +104,7 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         rightSprite = new AnimatedSprite(leftSpritesheet, frameCount);
         
         Orientation = Orientation.Down;
+        flipRightSprite = true;
     }
 
     public OrientedAnimatedSprite(AnimatedSprite upSprite, AnimatedSprite downSprite, AnimatedSprite leftSprite, AnimatedSprite rightSprite)
@@ -134,7 +146,7 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         SpriteEffects effects, 
         float layerDepth)
     {
-        if (_orientation == Orientation.Right) effects |= SpriteEffects.FlipHorizontally;
+        if (flipRightSprite && _orientation == Orientation.Right) effects |= SpriteEffects.FlipHorizontally;
         SpriteForOrientation(Orientation).Draw(spriteBatch, position, color, rotation, origin, scale, effects, layerDepth);
     }
 

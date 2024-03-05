@@ -9,6 +9,7 @@ public interface IAnimatedSprite
     public bool Playing { get;}
     public bool Loop { get; set; }
     public double Framerate { get; set; }
+    public int StartFrame { get; set; }
     public int CurrentFrameIndex { get; set; }
     public Point FrameSize { get; }
 
