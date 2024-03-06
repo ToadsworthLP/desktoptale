@@ -32,6 +32,12 @@ namespace Desktoptale.States.Common
                 return;
             }
         
+            if (context.Target.IsBeingDragged)
+            {
+                context.StateMachine.ChangeState(context.Target.IdleState);
+                return;
+            }
+            
             if (context.StateTime > duration)
             {
                 context.StateMachine.ChangeState(context.Target.RandomMovementState);

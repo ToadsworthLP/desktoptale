@@ -44,6 +44,12 @@ namespace Desktoptale.States.Common
                 context.StateMachine.ChangeState(context.Target.WalkState);
                 return;
             }
+            
+            if (context.Target.IsBeingDragged)
+            {
+                context.StateMachine.ChangeState(context.Target.IdleState);
+                return;
+            }
         
             if (context.StateTime > duration)
             {

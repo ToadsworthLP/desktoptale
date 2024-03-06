@@ -26,6 +26,7 @@ namespace Desktoptale
         public IAnimatedSprite WalkSprite { get; protected set; }
         public IAnimatedSprite RunSprite { get; protected set; }
         public IAnimatedSprite CurrentSprite { get; set; }
+        public bool IsBeingDragged => dragging;
 
         protected virtual IState<Character> InitialState => IdleState;
     
