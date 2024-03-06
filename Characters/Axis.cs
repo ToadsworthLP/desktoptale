@@ -2,15 +2,15 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Desktoptale.Characters;
-
-public class Axis : Character
+namespace Desktoptale.Characters
 {
-    public Axis(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager) : base(graphics, window, spriteBatch, inputManager)
+    public class Axis : Character
+    {
+        public Axis(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager) : base(graphics, window, spriteBatch, inputManager)
     {
     }
 
-    public override void LoadContent(ContentManager contentManager)
+        public override void LoadContent(ContentManager contentManager)
     {
         OrientedAnimatedSprite idleSprite = new OrientedAnimatedSprite(
             contentManager.Load<Texture2D>("Characters/Axis/Spr_Axis_Idle_Up"),    
@@ -41,5 +41,6 @@ public class Axis : Character
         runSprite.Loop = true;
         runSprite.Framerate = 10;
         RunSprite = runSprite;
+    }
     }
 }

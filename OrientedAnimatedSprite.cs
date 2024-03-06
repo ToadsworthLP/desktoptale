@@ -2,70 +2,70 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Desktoptale;
-
-public class OrientedAnimatedSprite : IAnimatedSprite
+namespace Desktoptale
 {
-    public Orientation Orientation
+    public class OrientedAnimatedSprite : IAnimatedSprite
     {
-        get => _orientation;
-        set
+        public Orientation Orientation
+        {
+            get => _orientation;
+            set
         {
             if(_orientation == value) return;
             
             UpdateOrientation(_orientation, value);
             _orientation = value;
         }
-    }
+        }
 
-    public bool KeepProgressOnDirectionChange { get; set; } = false;
+        public bool KeepProgressOnDirectionChange { get; set; } = false;
 
-    public bool Playing => SpriteForOrientation(Orientation).Playing;
-    public bool Loop
-    {
-        get => SpriteForOrientation(Orientation).Loop;
-        set
+        public bool Playing => SpriteForOrientation(Orientation).Playing;
+        public bool Loop
+        {
+            get => SpriteForOrientation(Orientation).Loop;
+            set
         {
             upSprite.Loop = value;
             downSprite.Loop = value;
             leftSprite.Loop = value;
             rightSprite.Loop = value;
         }
-    }
-    public double Framerate
-    {
-        get => SpriteForOrientation(Orientation).Framerate;
-        set
+        }
+        public double Framerate
+        {
+            get => SpriteForOrientation(Orientation).Framerate;
+            set
         {
             upSprite.Framerate = value;
             downSprite.Framerate = value;
             leftSprite.Framerate = value;
             rightSprite.Framerate = value;
         }
-    }
+        }
     
-    public int StartFrame {         
-        get => SpriteForOrientation(Orientation).StartFrame;
-        set
+        public int StartFrame {         
+            get => SpriteForOrientation(Orientation).StartFrame;
+            set
         {
             upSprite.StartFrame = value;
             downSprite.StartFrame = value;
             leftSprite.StartFrame = value;
             rightSprite.StartFrame = value;
-        } }
+        }        }
     
-    public int CurrentFrameIndex { 
-        get => SpriteForOrientation(Orientation).CurrentFrameIndex;
-        set => SpriteForOrientation(Orientation).CurrentFrameIndex = value;
-    }
+        public int CurrentFrameIndex { 
+            get => SpriteForOrientation(Orientation).CurrentFrameIndex;
+            set => SpriteForOrientation(Orientation).CurrentFrameIndex = value;
+        }
 
-    public Point FrameSize => SpriteForOrientation(Orientation).FrameSize;
+        public Point FrameSize => SpriteForOrientation(Orientation).FrameSize;
     
-    private AnimatedSprite upSprite, downSprite, leftSprite, rightSprite;
-    private Orientation _orientation;
-    private bool flipRightSprite = false;
+        private AnimatedSprite upSprite, downSprite, leftSprite, rightSprite;
+        private Orientation _orientation;
+        private bool flipRightSprite = false;
 
-    public OrientedAnimatedSprite(Texture2D upSpritesheet, int upFrameCount, Texture2D downSpritesheet, int downFrameCount, Texture2D leftSpritesheet, int leftFrameCount, Texture2D rightSpritesheet, int rightFrameCount)
+        public OrientedAnimatedSprite(Texture2D upSpritesheet, int upFrameCount, Texture2D downSpritesheet, int downFrameCount, Texture2D leftSpritesheet, int leftFrameCount, Texture2D rightSpritesheet, int rightFrameCount)
     {
         upSprite = new AnimatedSprite(upSpritesheet, upFrameCount);
         downSprite = new AnimatedSprite(downSpritesheet, downFrameCount);
@@ -75,7 +75,7 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         Orientation = Orientation.Down;
     }
     
-    public OrientedAnimatedSprite(Texture2D upSpritesheet, int upFrameCount, Texture2D downSpritesheet, int downFrameCount, Texture2D leftSpritesheet, int leftFrameCount)
+        public OrientedAnimatedSprite(Texture2D upSpritesheet, int upFrameCount, Texture2D downSpritesheet, int downFrameCount, Texture2D leftSpritesheet, int leftFrameCount)
     {
         upSprite = new AnimatedSprite(upSpritesheet, upFrameCount);
         downSprite = new AnimatedSprite(downSpritesheet, downFrameCount);
@@ -86,7 +86,7 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         flipRightSprite = true;
     }
     
-    public OrientedAnimatedSprite(Texture2D upSpritesheet, Texture2D downSpritesheet, Texture2D leftSpritesheet, Texture2D rightSpritesheet, int frameCount)
+        public OrientedAnimatedSprite(Texture2D upSpritesheet, Texture2D downSpritesheet, Texture2D leftSpritesheet, Texture2D rightSpritesheet, int frameCount)
     {
         upSprite = new AnimatedSprite(upSpritesheet, frameCount);
         downSprite = new AnimatedSprite(downSpritesheet, frameCount);
@@ -96,7 +96,7 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         Orientation = Orientation.Down;
     }
     
-    public OrientedAnimatedSprite(Texture2D upSpritesheet, Texture2D downSpritesheet, Texture2D leftSpritesheet, int frameCount)
+        public OrientedAnimatedSprite(Texture2D upSpritesheet, Texture2D downSpritesheet, Texture2D leftSpritesheet, int frameCount)
     {
         upSprite = new AnimatedSprite(upSpritesheet, frameCount);
         downSprite = new AnimatedSprite(downSpritesheet, frameCount);
@@ -107,7 +107,7 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         flipRightSprite = true;
     }
 
-    public OrientedAnimatedSprite(AnimatedSprite upSprite, AnimatedSprite downSprite, AnimatedSprite leftSprite, AnimatedSprite rightSprite)
+        public OrientedAnimatedSprite(AnimatedSprite upSprite, AnimatedSprite downSprite, AnimatedSprite leftSprite, AnimatedSprite rightSprite)
     {
         this.upSprite = upSprite;
         this.downSprite = downSprite;
@@ -117,40 +117,40 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         Orientation = Orientation.Down;
     }
 
-    public void Play()
+        public void Play()
     {
         SpriteForOrientation(Orientation).Play();
     }
 
-    public void Pause()
+        public void Pause()
     {
         SpriteForOrientation(Orientation).Pause();
     }
 
-    public void Stop()
+        public void Stop()
     {
         SpriteForOrientation(Orientation).Stop();
     }
 
-    public void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
     {
         SpriteForOrientation(Orientation).Update(gameTime);
     }
     
-    public void Draw(SpriteBatch spriteBatch,
-        Vector2 position,
-        Color color, 
-        float rotation, 
-        Vector2 origin, 
-        Vector2 scale, 
-        SpriteEffects effects, 
-        float layerDepth)
+        public void Draw(SpriteBatch spriteBatch,
+            Vector2 position,
+            Color color, 
+            float rotation, 
+            Vector2 origin, 
+            Vector2 scale, 
+            SpriteEffects effects, 
+            float layerDepth)
     {
         if (flipRightSprite && _orientation == Orientation.Right) effects |= SpriteEffects.FlipHorizontally;
         SpriteForOrientation(Orientation).Draw(spriteBatch, position, color, rotation, origin, scale, effects, layerDepth);
     }
 
-    private void UpdateOrientation(Orientation oldValue, Orientation newValue)
+        private void UpdateOrientation(Orientation oldValue, Orientation newValue)
     {
         AnimatedSprite oldSprite = SpriteForOrientation(oldValue);
         AnimatedSprite newSprite = SpriteForOrientation(newValue);
@@ -164,7 +164,7 @@ public class OrientedAnimatedSprite : IAnimatedSprite
         }
     }
     
-    private AnimatedSprite SpriteForOrientation(Orientation orientation)
+        private AnimatedSprite SpriteForOrientation(Orientation orientation)
     {
         switch (orientation)
         {
@@ -183,5 +183,6 @@ public class OrientedAnimatedSprite : IAnimatedSprite
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
     }
 }

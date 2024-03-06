@@ -3,11 +3,11 @@ using Desktoptale.Characters;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Desktoptale;
-
-public class CharacterFactory
+namespace Desktoptale
 {
-    public Character Create(CharacterType type, GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager)
+    public class CharacterFactory
+    {
+        public Character Create(CharacterType type, GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager)
     {
         Character character;
 
@@ -34,6 +34,7 @@ public class CharacterFactory
         
         return character;
     }
-}
+    }
 
-public enum CharacterType { Clover, Ceroba, Martlet, Axis, Starlo }
+    public enum CharacterType { Clover, Ceroba, Martlet, Axis, Starlo }
+}

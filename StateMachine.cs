@@ -1,20 +1,20 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace Desktoptale;
-
-public class StateMachine<T>
+namespace Desktoptale
 {
-    private T target;
-    private IState<T> currentState;
-    private TimeSpan currentTime;
-    private TimeSpan lastStateChangeTime;
-    private StateUpdateContext<T> lastUpdateContext;
+    public class StateMachine<T>
+    {
+        private T target;
+        private IState<T> currentState;
+        private TimeSpan currentTime;
+        private TimeSpan lastStateChangeTime;
+        private StateUpdateContext<T> lastUpdateContext;
 
-    public delegate void StateChangedEventHandler(IState<T> oldState, IState<T> newState);
-    public event StateChangedEventHandler StateChanged; 
+        public delegate void StateChangedEventHandler(IState<T> oldState, IState<T> newState);
+        public event StateChangedEventHandler StateChanged; 
 
-    public StateMachine(T target, IState<T> initialState)
+        public StateMachine(T target, IState<T> initialState)
     {
         this.target = target;
         
@@ -29,7 +29,7 @@ public class StateMachine<T>
         });
     }
     
-    public void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
     {
         currentTime = gameTime.TotalGameTime;
         
@@ -44,7 +44,7 @@ public class StateMachine<T>
         currentState.Update(lastUpdateContext);
     }
 
-    public void ChangeState(IState<T> newState)
+        public void ChangeState(IState<T> newState)
     {
         IState<T> previousState = currentState;
         
@@ -67,29 +67,36 @@ public class StateMachine<T>
 
         StateChanged?.Invoke(previousState, newState);
         
-        currentState.Update(lastUpdateContext with { LastStateChangeTime = lastStateChangeTime });
+        currentState.Update(new StateUpdateContext<T>
+        {
+            Time = lastUpdateContext.Time,
+            LastStateChangeTime = lastStateChangeTime,
+            StateMachine = lastUpdateContext.StateMachine,
+            Target = lastUpdateContext.Target
+        });
     }
-}
+    }
 
-public readonly struct StateUpdateContext<T>
-{
-    public GameTime Time { get; init; }
-    public TimeSpan LastStateChangeTime { get; init; }
-    public TimeSpan StateTime => Time.TotalGameTime - LastStateChangeTime;
-    public StateMachine<T> StateMachine { get; init; }
-    public T Target { get; init; }
-}
+    public struct StateUpdateContext<T>
+    {
+        public GameTime Time { get; set; }
+        public TimeSpan LastStateChangeTime { get; set; }
+        public TimeSpan StateTime => Time.TotalGameTime - LastStateChangeTime;
+        public StateMachine<T> StateMachine { get; set; }
+        public T Target { get; set; }
+    }
 
-public readonly struct StateEnterContext<T>
-{
-    public IState<T> PreviousState { get; init; }
-    public StateMachine<T> StateMachine { get; init; }
-    public T Target { get; init; }
-}
+    public struct StateEnterContext<T>
+    {
+        public IState<T> PreviousState { get; set; }
+        public StateMachine<T> StateMachine { get; set; }
+        public T Target { get; set; }
+    }
 
-public readonly struct StateExitContext<T>
-{
-    public IState<T> NextState { get; init; }
-    public StateMachine<T> StateMachine { get; init; }
-    public T Target { get; init; }
+    public struct StateExitContext<T>
+    {
+        public IState<T> NextState { get; set; }
+        public StateMachine<T> StateMachine { get; set; }
+        public T Target { get; set; }
+    }
 }

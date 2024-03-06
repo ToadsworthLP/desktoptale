@@ -1,6 +1,7 @@
-﻿namespace Desktoptale.Messages;
-
-public class ScaleChangeRequestedMessage
+﻿namespace Desktoptale.Messages
 {
-    public float ScaleFactor { get; init; }
+    public class ScaleChangeRequestedMessage
+    {
+        public float ScaleFactor { get; set; }
+    }
 }

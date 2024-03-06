@@ -1,8 +1,9 @@
 ﻿using System;
 
-namespace Desktoptale.Messages;
-
-public class CharacterChangeRequestedMessage
+namespace Desktoptale.Messages
 {
-    public CharacterType Character { get; init; }
+    public class CharacterChangeRequestedMessage
+    {
+        public CharacterType Character { get; set; }
+    }
 }

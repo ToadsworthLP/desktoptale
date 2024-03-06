@@ -2,42 +2,42 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace Desktoptale;
-
-public class InputManager
+namespace Desktoptale
 {
-    public Vector2 DirectionalInput { get; private set; }
-    public Point PointerPosition { get; private set; }
-    public bool LeftClickPressed { get; private set; }
-    public bool LeftClickJustPressed { get; private set; }
-    public bool RightClickPressed { get; private set; }
-    public bool RightClickJustPressed { get; private set; }
-    public bool RunButtonPressed { get; private set; }
+    public class InputManager
+    {
+        public Vector2 DirectionalInput { get; private set; }
+        public Point PointerPosition { get; private set; }
+        public bool LeftClickPressed { get; private set; }
+        public bool LeftClickJustPressed { get; private set; }
+        public bool RightClickPressed { get; private set; }
+        public bool RightClickJustPressed { get; private set; }
+        public bool RunButtonPressed { get; private set; }
 
-    private bool previousFrameLeftClick, previousFrameRightClick;
-    private Game game;
-    private GraphicsDevice graphics;
+        private bool previousFrameLeftClick, previousFrameRightClick;
+        private Game game;
+        private GraphicsDevice graphics;
 
-    private bool focused = true;
+        private bool focused = true;
     
-    public InputManager(Game game, GraphicsDevice graphics)
+        public InputManager(Game game, GraphicsDevice graphics)
     {
         this.game = game;
         this.graphics = graphics;
     }
 
-    public void Update()
+        public void Update()
     {
         UpdateKeyboardInput();
         UpdateMouseInput();
     }
 
-    public void GrabFocus()
+        public void GrabFocus()
     {
         focused = true;
     }
     
-    private void UpdateKeyboardInput()
+        private void UpdateKeyboardInput()
     {
         if (!game.IsActive || !focused)
         {
@@ -66,7 +66,7 @@ public class InputManager
         RunButtonPressed = keyboardState.IsKeyDown(Keys.X) || keyboardState.IsKeyDown(Keys.LeftShift);
     }
 
-    private void UpdateMouseInput()
+        private void UpdateMouseInput()
     {
         if (!game.IsActive)
         {
@@ -92,5 +92,6 @@ public class InputManager
         {
             focused = graphics.Viewport.Bounds.Contains(PointerPosition);
         }
+    }
     }
 }

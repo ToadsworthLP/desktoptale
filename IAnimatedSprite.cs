@@ -2,27 +2,29 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Desktoptale;
-
-public interface IAnimatedSprite
+namespace Desktoptale
 {
-    public bool Playing { get;}
-    public bool Loop { get; set; }
-    public double Framerate { get; set; }
-    public int StartFrame { get; set; }
-    public int CurrentFrameIndex { get; set; }
-    public Point FrameSize { get; }
+    public interface IAnimatedSprite
+    {
+        bool Playing { get;}
+        bool Loop { get; set; }
+        double Framerate { get; set; }
+        int StartFrame { get; set; }
+        int CurrentFrameIndex { get; set; }
+        Point FrameSize { get; }
 
-    public void Play();
-    public void Pause();
-    public void Stop();
-    public void Update(GameTime gameTime);
-    public void Draw(SpriteBatch spriteBatch,
-        Vector2 position,
-        Color color,
-        float rotation,
-        Vector2 origin,
-        Vector2 scale,
-        SpriteEffects effects,
-        float layerDepth);
+        void Play();
+        void Pause();
+        void Stop();
+        void Update(GameTime gameTime);
+
+        void Draw(SpriteBatch spriteBatch,
+            Vector2 position,
+            Color color,
+            float rotation,
+            Vector2 origin,
+            Vector2 scale,
+            SpriteEffects effects,
+            float layerDepth);
+    }
 }

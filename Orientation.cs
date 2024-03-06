@@ -1,6 +1,7 @@
-﻿namespace Desktoptale;
-
-public enum Orientation
+﻿namespace Desktoptale
 {
-    Up, Down, Left, Right
+    public enum Orientation
+    {
+        Up, Down, Left, Right
+    }
 }

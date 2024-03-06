@@ -1,46 +1,47 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace Desktoptale.States.Common;
-
-public class IdleState : IState<Character>
+namespace Desktoptale.States.Common
 {
-    private TimeSpan idleAnimationTime;
-    
-    private Random rng;
-    
-    public IdleState()
+    public class IdleState : IState<Character>
     {
-        rng = new Random();
-    }
+        private TimeSpan idleAnimationTime;
     
-    public virtual void Enter(StateEnterContext<Character> context)
-    {
-        idleAnimationTime = TimeSpan.FromSeconds(10);
-        
-        context.Target.UpdateSprite(context.Target.IdleSprite);
-        context.Target.CurrentSprite.Play();
-        
-        context.Target.Velocity = Vector2.Zero;
-    }
-
-    public virtual void Update(StateUpdateContext<Character> context)
-    {
-        if (context.Target.InputManager.DirectionalInput.LengthSquared() > float.Epsilon)
+        private Random rng;
+    
+        public IdleState()
         {
-            context.StateMachine.ChangeState(context.Target.WalkState);
-            return;
+            rng = new Random();
         }
-        
-        if (context.StateTime > idleAnimationTime)
+    
+        public virtual void Enter(StateEnterContext<Character> context)
         {
-            context.StateMachine.ChangeState(context.Target.RandomMovementState);
-            return;
+            idleAnimationTime = TimeSpan.FromSeconds(10);
+        
+            context.Target.UpdateSprite(context.Target.IdleSprite);
+            context.Target.CurrentSprite.Play();
+        
+            context.Target.Velocity = Vector2.Zero;
         }
-    }
 
-    public virtual void Exit(StateExitContext<Character> context)
-    {
-        context.Target.CurrentSprite.Stop();
+        public virtual void Update(StateUpdateContext<Character> context)
+        {
+            if (context.Target.InputManager.DirectionalInput.LengthSquared() > float.Epsilon)
+            {
+                context.StateMachine.ChangeState(context.Target.WalkState);
+                return;
+            }
+        
+            if (context.StateTime > idleAnimationTime)
+            {
+                context.StateMachine.ChangeState(context.Target.RandomMovementState);
+                return;
+            }
+        }
+
+        public virtual void Exit(StateExitContext<Character> context)
+        {
+            context.Target.CurrentSprite.Stop();
+        }
     }
 }

@@ -3,12 +3,12 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 
-namespace Desktoptale;
-
-// Adapted from https://github.com/j3soon/OverlayWindow/tree/master
-public class WindowsUtils
+namespace Desktoptale
 {
-    #region DllImports
+    // Adapted from https://github.com/j3soon/OverlayWindow/tree/master
+    public class WindowsUtils
+    {
+        #region DllImports
         [DllImport("kernel32.dll")]
         static extern void SetLastError(uint dwErrCode);
 
@@ -37,9 +37,9 @@ public class WindowsUtils
         const int SWP_NOMOVE = 0x0002;
         const int SWP_NOSIZE = 0x0001;
         const int S_OK = 0x00000000;
-    #endregion
+        #endregion
     
-    public static void MakeWindowOverlay(GameWindow window)
+        public static void MakeWindowOverlay(GameWindow window)
     {
         // Set to layered, transparent window.
         SetLastError(0);
@@ -62,9 +62,10 @@ public class WindowsUtils
         window.IsBorderless = true;
     }
 
-    public static void MakeTopmostWindow(GameWindow window)
+        public static void MakeTopmostWindow(GameWindow window)
     {
         if (!SetWindowPos(window.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE))
             throw new Win32Exception(Marshal.GetLastWin32Error());
+    }
     }
 }
