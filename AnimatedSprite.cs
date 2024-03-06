@@ -57,16 +57,16 @@ public class AnimatedSprite : IAnimatedSprite
     {
         if (Playing)
         {
-            TimeSpan nextScheduledUpdate = Framerate == 0 ? TimeSpan.MaxValue : gameTime.TotalGameTime + TimeSpan.FromSeconds(1 / Framerate);
-            
             if (justStarted)
             {
+                TimeSpan nextScheduledUpdate = Framerate == 0 ? TimeSpan.MaxValue : gameTime.TotalGameTime + TimeSpan.FromSeconds(1 / Framerate);
                 nextFrameUpdate = nextScheduledUpdate;
                 justStarted = false;
             }
             
             if (nextFrameUpdate < gameTime.TotalGameTime)
             {
+                TimeSpan nextScheduledUpdate = Framerate == 0 ? TimeSpan.MaxValue : gameTime.TotalGameTime + TimeSpan.FromSeconds(1 / Framerate);
                 nextFrameUpdate = nextScheduledUpdate;
 
                 if (CurrentFrameIndex < frameCount - 1)

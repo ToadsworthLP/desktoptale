@@ -19,11 +19,13 @@ public class RunState : WalkState
         if (context.Target.InputManager.DirectionalInput.LengthSquared() < float.Epsilon)
         {
             context.StateMachine.ChangeState(context.Target.IdleState);
+            return;
         }
         
         if (!context.Target.InputManager.RunButtonPressed)
         {
             context.StateMachine.ChangeState(context.Target.WalkState);
+            return;
         }
         
         context.Target.Velocity = 

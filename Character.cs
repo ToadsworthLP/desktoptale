@@ -19,6 +19,8 @@ public abstract class Character : IGameObject
     public IState<Character> IdleState { get; protected set; }
     public IState<Character> WalkState { get; protected set; }
     public IState<Character> RunState { get; protected set; }
+    public IState<Character> RandomMovementState { get; protected set; }
+    public IState<Character> RandomMovementWaitState { get; protected set; }
     
     public IAnimatedSprite IdleSprite { get; protected set; }
     public IAnimatedSprite WalkSprite { get; protected set; }
@@ -33,6 +35,7 @@ public abstract class Character : IGameObject
 
     private bool dragging;
     private Point previousSpriteFrameSize;
+    private Orientation orientation = Orientation.Down;
     
     private Subscription scaleChangeRequestedSubscription;
 
@@ -62,6 +65,8 @@ public abstract class Character : IGameObject
         IdleState = new IdleState();
         WalkState = new WalkState(90f);
         RunState = new RunState(180f);
+        RandomMovementState = new RandomMovementState(90);
+        RandomMovementWaitState = new RandomMovementWaitState();
         
         StateMachine = new StateMachine<Character>(this, InitialState);
         StateMachine.StateChanged += (state, newState) => UpdateOrientation();
@@ -113,8 +118,13 @@ public abstract class Character : IGameObject
     private void UpdateOrientation()
     {
         Orientation? updatedOrientation = GetOrientationFromVelocity(Velocity);
-        if (updatedOrientation != null && CurrentSprite is OrientedAnimatedSprite animatedSprite)
-            animatedSprite.Orientation = updatedOrientation.Value;
+        if (updatedOrientation != null)
+            orientation = updatedOrientation.Value;
+
+        if (CurrentSprite is OrientedAnimatedSprite sprite)
+        {
+            sprite.Orientation = orientation;
+        }
     }
 
     private Orientation? GetOrientationFromVelocity(Vector2 input)

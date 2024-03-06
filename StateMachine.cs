@@ -67,7 +67,7 @@ public class StateMachine<T>
 
         StateChanged?.Invoke(previousState, newState);
         
-        currentState.Update(lastUpdateContext);
+        currentState.Update(lastUpdateContext with { LastStateChangeTime = lastStateChangeTime });
     }
 }
 
@@ -75,7 +75,7 @@ public readonly struct StateUpdateContext<T>
 {
     public GameTime Time { get; init; }
     public TimeSpan LastStateChangeTime { get; init; }
-    public TimeSpan StateTime => Time.ElapsedGameTime - LastStateChangeTime;
+    public TimeSpan StateTime => Time.TotalGameTime - LastStateChangeTime;
     public StateMachine<T> StateMachine { get; init; }
     public T Target { get; init; }
 }

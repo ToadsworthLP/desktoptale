@@ -22,11 +22,13 @@ public class WalkState : IState<Character>
         if (context.Target.InputManager.DirectionalInput.LengthSquared() < float.Epsilon)
         {
             context.StateMachine.ChangeState(context.Target.IdleState);
+            return;
         }
         
         if (context.Target.InputManager.RunButtonPressed)
         {
             context.StateMachine.ChangeState(context.Target.RunState);
+            return;
         }
         
         context.Target.Velocity = 

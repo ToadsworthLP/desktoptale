@@ -3,20 +3,20 @@ using Microsoft.Xna.Framework;
 
 namespace Desktoptale.States.Common;
 
-public class IdleState : IState<Character>
+public class RandomMovementWaitState : IState<Character>
 {
-    private TimeSpan idleAnimationTime;
+    private TimeSpan duration;
     
     private Random rng;
     
-    public IdleState()
+    public RandomMovementWaitState()
     {
         rng = new Random();
     }
     
-    public virtual void Enter(StateEnterContext<Character> context)
+    public void Enter(StateEnterContext<Character> context)
     {
-        idleAnimationTime = TimeSpan.FromSeconds(10);
+        duration = TimeSpan.FromSeconds(rng.NextDouble() * 10);
         
         context.Target.UpdateSprite(context.Target.IdleSprite);
         context.Target.CurrentSprite.Play();
@@ -24,7 +24,7 @@ public class IdleState : IState<Character>
         context.Target.Velocity = Vector2.Zero;
     }
 
-    public virtual void Update(StateUpdateContext<Character> context)
+    public void Update(StateUpdateContext<Character> context)
     {
         if (context.Target.InputManager.DirectionalInput.LengthSquared() > float.Epsilon)
         {
@@ -32,15 +32,15 @@ public class IdleState : IState<Character>
             return;
         }
         
-        if (context.StateTime > idleAnimationTime)
+        if (context.StateTime > duration)
         {
             context.StateMachine.ChangeState(context.Target.RandomMovementState);
             return;
         }
     }
 
-    public virtual void Exit(StateExitContext<Character> context)
+    public void Exit(StateExitContext<Character> context)
     {
-        context.Target.CurrentSprite.Stop();
+        
     }
 }
