@@ -53,6 +53,7 @@ namespace Desktoptale
             
             MessageBus.Send(new CharacterChangeRequestedMessage { Character = CharacterType.Clover });
             MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = 2 });
+            MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = true });
         }
 
         /// <summary>
@@ -119,6 +120,7 @@ namespace Desktoptale
             {
                 newCharacter.Position = character.Position;
                 newCharacter.Scale = character.Scale;
+                newCharacter.EnableIdleMovement = character.EnableIdleMovement;
                 gameObjects.Remove(character);
                 character.Dispose();
             }

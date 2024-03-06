@@ -16,6 +16,7 @@ namespace Desktoptale
         
         private int currentScaleFactor;
         private CharacterType currentCharacter;
+        private bool idleMovementEnabled = true;
 
         public ContextMenu(GameWindow window, InputManager inputManager, GraphicsDevice graphicsDevice)
         {
@@ -28,6 +29,7 @@ namespace Desktoptale
         {
             MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
+            MessageBus.Subscribe<IdleMovementChangeRequestedMessage>(OnIdleMovementChangeRequestedMessage);
         }
         
         public void Update(GameTime gameTime)
@@ -63,6 +65,10 @@ namespace Desktoptale
             characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Axis, "Axis"));
             characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Starlo, "Starlo"));
             
+            ToolStripMenuItem idleMovementItem = new ToolStripMenuItem($"Idle Roaming", null, (o, e) => MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = !idleMovementEnabled}));
+            idleMovementItem.Checked = idleMovementEnabled;
+            contextMenuStrip.Items.Add(idleMovementItem);
+            
             ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (o, e) => ShowInfoScreen());
             contextMenuStrip.Items.Add(infoItem);
             
@@ -84,6 +90,11 @@ namespace Desktoptale
         private void OnCharacterChangeRequestedMessage(CharacterChangeRequestedMessage message)
         {
             currentCharacter = message.Character;
+        }
+        
+        private void OnIdleMovementChangeRequestedMessage(IdleMovementChangeRequestedMessage message)
+        {
+            idleMovementEnabled = message.Enabled;
         }
 
         private void ShowInfoScreen()

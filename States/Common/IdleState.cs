@@ -32,7 +32,7 @@ namespace Desktoptale.States.Common
                 return;
             }
         
-            if (context.StateTime > idleAnimationTime && !context.Target.IsBeingDragged)
+            if (context.Target.EnableIdleMovement && context.StateTime > idleAnimationTime && !context.Target.IsBeingDragged)
             {
                 context.StateMachine.ChangeState(context.Target.RandomMovementState);
                 return;

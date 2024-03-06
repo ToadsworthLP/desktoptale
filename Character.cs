@@ -27,6 +27,7 @@ namespace Desktoptale
         public IAnimatedSprite RunSprite { get; protected set; }
         public IAnimatedSprite CurrentSprite { get; set; }
         public bool IsBeingDragged => dragging;
+        public bool EnableIdleMovement { get; set; }
 
         protected virtual IState<Character> InitialState => IdleState;
     
@@ -39,6 +40,7 @@ namespace Desktoptale
         private Orientation orientation = Orientation.Down;
     
         private Subscription scaleChangeRequestedSubscription;
+        private Subscription idleMovementChangeRequestedSubscription;
 
         public Character(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager)
         {
@@ -62,6 +64,7 @@ namespace Desktoptale
         public virtual void Initialize()
         {
             scaleChangeRequestedSubscription = MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
+            idleMovementChangeRequestedSubscription = MessageBus.Subscribe<IdleMovementChangeRequestedMessage>(OnIdleMovementChangeRequestedMessage);
 
             IdleState = new IdleState();
             WalkState = new WalkState(90f);
@@ -107,6 +110,7 @@ namespace Desktoptale
         public virtual void Dispose()
         {
             MessageBus.Unsubscribe(scaleChangeRequestedSubscription);
+            MessageBus.Unsubscribe(idleMovementChangeRequestedSubscription);
         }
 
         private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
@@ -114,6 +118,11 @@ namespace Desktoptale
             Scale = new Vector2(message.ScaleFactor, message.ScaleFactor);
             UpdateWindowSize();
             InputManager.GrabFocus();
+        }
+        
+        private void OnIdleMovementChangeRequestedMessage(IdleMovementChangeRequestedMessage message)
+        {
+            EnableIdleMovement = message.Enabled;
         }
 
         private void UpdateOrientation()
