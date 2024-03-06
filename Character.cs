@@ -161,10 +161,13 @@ public abstract class Character : IGameObject
         Point screenSize = GetScreenSize();
         Point windowSize = GetWindowSize();
 
-        if (Position.X < -windowSize.X) Position.X = -windowSize.X;
-        if (Position.Y < -windowSize.Y) Position.Y = -windowSize.Y;
-        if (Position.X > screenSize.X) Position.X = screenSize.X;
-        if (Position.Y > screenSize.Y) Position.Y = screenSize.Y;
+        float xPivot = CurrentSprite.FrameSize.X * Scale.X / 2;
+        float yPivot = CurrentSprite.FrameSize.Y * Scale.X / 2;
+
+        if (Position.X < -windowSize.X + xPivot) Position.X = -windowSize.X + xPivot;
+        if (Position.Y < -windowSize.Y + yPivot) Position.Y = -windowSize.Y + yPivot;
+        if (Position.X > screenSize.X - xPivot) Position.X = screenSize.X - xPivot;
+        if (Position.Y > screenSize.Y - yPivot) Position.Y = screenSize.Y - yPivot;
     }
 
     private Point GetScreenSize()
