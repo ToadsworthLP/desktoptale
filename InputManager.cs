@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Desktoptale.Messages;
+using Desktoptale.Messaging;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -19,79 +21,87 @@ namespace Desktoptale
         private GraphicsDevice graphics;
 
         private bool focused = true;
+        private bool unfocusedMovementEnabled = false;
     
         public InputManager(Game game, GraphicsDevice graphics)
-    {
-        this.game = game;
-        this.graphics = graphics;
-    }
+        {
+            this.game = game;
+            this.graphics = graphics;
+            
+            MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
+        }
 
         public void Update()
-    {
-        UpdateKeyboardInput();
-        UpdateMouseInput();
-    }
+        {
+            UpdateKeyboardInput();
+            UpdateMouseInput();
+        }
 
         public void GrabFocus()
-    {
-        focused = true;
-    }
+        {
+            focused = true;
+        }
     
         private void UpdateKeyboardInput()
-    {
-        if (!game.IsActive || !focused)
         {
-            DirectionalInput = Vector2.Zero;
-            RunButtonPressed = false;
-            return;
+            if (!unfocusedMovementEnabled && (!game.IsActive || !focused))
+            {
+                DirectionalInput = Vector2.Zero;
+                RunButtonPressed = false;
+                return;
+            }
+            
+            KeyboardState keyboardState = Keyboard.GetState();
+
+            Vector2 input = Vector2.Zero;
+            
+            if (keyboardState.IsKeyDown(Keys.W)) input.Y -= 1f;
+            if (keyboardState.IsKeyDown(Keys.S)) input.Y += 1f;
+            if (keyboardState.IsKeyDown(Keys.A)) input.X -= 1f;
+            if (keyboardState.IsKeyDown(Keys.D)) input.X += 1f;
+            
+            if (keyboardState.IsKeyDown(Keys.Up)) input.Y -= 1f;
+            if (keyboardState.IsKeyDown(Keys.Down)) input.Y += 1f;
+            if (keyboardState.IsKeyDown(Keys.Left)) input.X -= 1f;
+            if (keyboardState.IsKeyDown(Keys.Right)) input.X += 1f;
+
+            if(input.LengthSquared() > float.Epsilon) input.Normalize();
+            DirectionalInput = input;
+
+            RunButtonPressed = keyboardState.IsKeyDown(Keys.X) || keyboardState.IsKeyDown(Keys.LeftShift);
         }
-        
-        KeyboardState keyboardState = Keyboard.GetState();
-
-        Vector2 input = Vector2.Zero;
-        
-        if (keyboardState.IsKeyDown(Keys.W)) input.Y -= 1f;
-        if (keyboardState.IsKeyDown(Keys.S)) input.Y += 1f;
-        if (keyboardState.IsKeyDown(Keys.A)) input.X -= 1f;
-        if (keyboardState.IsKeyDown(Keys.D)) input.X += 1f;
-        
-        if (keyboardState.IsKeyDown(Keys.Up)) input.Y -= 1f;
-        if (keyboardState.IsKeyDown(Keys.Down)) input.Y += 1f;
-        if (keyboardState.IsKeyDown(Keys.Left)) input.X -= 1f;
-        if (keyboardState.IsKeyDown(Keys.Right)) input.X += 1f;
-
-        if(input.LengthSquared() > float.Epsilon) input.Normalize();
-        DirectionalInput = input;
-
-        RunButtonPressed = keyboardState.IsKeyDown(Keys.X) || keyboardState.IsKeyDown(Keys.LeftShift);
-    }
 
         private void UpdateMouseInput()
-    {
-        if (!game.IsActive)
         {
-            LeftClickPressed = false;
-            RightClickPressed = false;
-            return;
+            if (!game.IsActive)
+            {
+                LeftClickPressed = false;
+                RightClickPressed = false;
+                return;
+            }
+            
+            previousFrameLeftClick = LeftClickPressed;
+            previousFrameRightClick = RightClickPressed;
+            
+            MouseState mouseState = Mouse.GetState();
+            
+            LeftClickPressed = mouseState.LeftButton == ButtonState.Pressed;
+            if (LeftClickPressed) LeftClickJustPressed = !previousFrameLeftClick;
+            
+            RightClickPressed = mouseState.RightButton == ButtonState.Pressed;
+            if (RightClickPressed) RightClickJustPressed = !previousFrameRightClick;
+
+            PointerPosition = mouseState.Position;
+
+            if (LeftClickJustPressed || RightClickJustPressed)
+            {
+                focused = graphics.Viewport.Bounds.Contains(PointerPosition);
+            }
         }
         
-        previousFrameLeftClick = LeftClickPressed;
-        previousFrameRightClick = RightClickPressed;
-        
-        MouseState mouseState = Mouse.GetState();
-        
-        LeftClickPressed = mouseState.LeftButton == ButtonState.Pressed;
-        if (LeftClickPressed) LeftClickJustPressed = !previousFrameLeftClick;
-        
-        RightClickPressed = mouseState.RightButton == ButtonState.Pressed;
-        if (RightClickPressed) RightClickJustPressed = !previousFrameRightClick;
-
-        PointerPosition = mouseState.Position;
-
-        if (LeftClickJustPressed || RightClickJustPressed)
+        private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangeRequestedMessage message)
         {
-            focused = graphics.Viewport.Bounds.Contains(PointerPosition);
+            unfocusedMovementEnabled = message.Enabled;
         }
-    }
     }
 }

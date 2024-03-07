@@ -17,6 +17,7 @@ namespace Desktoptale
         private int currentScaleFactor;
         private CharacterType currentCharacter;
         private bool idleMovementEnabled = true;
+        private bool unfocusedMovementEnabled = false;
 
         public ContextMenu(GameWindow window, InputManager inputManager, GraphicsDevice graphicsDevice)
         {
@@ -30,6 +31,7 @@ namespace Desktoptale
             MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
             MessageBus.Subscribe<IdleMovementChangeRequestedMessage>(OnIdleMovementChangeRequestedMessage);
+            MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
         }
         
         public void Update(GameTime gameTime)
@@ -45,6 +47,15 @@ namespace Desktoptale
         {
             ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
             
+            ToolStripMenuItem characterItem = new ToolStripMenuItem("Character");
+            contextMenuStrip.Items.Add(characterItem);
+            
+            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Clover, "Clover"));
+            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Ceroba, "Ceroba"));
+            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Martlet, "Martlet"));
+            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Axis, "Axis"));
+            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Starlo, "Starlo"));
+            
             ToolStripMenuItem scaleItem = new ToolStripMenuItem("Scale");
             contextMenuStrip.Items.Add(scaleItem);
 
@@ -56,18 +67,16 @@ namespace Desktoptale
                 scaleItem.DropDownItems.Add(scaleSelectItem);
             }
             
-            ToolStripMenuItem characterItem = new ToolStripMenuItem("Character");
-            contextMenuStrip.Items.Add(characterItem);
-            
-            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Clover, "Clover"));
-            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Ceroba, "Ceroba"));
-            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Martlet, "Martlet"));
-            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Axis, "Axis"));
-            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Starlo, "Starlo"));
+            ToolStripMenuItem settingsItem = new ToolStripMenuItem("Settings");
+            contextMenuStrip.Items.Add(settingsItem);
             
             ToolStripMenuItem idleMovementItem = new ToolStripMenuItem($"Idle Roaming", null, (o, e) => MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = !idleMovementEnabled}));
             idleMovementItem.Checked = idleMovementEnabled;
-            contextMenuStrip.Items.Add(idleMovementItem);
+            settingsItem.DropDownItems.Add(idleMovementItem);
+            
+            ToolStripMenuItem unfocusedMovementItem = new ToolStripMenuItem($"Unfocused Movement", null, (o, e) => MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = !unfocusedMovementEnabled}));
+            unfocusedMovementItem.Checked = unfocusedMovementEnabled;
+            settingsItem.DropDownItems.Add(unfocusedMovementItem);
             
             ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (o, e) => ShowInfoScreen());
             contextMenuStrip.Items.Add(infoItem);
@@ -95,6 +104,11 @@ namespace Desktoptale
         private void OnIdleMovementChangeRequestedMessage(IdleMovementChangeRequestedMessage message)
         {
             idleMovementEnabled = message.Enabled;
+        }
+        
+        private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangeRequestedMessage message)
+        {
+            unfocusedMovementEnabled = message.Enabled;
         }
 
         private void ShowInfoScreen()
