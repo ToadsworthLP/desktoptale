@@ -5,16 +5,15 @@ namespace Desktoptale.States.Common
 {
     public class RandomMovementWaitState : IState<Character>
     {
-        private TimeSpan duration;
-    
-        private Random rng;
+        protected TimeSpan duration;
+        protected Random rng;
     
         public RandomMovementWaitState()
         {
             rng = new Random();
         }
     
-        public void Enter(StateEnterContext<Character> context)
+        public virtual void Enter(StateEnterContext<Character> context)
         {
             duration = TimeSpan.FromSeconds(rng.NextDouble() * 10);
         
@@ -24,7 +23,7 @@ namespace Desktoptale.States.Common
             context.Target.Velocity = Vector2.Zero;
         }
 
-        public void Update(StateUpdateContext<Character> context)
+        public virtual void Update(StateUpdateContext<Character> context)
         {
             if (context.Target.InputManager.DirectionalInput.LengthSquared() > float.Epsilon)
             {
@@ -45,7 +44,7 @@ namespace Desktoptale.States.Common
             }
         }
 
-        public void Exit(StateExitContext<Character> context)
+        public virtual void Exit(StateExitContext<Character> context)
         {
         
         }
