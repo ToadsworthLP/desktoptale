@@ -30,7 +30,7 @@ namespace Desktoptale.States.Common
         {
             duration = TimeSpan.FromSeconds(0.25 + rng.NextDouble() / 2);
 
-            int directionIndex = rng.Next(0, 3);
+            int directionIndex = rng.Next(0, 4);
             direction = directions[directionIndex];
         
             context.Target.UpdateSprite(context.Target.WalkSprite);
