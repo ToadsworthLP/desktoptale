@@ -43,12 +43,12 @@ namespace Desktoptale
         private Subscription scaleChangeRequestedSubscription;
         private Subscription idleMovementChangeRequestedSubscription;
 
-        public Character(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager)
+        public Character(CharacterCreationContext characterCreationContext)
         {
-            this.spriteBatch = spriteBatch;
-            this.InputManager = inputManager;
-            this.graphics = graphics;
-            this.window = window;
+            this.spriteBatch = characterCreationContext.SpriteBatch;
+            this.InputManager = characterCreationContext.InputManager;
+            this.graphics = characterCreationContext.Graphics;
+            this.window = characterCreationContext.Window;
         }
 
         public void UpdateSprite(IAnimatedSprite sprite)

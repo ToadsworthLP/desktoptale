@@ -6,9 +6,7 @@ namespace Desktoptale.Characters
 {
     public class Starlo : Character
     {
-        public Starlo(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager) : base(graphics, window, spriteBatch, inputManager)
-        {
-        }
+        public Starlo(CharacterCreationContext characterCreationContext) : base(characterCreationContext) {}
     
         public override void LoadContent(ContentManager contentManager)
         {

@@ -10,7 +10,7 @@ namespace Desktoptale.Characters
         public IState<Character> DanceState { get; protected set; }
         public IAnimatedSprite DanceSprite { get; protected set; }
         
-        public Clover(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager) : base(graphics, window, spriteBatch, inputManager) {}
+        public Clover(CharacterCreationContext characterCreationContext) : base(characterCreationContext) {}
 
         public override void Initialize()
         {

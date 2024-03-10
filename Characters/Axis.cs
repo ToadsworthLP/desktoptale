@@ -6,9 +6,7 @@ namespace Desktoptale.Characters
 {
     public class Axis : Character
     {
-        public Axis(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager) : base(graphics, window, spriteBatch, inputManager)
-    {
-    }
+        public Axis(CharacterCreationContext characterCreationContext) : base(characterCreationContext) {}
 
         public override void LoadContent(ContentManager contentManager)
     {

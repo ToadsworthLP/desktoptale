@@ -6,9 +6,7 @@ namespace Desktoptale.Characters
 {
     public class Martlet : Character
     {
-        public Martlet(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager) : base(graphics, window, spriteBatch, inputManager)
-        {
-        }
+        public Martlet(CharacterCreationContext characterCreationContext) : base(characterCreationContext) {}
     
         public override void LoadContent(ContentManager contentManager)
         {

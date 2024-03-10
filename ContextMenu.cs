@@ -49,12 +49,13 @@ namespace Desktoptale
             
             ToolStripMenuItem characterItem = new ToolStripMenuItem("Character");
             contextMenuStrip.Items.Add(characterItem);
-            
-            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Clover, "Clover"));
-            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Martlet, "Martlet"));
-            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Starlo, "Starlo"));
-            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Ceroba, "Ceroba"));
-            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Axis, "Axis"));
+
+            foreach (CharacterType character in Desktoptale.Characters.GetAll())
+            {
+                ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(character.Name, null, (o, e) => MessageBus.Send(new CharacterChangeRequestedMessage { Character = character }));
+                characterSelectItem.Checked = currentCharacter == character;
+                characterItem.DropDownItems.Add(characterSelectItem);
+            }
             
             ToolStripMenuItem scaleItem = new ToolStripMenuItem("Scale");
             contextMenuStrip.Items.Add(scaleItem);
@@ -82,13 +83,6 @@ namespace Desktoptale
             contextMenuStrip.Items.Add(infoItem);
             
             contextMenuStrip.Show(mousePosition.X, mousePosition.Y);
-        }
-
-        private ToolStripMenuItem GetCharacterItem(CharacterType characterType, string name)
-        {
-            ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(name, null, (o, e) => MessageBus.Send(new CharacterChangeRequestedMessage { Character = characterType }));
-            characterSelectItem.Checked = currentCharacter == characterType;
-            return characterSelectItem;
         }
         
         private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)

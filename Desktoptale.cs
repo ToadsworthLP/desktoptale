@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Desktoptale.Characters;
 using Desktoptale.Messages;
 using Desktoptale.Messaging;
+using Desktoptale.Registry;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
@@ -10,16 +10,19 @@ namespace Desktoptale
 {
     public class Desktoptale : Game
     {
+        public static IRegistry<CharacterType, int> Characters { get; private set; }
+        
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private InputManager inputManager;
 
-        private CharacterFactory characterFactory;
         private Character character;
         private ISet<IGameObject> gameObjects;
         
         public Desktoptale()
         {
+            Characters = new CharacterRegistry();
+            
             graphics = new GraphicsDeviceManager(this);
             Window.Title = ProgramInfo.NAME;
             
@@ -27,6 +30,7 @@ namespace Desktoptale
             IsMouseVisible = true;
             
             WindowsUtils.MakeWindowOverlay(Window);
+            WindowsUtils.MakeTopmostWindow(Window);
         }
 
         /// <summary>
@@ -43,7 +47,6 @@ namespace Desktoptale
             
             inputManager = new InputManager(this, GraphicsDevice);
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            characterFactory = new CharacterFactory();
             
             gameObjects = new HashSet<IGameObject>();
 
@@ -51,7 +54,7 @@ namespace Desktoptale
             contextMenu.Initialize();
             gameObjects.Add(contextMenu);
             
-            MessageBus.Send(new CharacterChangeRequestedMessage { Character = CharacterType.Clover });
+            MessageBus.Send(new CharacterChangeRequestedMessage { Character = CharacterRegistry.CLOVER});
             MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = 2 });
             MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = true });
             MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = false });
@@ -88,8 +91,6 @@ namespace Desktoptale
             {
                 gameObject.Update(gameTime);
             }
-
-            WindowsUtils.MakeTopmostWindow(Window);
             
             base.Update(gameTime);
         }
@@ -112,8 +113,8 @@ namespace Desktoptale
         
         private void OnCharacterChangeRequestedMessage(CharacterChangeRequestedMessage message)
         {
-            Character newCharacter =
-                characterFactory.Create(message.Character, graphics, Window, spriteBatch, inputManager);
+            Character newCharacter = message.Character.FactoryFunction
+                .Invoke(new CharacterCreationContext(graphics, Window, spriteBatch, inputManager));
             
             newCharacter.LoadContent(Content);
 
