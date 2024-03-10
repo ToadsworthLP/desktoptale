@@ -53,6 +53,7 @@ namespace Desktoptale
             characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Clover, "Clover"));
             characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Martlet, "Martlet"));
             characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Starlo, "Starlo"));
+            characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Mooch, "Mooch"));
             characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Ceroba, "Ceroba"));
             characterItem.DropDownItems.Add(GetCharacterItem(CharacterType.Axis, "Axis"));
             

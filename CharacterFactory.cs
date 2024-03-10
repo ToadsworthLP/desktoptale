@@ -28,6 +28,9 @@ namespace Desktoptale
             case CharacterType.Starlo:
                 character = new Starlo(graphics, window, spriteBatch, inputManager);
                 break;
+            case CharacterType.Mooch:
+                character = new Mooch(graphics, window, spriteBatch, inputManager);
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
@@ -36,5 +39,5 @@ namespace Desktoptale
     }
     }
 
-    public enum CharacterType { Clover, Ceroba, Martlet, Axis, Starlo }
+    public enum CharacterType { Clover, Ceroba, Martlet, Axis, Starlo, Mooch }
 }
