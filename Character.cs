@@ -38,6 +38,7 @@ namespace Desktoptale
         private bool dragging;
         private Point previousSpriteFrameSize;
         private Orientation orientation = Orientation.Down;
+        private Orientation previousOrientation = Orientation.Down;
     
         private Subscription scaleChangeRequestedSubscription;
         private Subscription idleMovementChangeRequestedSubscription;
@@ -129,11 +130,19 @@ namespace Desktoptale
         {
             Orientation? updatedOrientation = GetOrientationFromVelocity(Velocity);
             if (updatedOrientation != null)
+            {
+                previousOrientation = orientation;
                 orientation = updatedOrientation.Value;
+            }
 
             if (CurrentSprite is OrientedAnimatedSprite sprite)
             {
                 sprite.Orientation = orientation;
+
+                if (previousOrientation != orientation)
+                {
+                    UpdateWindowSize();
+                }
             }
         }
 
