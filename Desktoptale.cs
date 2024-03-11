@@ -34,7 +34,6 @@ namespace Desktoptale
             externalCharacterFactory.AddAllToRegistry(characterRegistry);
             
             WindowsUtils.MakeWindowOverlay(Window);
-            WindowsUtils.MakeTopmostWindow(Window);
         }
 
         /// <summary>
@@ -95,6 +94,8 @@ namespace Desktoptale
             {
                 gameObject.Update(gameTime);
             }
+            
+            WindowsUtils.MakeTopmostWindow(Window);
             
             base.Update(gameTime);
         }
