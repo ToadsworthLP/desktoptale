@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Desktoptale
+namespace Desktoptale.Characters
 {
     public class CharacterType
     {

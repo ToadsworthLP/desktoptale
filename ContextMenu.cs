@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Windows.Forms;
+using Desktoptale.Characters;
 using Desktoptale.Messages;
 using Desktoptale.Messaging;
+using Desktoptale.Registry;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,17 +15,19 @@ namespace Desktoptale
         private GameWindow window;
         private InputManager inputManager;
         private GraphicsDevice graphicsDevice;
+        private IRegistry<CharacterType, int> characterRegistry;
         
         private int currentScaleFactor;
         private CharacterType currentCharacter;
         private bool idleMovementEnabled = true;
         private bool unfocusedMovementEnabled = false;
 
-        public ContextMenu(GameWindow window, InputManager inputManager, GraphicsDevice graphicsDevice)
+        public ContextMenu(GameWindow window, InputManager inputManager, GraphicsDevice graphicsDevice, IRegistry<CharacterType, int> characterRegistry)
         {
             this.window = window;
             this.inputManager = inputManager;
             this.graphicsDevice = graphicsDevice;
+            this.characterRegistry = characterRegistry;
         }
         
         public void Initialize()
@@ -50,7 +54,7 @@ namespace Desktoptale
             ToolStripMenuItem characterItem = new ToolStripMenuItem("Character");
             contextMenuStrip.Items.Add(characterItem);
 
-            foreach (CharacterType character in Desktoptale.Characters.GetAll())
+            foreach (CharacterType character in characterRegistry.GetAll())
             {
                 ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(character.Name, null, (o, e) => MessageBus.Send(new CharacterChangeRequestedMessage { Character = character }));
                 characterSelectItem.Checked = currentCharacter == character;

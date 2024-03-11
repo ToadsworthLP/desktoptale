@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Desktoptale.Characters
@@ -11,9 +10,9 @@ namespace Desktoptale.Characters
         public override void LoadContent(ContentManager contentManager)
         {
             OrientedAnimatedSprite idleSprite = new OrientedAnimatedSprite(
-                contentManager.Load<Texture2D>("Characters/Martlet/Spr_Martlet_Idle_Up"),    
-                contentManager.Load<Texture2D>("Characters/Martlet/Spr_Martlet_Idle_Down"),    
-                contentManager.Load<Texture2D>("Characters/Martlet/Spr_Martlet_Idle_Left"),    
+                contentManager.Load<Texture2D>("Included/Martlet/Spr_Martlet_Idle_Up"),    
+                contentManager.Load<Texture2D>("Included/Martlet/Spr_Martlet_Idle_Down"),    
+                contentManager.Load<Texture2D>("Included/Martlet/Spr_Martlet_Idle_Left"),    
                 1
             );
             idleSprite.Loop = false;
@@ -21,9 +20,9 @@ namespace Desktoptale.Characters
             IdleSprite = idleSprite;
 
             OrientedAnimatedSprite walkSprite = new OrientedAnimatedSprite(
-                contentManager.Load<Texture2D>("Characters/Martlet/Spr_Martlet_Walk_Up"),
-                contentManager.Load<Texture2D>("Characters/Martlet/Spr_Martlet_Walk_Down"),
-                contentManager.Load<Texture2D>("Characters/Martlet/Spr_Martlet_Walk_Left"),
+                contentManager.Load<Texture2D>("Included/Martlet/Spr_Martlet_Walk_Up"),
+                contentManager.Load<Texture2D>("Included/Martlet/Spr_Martlet_Walk_Down"),
+                contentManager.Load<Texture2D>("Included/Martlet/Spr_Martlet_Walk_Left"),
                 4
             );
             walkSprite.Loop = true;
@@ -31,9 +30,9 @@ namespace Desktoptale.Characters
             WalkSprite = walkSprite;
 
             OrientedAnimatedSprite runSprite = new OrientedAnimatedSprite(
-                contentManager.Load<Texture2D>("Characters/Martlet/Spr_Martlet_Run_Up"),    
-                contentManager.Load<Texture2D>("Characters/Martlet/Spr_Martlet_Run_Down"),    
-                contentManager.Load<Texture2D>("Characters/Martlet/Spr_Martlet_Run_Left"),    
+                contentManager.Load<Texture2D>("Included/Martlet/Spr_Martlet_Run_Up"),    
+                contentManager.Load<Texture2D>("Included/Martlet/Spr_Martlet_Run_Down"),    
+                contentManager.Load<Texture2D>("Included/Martlet/Spr_Martlet_Run_Left"),    
                 6
             );
             runSprite.Loop = true;

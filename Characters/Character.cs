@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Desktoptale
+namespace Desktoptale.Characters
 {
     public abstract class Character : IGameObject
     {

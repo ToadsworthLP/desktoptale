@@ -1,4 +1,5 @@
 ﻿using System;
+using Desktoptale.Characters;
 
 namespace Desktoptale.States.Clover
 {

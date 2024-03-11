@@ -1,4 +1,5 @@
 ﻿using System;
+using Desktoptale.Characters;
 using Microsoft.Xna.Framework;
 
 namespace Desktoptale.States.Common

@@ -13,7 +13,7 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Characters/Axis/Spr_Axis_Idle_Down.png
+#begin Included/Axis/Spr_Axis_Idle_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -23,9 +23,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Axis/Spr_Axis_Idle_Down.png
+/build:Included/Axis/Spr_Axis_Idle_Down.png
 
-#begin Characters/Axis/Spr_Axis_Idle_Left.png
+#begin Included/Axis/Spr_Axis_Idle_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -35,9 +35,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Axis/Spr_Axis_Idle_Left.png
+/build:Included/Axis/Spr_Axis_Idle_Left.png
 
-#begin Characters/Axis/Spr_Axis_Idle_Up.png
+#begin Included/Axis/Spr_Axis_Idle_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -47,9 +47,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Axis/Spr_Axis_Idle_Up.png
+/build:Included/Axis/Spr_Axis_Idle_Up.png
 
-#begin Characters/Ceroba/Spr_Ceroba_Idle_Down.png
+#begin Included/Ceroba/Spr_Ceroba_Idle_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -59,9 +59,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Ceroba/Spr_Ceroba_Idle_Down.png
+/build:Included/Ceroba/Spr_Ceroba_Idle_Down.png
 
-#begin Characters/Ceroba/Spr_Ceroba_Idle_Left.png
+#begin Included/Ceroba/Spr_Ceroba_Idle_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -71,9 +71,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Ceroba/Spr_Ceroba_Idle_Left.png
+/build:Included/Ceroba/Spr_Ceroba_Idle_Left.png
 
-#begin Characters/Ceroba/Spr_Ceroba_Idle_Up.png
+#begin Included/Ceroba/Spr_Ceroba_Idle_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -83,9 +83,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Ceroba/Spr_Ceroba_Idle_Up.png
+/build:Included/Ceroba/Spr_Ceroba_Idle_Up.png
 
-#begin Characters/Ceroba/Spr_Ceroba_Run_Down.png
+#begin Included/Ceroba/Spr_Ceroba_Run_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -95,9 +95,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Ceroba/Spr_Ceroba_Run_Down.png
+/build:Included/Ceroba/Spr_Ceroba_Run_Down.png
 
-#begin Characters/Ceroba/Spr_Ceroba_Run_Left.png
+#begin Included/Ceroba/Spr_Ceroba_Run_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -107,9 +107,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Ceroba/Spr_Ceroba_Run_Left.png
+/build:Included/Ceroba/Spr_Ceroba_Run_Left.png
 
-#begin Characters/Ceroba/Spr_Ceroba_Run_Up.png
+#begin Included/Ceroba/Spr_Ceroba_Run_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -119,9 +119,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Ceroba/Spr_Ceroba_Run_Up.png
+/build:Included/Ceroba/Spr_Ceroba_Run_Up.png
 
-#begin Characters/Ceroba/Spr_Ceroba_Walk_Down.png
+#begin Included/Ceroba/Spr_Ceroba_Walk_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -131,9 +131,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Ceroba/Spr_Ceroba_Walk_Down.png
+/build:Included/Ceroba/Spr_Ceroba_Walk_Down.png
 
-#begin Characters/Ceroba/Spr_Ceroba_Walk_Left.png
+#begin Included/Ceroba/Spr_Ceroba_Walk_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -143,9 +143,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Ceroba/Spr_Ceroba_Walk_Left.png
+/build:Included/Ceroba/Spr_Ceroba_Walk_Left.png
 
-#begin Characters/Ceroba/Spr_Ceroba_Walk_Up.png
+#begin Included/Ceroba/Spr_Ceroba_Walk_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -155,9 +155,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Ceroba/Spr_Ceroba_Walk_Up.png
+/build:Included/Ceroba/Spr_Ceroba_Walk_Up.png
 
-#begin Characters/Clover/Spr_Clover_Dance.png
+#begin Included/Clover/Spr_Clover_Dance.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -167,9 +167,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Clover/Spr_Clover_Dance.png
+/build:Included/Clover/Spr_Clover_Dance.png
 
-#begin Characters/Clover/Spr_Clover_Idle_Down.png
+#begin Included/Clover/Spr_Clover_Idle_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -179,9 +179,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Clover/Spr_Clover_Idle_Down.png
+/build:Included/Clover/Spr_Clover_Idle_Down.png
 
-#begin Characters/Clover/Spr_Clover_Idle_Left.png
+#begin Included/Clover/Spr_Clover_Idle_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -191,9 +191,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Clover/Spr_Clover_Idle_Left.png
+/build:Included/Clover/Spr_Clover_Idle_Left.png
 
-#begin Characters/Clover/Spr_Clover_Idle_Up.png
+#begin Included/Clover/Spr_Clover_Idle_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -203,9 +203,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Clover/Spr_Clover_Idle_Up.png
+/build:Included/Clover/Spr_Clover_Idle_Up.png
 
-#begin Characters/Clover/Spr_Clover_Run_Down.png
+#begin Included/Clover/Spr_Clover_Run_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -215,9 +215,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Clover/Spr_Clover_Run_Down.png
+/build:Included/Clover/Spr_Clover_Run_Down.png
 
-#begin Characters/Clover/Spr_Clover_Run_Left.png
+#begin Included/Clover/Spr_Clover_Run_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -227,9 +227,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Clover/Spr_Clover_Run_Left.png
+/build:Included/Clover/Spr_Clover_Run_Left.png
 
-#begin Characters/Clover/Spr_Clover_Run_Up.png
+#begin Included/Clover/Spr_Clover_Run_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -239,9 +239,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Clover/Spr_Clover_Run_Up.png
+/build:Included/Clover/Spr_Clover_Run_Up.png
 
-#begin Characters/Clover/Spr_Clover_Walk_Down.png
+#begin Included/Clover/Spr_Clover_Walk_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -251,9 +251,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Clover/Spr_Clover_Walk_Down.png
+/build:Included/Clover/Spr_Clover_Walk_Down.png
 
-#begin Characters/Clover/Spr_Clover_Walk_Left.png
+#begin Included/Clover/Spr_Clover_Walk_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -263,9 +263,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Clover/Spr_Clover_Walk_Left.png
+/build:Included/Clover/Spr_Clover_Walk_Left.png
 
-#begin Characters/Clover/Spr_Clover_Walk_Up.png
+#begin Included/Clover/Spr_Clover_Walk_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -275,9 +275,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Clover/Spr_Clover_Walk_Up.png
+/build:Included/Clover/Spr_Clover_Walk_Up.png
 
-#begin Characters/Martlet/Spr_Martlet_Idle_Down.png
+#begin Included/Martlet/Spr_Martlet_Idle_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -287,9 +287,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Martlet/Spr_Martlet_Idle_Down.png
+/build:Included/Martlet/Spr_Martlet_Idle_Down.png
 
-#begin Characters/Martlet/Spr_Martlet_Idle_Left.png
+#begin Included/Martlet/Spr_Martlet_Idle_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -299,9 +299,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Martlet/Spr_Martlet_Idle_Left.png
+/build:Included/Martlet/Spr_Martlet_Idle_Left.png
 
-#begin Characters/Martlet/Spr_Martlet_Idle_Up.png
+#begin Included/Martlet/Spr_Martlet_Idle_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -311,9 +311,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Martlet/Spr_Martlet_Idle_Up.png
+/build:Included/Martlet/Spr_Martlet_Idle_Up.png
 
-#begin Characters/Martlet/Spr_Martlet_Run_Down.png
+#begin Included/Martlet/Spr_Martlet_Run_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -323,9 +323,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Martlet/Spr_Martlet_Run_Down.png
+/build:Included/Martlet/Spr_Martlet_Run_Down.png
 
-#begin Characters/Martlet/Spr_Martlet_Run_Left.png
+#begin Included/Martlet/Spr_Martlet_Run_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -335,9 +335,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Martlet/Spr_Martlet_Run_Left.png
+/build:Included/Martlet/Spr_Martlet_Run_Left.png
 
-#begin Characters/Martlet/Spr_Martlet_Run_Up.png
+#begin Included/Martlet/Spr_Martlet_Run_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -347,9 +347,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Martlet/Spr_Martlet_Run_Up.png
+/build:Included/Martlet/Spr_Martlet_Run_Up.png
 
-#begin Characters/Martlet/Spr_Martlet_Walk_Down.png
+#begin Included/Martlet/Spr_Martlet_Walk_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -359,9 +359,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Martlet/Spr_Martlet_Walk_Down.png
+/build:Included/Martlet/Spr_Martlet_Walk_Down.png
 
-#begin Characters/Martlet/Spr_Martlet_Walk_Left.png
+#begin Included/Martlet/Spr_Martlet_Walk_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -371,9 +371,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Martlet/Spr_Martlet_Walk_Left.png
+/build:Included/Martlet/Spr_Martlet_Walk_Left.png
 
-#begin Characters/Martlet/Spr_Martlet_Walk_Up.png
+#begin Included/Martlet/Spr_Martlet_Walk_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -383,9 +383,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Martlet/Spr_Martlet_Walk_Up.png
+/build:Included/Martlet/Spr_Martlet_Walk_Up.png
 
-#begin Characters/Starlo/Spr_Starlo_Idle_Down.png
+#begin Included/Starlo/Spr_Starlo_Idle_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -395,9 +395,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Starlo/Spr_Starlo_Idle_Down.png
+/build:Included/Starlo/Spr_Starlo_Idle_Down.png
 
-#begin Characters/Starlo/Spr_Starlo_Idle_Left.png
+#begin Included/Starlo/Spr_Starlo_Idle_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -407,9 +407,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Starlo/Spr_Starlo_Idle_Left.png
+/build:Included/Starlo/Spr_Starlo_Idle_Left.png
 
-#begin Characters/Starlo/Spr_Starlo_Idle_Right.png
+#begin Included/Starlo/Spr_Starlo_Idle_Right.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -419,9 +419,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Starlo/Spr_Starlo_Idle_Right.png
+/build:Included/Starlo/Spr_Starlo_Idle_Right.png
 
-#begin Characters/Starlo/Spr_Starlo_Idle_Up.png
+#begin Included/Starlo/Spr_Starlo_Idle_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -431,9 +431,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Starlo/Spr_Starlo_Idle_Up.png
+/build:Included/Starlo/Spr_Starlo_Idle_Up.png
 
-#begin Characters/Starlo/Spr_Starlo_Walk_Down.png
+#begin Included/Starlo/Spr_Starlo_Walk_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -443,9 +443,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Starlo/Spr_Starlo_Walk_Down.png
+/build:Included/Starlo/Spr_Starlo_Walk_Down.png
 
-#begin Characters/Starlo/Spr_Starlo_Walk_Left.png
+#begin Included/Starlo/Spr_Starlo_Walk_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -455,9 +455,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Starlo/Spr_Starlo_Walk_Left.png
+/build:Included/Starlo/Spr_Starlo_Walk_Left.png
 
-#begin Characters/Starlo/Spr_Starlo_Walk_Right.png
+#begin Included/Starlo/Spr_Starlo_Walk_Right.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -467,9 +467,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Starlo/Spr_Starlo_Walk_Right.png
+/build:Included/Starlo/Spr_Starlo_Walk_Right.png
 
-#begin Characters/Starlo/Spr_Starlo_Walk_Up.png
+#begin Included/Starlo/Spr_Starlo_Walk_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -479,5 +479,5 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Characters/Starlo/Spr_Starlo_Walk_Up.png
+/build:Included/Starlo/Spr_Starlo_Walk_Up.png
 

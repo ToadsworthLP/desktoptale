@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Desktoptale.Characters;
 using Desktoptale.Messages;
 using Desktoptale.Messaging;
 using Desktoptale.Registry;
@@ -10,7 +11,7 @@ namespace Desktoptale
 {
     public class Desktoptale : Game
     {
-        public static IRegistry<CharacterType, int> Characters { get; private set; }
+        private IRegistry<CharacterType, int> characterRegistry { get; }
         
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
@@ -21,13 +22,16 @@ namespace Desktoptale
         
         public Desktoptale()
         {
-            Characters = new CharacterRegistry();
+            characterRegistry = new CharacterRegistry();
             
             graphics = new GraphicsDeviceManager(this);
             Window.Title = ProgramInfo.NAME;
             
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory("Content/Characters/");
+            externalCharacterFactory.AddAllToRegistry(characterRegistry);
             
             WindowsUtils.MakeWindowOverlay(Window);
             WindowsUtils.MakeTopmostWindow(Window);
@@ -50,7 +54,7 @@ namespace Desktoptale
             
             gameObjects = new HashSet<IGameObject>();
 
-            ContextMenu contextMenu = new ContextMenu(Window, inputManager, GraphicsDevice);
+            ContextMenu contextMenu = new ContextMenu(Window, inputManager, GraphicsDevice, characterRegistry);
             contextMenu.Initialize();
             gameObjects.Add(contextMenu);
             

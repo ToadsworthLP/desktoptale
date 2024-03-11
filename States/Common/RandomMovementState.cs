@@ -1,4 +1,5 @@
 ﻿using System;
+using Desktoptale.Characters;
 using SharpDX;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Desktoptale.Characters
@@ -11,9 +10,9 @@ namespace Desktoptale.Characters
         public override void LoadContent(ContentManager contentManager)
         {
             OrientedAnimatedSprite idleSprite = new OrientedAnimatedSprite(
-                contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Idle_Up"),    
-                contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Idle_Down"),    
-                contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Idle_Left"),    
+                contentManager.Load<Texture2D>("Included/Ceroba/Spr_Ceroba_Idle_Up"),    
+                contentManager.Load<Texture2D>("Included/Ceroba/Spr_Ceroba_Idle_Down"),    
+                contentManager.Load<Texture2D>("Included/Ceroba/Spr_Ceroba_Idle_Left"),    
                 1
             );
             idleSprite.Loop = false;
@@ -21,9 +20,9 @@ namespace Desktoptale.Characters
             IdleSprite = idleSprite;
 
             OrientedAnimatedSprite walkSprite = new OrientedAnimatedSprite(
-                contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Walk_Up"),
-                contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Walk_Down"),
-                contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Walk_Left"),
+                contentManager.Load<Texture2D>("Included/Ceroba/Spr_Ceroba_Walk_Up"),
+                contentManager.Load<Texture2D>("Included/Ceroba/Spr_Ceroba_Walk_Down"),
+                contentManager.Load<Texture2D>("Included/Ceroba/Spr_Ceroba_Walk_Left"),
                 4
             );
             walkSprite.Loop = true;
@@ -32,9 +31,9 @@ namespace Desktoptale.Characters
             WalkSprite = walkSprite;
 
             OrientedAnimatedSprite runSprite = new OrientedAnimatedSprite(
-                contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Run_Up"),    
-                contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Run_Down"),    
-                contentManager.Load<Texture2D>("Characters/Ceroba/Spr_Ceroba_Run_Left"),    
+                contentManager.Load<Texture2D>("Included/Ceroba/Spr_Ceroba_Run_Up"),    
+                contentManager.Load<Texture2D>("Included/Ceroba/Spr_Ceroba_Run_Down"),    
+                contentManager.Load<Texture2D>("Included/Ceroba/Spr_Ceroba_Run_Left"),    
                 6
             );
             runSprite.Loop = true;
