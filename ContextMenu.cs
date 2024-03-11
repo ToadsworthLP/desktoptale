@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Desktoptale.Characters;
 using Desktoptale.Messages;
@@ -33,7 +34,7 @@ namespace Desktoptale
         public void Initialize()
         {
             MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
-            MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
+            MessageBus.Subscribe<CharacterChangeSuccessMessage>(OnCharacterChangeSuccessMessage);
             MessageBus.Subscribe<IdleMovementChangeRequestedMessage>(OnIdleMovementChangeRequestedMessage);
             MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
         }
@@ -54,13 +55,31 @@ namespace Desktoptale
             ToolStripMenuItem characterItem = new ToolStripMenuItem("Character");
             contextMenuStrip.Items.Add(characterItem);
 
+            IDictionary<string, ToolStripMenuItem> categoryItems = new Dictionary<string, ToolStripMenuItem>();
+
             foreach (CharacterType character in characterRegistry.GetAll())
             {
-                // TODO group characters by category
-                
                 ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(character.Name, null, (o, e) => MessageBus.Send(new CharacterChangeRequestedMessage { Character = character }));
                 characterSelectItem.Checked = currentCharacter == character;
-                characterItem.DropDownItems.Add(characterSelectItem);
+                
+                ToolStripMenuItem parent;
+                if (character.Category == null)
+                {
+                    parent = characterItem;
+                }
+                else
+                {
+                    if (!categoryItems.ContainsKey(character.Category))
+                    {
+                        ToolStripMenuItem categoryItem = new ToolStripMenuItem(character.Category);
+                        characterItem.DropDownItems.Add(categoryItem);
+                        categoryItems.Add(character.Category, categoryItem);
+                    }
+
+                    parent = categoryItems[character.Category];
+                }
+
+                parent.DropDownItems.Add(characterSelectItem);
             }
             
             ToolStripMenuItem scaleItem = new ToolStripMenuItem("Scale");
@@ -96,7 +115,7 @@ namespace Desktoptale
             currentScaleFactor = (int)message.ScaleFactor;
         }
 
-        private void OnCharacterChangeRequestedMessage(CharacterChangeRequestedMessage message)
+        private void OnCharacterChangeSuccessMessage(CharacterChangeSuccessMessage message)
         {
             currentCharacter = message.Character;
         }

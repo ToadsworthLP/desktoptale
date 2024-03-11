@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Desktoptale.Characters;
 using Desktoptale.Messages;
 using Desktoptale.Messaging;
@@ -19,19 +20,16 @@ namespace Desktoptale
 
         private Character character;
         private ISet<IGameObject> gameObjects;
-        
+
         public Desktoptale()
         {
-            characterRegistry = new CharacterRegistry();
-
             graphics = new GraphicsDeviceManager(this);
             Window.Title = ProgramInfo.NAME;
             
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-
-            ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory("Content/Characters/");
-            externalCharacterFactory.AddAllToRegistry(characterRegistry);
+            
+            characterRegistry = new CharacterRegistry();
             
             WindowsUtils.MakeWindowOverlay(Window);
         }
@@ -69,7 +67,8 @@ namespace Desktoptale
         /// </summary>
         protected override void LoadContent()
         {
-            
+            ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory("Content/Characters/", graphics.GraphicsDevice);
+            externalCharacterFactory.AddAllToRegistry(characterRegistry);
         }
 
         /// <summary>
@@ -118,10 +117,19 @@ namespace Desktoptale
         
         private void OnCharacterChangeRequestedMessage(CharacterChangeRequestedMessage message)
         {
-            Character newCharacter = message.Character.FactoryFunction
-                .Invoke(new CharacterCreationContext(graphics, Window, spriteBatch, inputManager));
-            
-            newCharacter.LoadContent(Content);
+            Character newCharacter;
+            try
+            {
+                newCharacter = message.Character.FactoryFunction
+                    .Invoke(new CharacterCreationContext(graphics, Window, spriteBatch, inputManager));
+
+                newCharacter.LoadContent(Content);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Failed to switch character: {e.Message}");
+                return;
+            }
 
             if (character != null)
             {
@@ -141,6 +149,8 @@ namespace Desktoptale
             newCharacter.Initialize();
             gameObjects.Add(newCharacter);
             character = newCharacter;
+            
+            MessageBus.Send(new CharacterChangeSuccessMessage { Character = message.Character });
         }
     }
 }

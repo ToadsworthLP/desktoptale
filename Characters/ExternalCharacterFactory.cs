@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Forms;
 using Desktoptale.Registry;
+using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 
 namespace Desktoptale.Characters
@@ -9,24 +10,20 @@ namespace Desktoptale.Characters
     public class ExternalCharacterFactory
     {
         private string rootPath;
+        private SpriteCache spriteCache;
+        private GraphicsDevice graphicsDevice;
 
-        public ExternalCharacterFactory(string rootPath)
+        public ExternalCharacterFactory(string rootPath, GraphicsDevice graphicsDevice)
         {
             this.rootPath = rootPath;
+            this.graphicsDevice = graphicsDevice;
+            spriteCache = new SpriteCache(this.graphicsDevice);
         }
 
         public void AddAllToRegistry(IRegistry<CharacterType, int> registry)
         {
             if (!Directory.Exists(rootPath))
             {
-                try
-                {
-                    Directory.CreateDirectory(rootPath);
-                }
-                catch (Exception e)
-                {
-                    ShowDirectoryError();
-                }
                 return;
             }
             
@@ -63,16 +60,65 @@ namespace Desktoptale.Characters
             if (!ValidateCharacterDefinition(externalCharacterDefinition))
                 return;
 
+            string basePath = new FileInfo(path).Directory.FullName;
             CharacterType characterType = new CharacterType(externalCharacterDefinition.Name, externalCharacterDefinition.Category, context =>
             {
                 ExternalCharacter externalCharacter = new ExternalCharacter(context);
-                
-                // TODO set up sprites and cache them so avoid loading the same one multiple times
+                SetupState((s) => externalCharacter.IdleSprite = s, externalCharacterDefinition.Idle, basePath);
+                SetupState((s) => externalCharacter.WalkSprite = s, externalCharacterDefinition.Walk, basePath);
+                SetupState((s) => externalCharacter.RunSprite = s, externalCharacterDefinition.Run, basePath);
                 
                 return externalCharacter;
             });
 
             registry.Add(characterType);
+        }
+
+        private void SetupState(Action<IAnimatedSprite> setter, ExternalCharacterDefinition.ExternalCharacterStateDefinition state, string basePath)
+        {
+            OrientedAnimatedSprite sprite;
+            if (state.Right == null)
+            {
+                sprite = new OrientedAnimatedSprite(
+                    GetSpriteForOrientation(state.Up, basePath),
+                    GetSpriteForOrientation(state.Down, basePath),
+                    GetSpriteForOrientation(state.Left, basePath)
+                );
+            }
+            else
+            {
+                sprite = new OrientedAnimatedSprite(
+                    GetSpriteForOrientation(state.Up, basePath),
+                    GetSpriteForOrientation(state.Down, basePath),
+                    GetSpriteForOrientation(state.Left, basePath),
+                    GetSpriteForOrientation(state.Right, basePath)
+                );
+            }
+            
+            setter.Invoke(sprite);
+        }
+
+        private AnimatedSprite GetSpriteForOrientation(ExternalCharacterDefinition.ExternalCharacterSpriteDefinition spriteDefinition, string basePath)
+        {
+            string absolutePath = Path.Combine(basePath, spriteDefinition.Sprite);
+
+            Texture2D texture;
+            try
+            {
+                texture = spriteCache.Get(absolutePath);
+            }
+            catch (Exception e)
+            {
+                ShowSpriteLoadError(absolutePath);
+                throw e;
+            }
+            
+            AnimatedSprite sprite = new AnimatedSprite(texture, spriteDefinition.FrameCount);
+            sprite.Framerate = spriteDefinition.FrameRate;
+            sprite.Loop = spriteDefinition.Loop;
+            sprite.StartFrame = spriteDefinition.StartFrame;
+
+            return sprite;
         }
 
         private bool ValidateCharacterDefinition(ExternalCharacterDefinition definition)
@@ -83,9 +129,9 @@ namespace Desktoptale.Characters
                 return false;
             }
 
-            if (definition.Category == null)
+            if (string.IsNullOrWhiteSpace(definition.Category))
             {
-                definition.Category = "";
+                definition.Category = null;
             }
 
             if (definition.Idle == null)
@@ -113,18 +159,20 @@ namespace Desktoptale.Characters
         {
             if (state.Down == null)
             {
-                ShowStateDefinitionError(characterName, stateName, "Up orientation undefined.");
+                ShowStateDefinitionError(characterName, stateName, "Orientation Down undefined.");
                 return false;
             }
 
             if (state.Up == null)
             {
-                state.Up = state.Down;
+                ShowStateDefinitionError(characterName, stateName, "Orientation Up undefined.");
+                return false;
             }
 
             if (state.Left == null)
             {
-                state.Left = state.Down;
+                ShowStateDefinitionError(characterName, stateName, "Orientation Left undefined.");
+                return false;
             }
 
             if (state.Right == null)
@@ -153,34 +201,34 @@ namespace Desktoptale.Characters
             return true;
         }
 
-        private void ShowDirectoryError()
+        private void ShowSpriteLoadError(string path)
         {
-            MessageBox.Show("Failed to create custom character directory.", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Failed to load sprite at {path}.", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
-
+        
         private void ShowJsonReadError(string path)
         {
-            MessageBox.Show($"Failed to read JSON file {path}.", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Failed to read JSON file {path}.", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void ShowJsonParseError(string path, string error)
         {
-            MessageBox.Show($"Failed to parse JSON file {path}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Failed to parse JSON file {path}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void ShowDefinitionError(string name, string error)
         {
-            MessageBox.Show($"Failed to load character {name}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Failed to load character {name}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
         
         private void ShowStateDefinitionError(string characterName, string stateName, string error)
         {
-            MessageBox.Show($"Failed to load state {stateName} of character {characterName}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Failed to load state {stateName} of character {characterName}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
         
         private void ShowSpriteDefinitionError(string characterName, string stateName, string orientation, string error)
         {
-            MessageBox.Show($"Failed to load sprite {orientation} of state {stateName} of character {characterName}:\n{error}","Custom Character Loader" , MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Failed to load sprite {orientation} of state {stateName} of character {characterName}:\n{error}","Custom Character Loader" , MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }

@@ -22,9 +22,9 @@ namespace Desktoptale.Characters
         public IState<Character> RandomMovementState { get; protected set; }
         public IState<Character> RandomMovementWaitState { get; protected set; }
     
-        public IAnimatedSprite IdleSprite { get; protected set; }
-        public IAnimatedSprite WalkSprite { get; protected set; }
-        public IAnimatedSprite RunSprite { get; protected set; }
+        public IAnimatedSprite IdleSprite { get; set; }
+        public IAnimatedSprite WalkSprite { get; set; }
+        public IAnimatedSprite RunSprite { get; set; }
         public IAnimatedSprite CurrentSprite { get; set; }
         public bool IsBeingDragged => dragging;
         public bool EnableIdleMovement { get; set; }
