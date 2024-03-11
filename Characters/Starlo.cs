@@ -33,15 +33,15 @@ namespace Desktoptale.Characters
             WalkSprite = walkSprite;
 
             OrientedAnimatedSprite runSprite = new OrientedAnimatedSprite(
-                contentManager.Load<Texture2D>("Included/Starlo/Spr_Starlo_Walk_Up"),    
-                contentManager.Load<Texture2D>("Included/Starlo/Spr_Starlo_Walk_Down"),    
-                contentManager.Load<Texture2D>("Included/Starlo/Spr_Starlo_Walk_Left"),    
-                contentManager.Load<Texture2D>("Included/Starlo/Spr_Starlo_Walk_Right"),    
-                4
+                contentManager.Load<Texture2D>("Included/Starlo/Spr_Starlo_Run_Up"),    
+                contentManager.Load<Texture2D>("Included/Starlo/Spr_Starlo_Run_Down"),    
+                contentManager.Load<Texture2D>("Included/Starlo/Spr_Starlo_Run_Left"),    
+                contentManager.Load<Texture2D>("Included/Starlo/Spr_Starlo_Run_Right"),    
+                6
             );
             runSprite.Loop = true;
             runSprite.Framerate = 10;
-            runSprite.StartFrame = 1;
+            runSprite.StartFrame = 0;
             RunSprite = runSprite;
         }
     }
