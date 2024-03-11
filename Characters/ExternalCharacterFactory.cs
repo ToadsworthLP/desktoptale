@@ -66,7 +66,16 @@ namespace Desktoptale.Characters
                 ExternalCharacter externalCharacter = new ExternalCharacter(context);
                 SetupState((s) => externalCharacter.IdleSprite = s, externalCharacterDefinition.Idle, basePath);
                 SetupState((s) => externalCharacter.WalkSprite = s, externalCharacterDefinition.Walk, basePath);
-                SetupState((s) => externalCharacter.RunSprite = s, externalCharacterDefinition.Run, basePath);
+
+                if (externalCharacterDefinition.Run == null)
+                {
+                    SetupState((s) => externalCharacter.RunSprite = s, externalCharacterDefinition.Walk, basePath);
+                    externalCharacter.RunSprite.Framerate = externalCharacter.WalkSprite.Framerate * 2;
+                }
+                else
+                {
+                    SetupState((s) => externalCharacter.RunSprite = s, externalCharacterDefinition.Run, basePath);
+                }
                 
                 return externalCharacter;
             });
@@ -147,7 +156,8 @@ namespace Desktoptale.Characters
 
             if (definition.Run == null)
             {
-                definition.Run = definition.Walk;
+                return ValidateCharacterStateDefinition(definition.Idle, definition.Name, "Idle") &&
+                       ValidateCharacterStateDefinition(definition.Walk, definition.Name, "Walk");
             }
 
             return ValidateCharacterStateDefinition(definition.Idle, definition.Name, "Idle") &&

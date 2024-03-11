@@ -67,7 +67,7 @@ namespace Desktoptale
         /// </summary>
         protected override void LoadContent()
         {
-            ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory("Content/Characters/", graphics.GraphicsDevice);
+            ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory("Content/Custom/", graphics.GraphicsDevice);
             externalCharacterFactory.AddAllToRegistry(characterRegistry);
         }
 
