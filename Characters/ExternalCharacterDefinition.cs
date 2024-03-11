@@ -9,19 +9,19 @@
         
         public class ExternalCharacterStateDefinition
         {
-            public ExternalCharacterSpriteDefinition Sprites { get; set; }
-            public double FrameRate { get; set; }
-            public int FrameCount { get; set; }
-            public bool Loop { get; set; }
-            public int StartFrame { get; set; }
+            public ExternalCharacterSpriteDefinition Up { get; set; }
+            public ExternalCharacterSpriteDefinition Down { get; set; }
+            public ExternalCharacterSpriteDefinition Left { get; set; }
+            public ExternalCharacterSpriteDefinition Right { get; set; }
         }
         
         public class ExternalCharacterSpriteDefinition
         {
-            public string Up { get; set; }
-            public string Down { get; set; }
-            public string Left { get; set; }
-            public string Right { get; set; }
+            public string Sprite { get; set; }
+            public double FrameRate { get; set; }
+            public int FrameCount { get; set; }
+            public int StartFrame { get; set; }
+            public bool Loop { get; set; }
         }
     }
 }
