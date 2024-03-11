@@ -23,7 +23,7 @@ namespace Desktoptale
         public Desktoptale()
         {
             characterRegistry = new CharacterRegistry();
-            
+
             graphics = new GraphicsDeviceManager(this);
             Window.Title = ProgramInfo.NAME;
             

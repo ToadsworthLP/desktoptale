@@ -56,6 +56,8 @@ namespace Desktoptale
 
             foreach (CharacterType character in characterRegistry.GetAll())
             {
+                // TODO group characters by category
+                
                 ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(character.Name, null, (o, e) => MessageBus.Send(new CharacterChangeRequestedMessage { Character = character }));
                 characterSelectItem.Checked = currentCharacter == character;
                 characterItem.DropDownItems.Add(characterSelectItem);
