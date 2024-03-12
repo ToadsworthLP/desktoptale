@@ -36,9 +36,7 @@ namespace Desktoptale.Characters
         private SpriteBatch spriteBatch;
 
         private bool dragging;
-        private Point previousSpriteFrameSize;
         private Orientation orientation = Orientation.Down;
-        private Orientation previousOrientation = Orientation.Down;
     
         private Subscription scaleChangeRequestedSubscription;
         private Subscription idleMovementChangeRequestedSubscription;
@@ -55,11 +53,6 @@ namespace Desktoptale.Characters
         {
             CurrentSprite?.Stop();
             CurrentSprite = sprite;
-        
-            if(previousSpriteFrameSize != sprite.FrameSize)
-                UpdateWindowSize();
-
-            previousSpriteFrameSize = sprite.FrameSize;
         }
 
         public virtual void Initialize()
@@ -76,6 +69,8 @@ namespace Desktoptale.Characters
             StateMachine = new StateMachine<Character>(this, InitialState);
             StateMachine.StateChanged += (state, newState) => UpdateOrientation();
         
+            UpdateWindowSize(GetMaximumFrameSize());
+            
             InputManager.GrabFocus();
         }
 
@@ -117,7 +112,7 @@ namespace Desktoptale.Characters
         private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
         {
             Scale = new Vector2(message.ScaleFactor, message.ScaleFactor);
-            UpdateWindowSize();
+            UpdateWindowSize(GetMaximumFrameSize());
             InputManager.GrabFocus();
         }
         
@@ -131,18 +126,12 @@ namespace Desktoptale.Characters
             Orientation? updatedOrientation = GetOrientationFromVelocity(Velocity);
             if (updatedOrientation != null)
             {
-                previousOrientation = orientation;
                 orientation = updatedOrientation.Value;
             }
 
             if (CurrentSprite is OrientedAnimatedSprite sprite)
             {
                 sprite.Orientation = orientation;
-
-                if (previousOrientation != orientation)
-                {
-                    UpdateWindowSize();
-                }
             }
         }
 
@@ -200,12 +189,38 @@ namespace Desktoptale.Characters
             return new Point((int)(CurrentSprite.FrameSize.X * Scale.X), (int)(CurrentSprite.FrameSize.Y * Scale.Y));
         }
 
-        private void UpdateWindowSize()
+        private Point GetMaximumFrameSize()
+        {
+            Point size = new Point(0, 0);
+
+            Point idleSize = IdleSprite is OrientedAnimatedSprite orientedIdle
+                ? orientedIdle.GetMaximumFrameSize()
+                : IdleSprite.FrameSize;
+
+            Point walkSize = WalkSprite is OrientedAnimatedSprite orientedWalk
+                ? orientedWalk.GetMaximumFrameSize()
+                : WalkSprite.FrameSize;
+
+            Point runSize = RunSprite is OrientedAnimatedSprite orientedRun
+                ? orientedRun.GetMaximumFrameSize()
+                : RunSprite.FrameSize;
+
+            size.X = Math.Max(size.X, idleSize.X);
+            size.X = Math.Max(size.X, walkSize.X);
+            size.X = Math.Max(size.X, runSize.X);
+            
+            size.Y = Math.Max(size.Y, idleSize.Y);
+            size.Y = Math.Max(size.Y, walkSize.Y);
+            size.Y = Math.Max(size.Y, runSize.Y);
+
+            return new Point((int)(size.X * Scale.X), (int)(size.Y * Scale.Y));
+        }
+
+        private void UpdateWindowSize(Point windowSize)
         {
             int oldWidth = graphics.PreferredBackBufferWidth;
             int oldHeight = graphics.PreferredBackBufferHeight;
         
-            Point windowSize = GetWindowSize();
             graphics.PreferredBackBufferWidth = windowSize.X;
             graphics.PreferredBackBufferHeight = windowSize.Y;
             graphics.ApplyChanges();

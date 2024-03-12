@@ -161,6 +161,23 @@ namespace Desktoptale
             SpriteForOrientation(Orientation).Draw(spriteBatch, position, color, rotation, origin, scale, effects, layerDepth);
         }
 
+        public Point GetMaximumFrameSize()
+        {
+            Point size = new Point(0, 0);
+
+            size.X = Math.Max(size.X, upSprite.FrameSize.X);
+            size.X = Math.Max(size.X, downSprite.FrameSize.X);
+            size.X = Math.Max(size.X, leftSprite.FrameSize.X);
+            size.X = Math.Max(size.X, rightSprite.FrameSize.X);
+            
+            size.Y = Math.Max(size.Y, upSprite.FrameSize.Y);
+            size.Y = Math.Max(size.Y, downSprite.FrameSize.Y);
+            size.Y = Math.Max(size.Y, leftSprite.FrameSize.Y);
+            size.Y = Math.Max(size.Y, rightSprite.FrameSize.Y);
+            
+            return size;
+        }
+
         private void UpdateOrientation(Orientation oldValue, Orientation newValue)
         {
             AnimatedSprite oldSprite = SpriteForOrientation(oldValue);
