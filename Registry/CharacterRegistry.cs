@@ -9,6 +9,9 @@ namespace Desktoptale.Registry
         public static readonly CharacterType PAPYRUS = new CharacterType("Papyrus", "Undertale", ctx => new Papyrus(ctx));
         public static readonly CharacterType SANS = new CharacterType("Sans", "Undertale", ctx => new Sans(ctx));
         public static readonly CharacterType UNDYNE = new CharacterType("Undyne", "Undertale", ctx => new Undyne(ctx));
+        public static readonly CharacterType UNDYNE_ARMORED = new CharacterType("Undyne (Armored)", "Undertale", ctx => new UndyneArmored(ctx));
+        public static readonly CharacterType ALPHYS = new CharacterType("Alphys", "Undertale", ctx => new Alphys(ctx));
+        public static readonly CharacterType ASGORE = new CharacterType("Asgore", "Undertale", ctx => new Asgore(ctx));
         
         public static readonly CharacterType CLOVER = new CharacterType("Clover", "Undertale Yellow", ctx => new Clover(ctx));
         public static readonly CharacterType DALV = new CharacterType("Dalv", "Undertale Yellow", ctx => new Dalv(ctx));
@@ -25,6 +28,9 @@ namespace Desktoptale.Registry
             Add(PAPYRUS);
             Add(SANS);
             Add(UNDYNE);
+            Add(UNDYNE_ARMORED);
+            Add(ALPHYS);
+            Add(ASGORE);
             
             Add(CLOVER);
             Add(DALV);
