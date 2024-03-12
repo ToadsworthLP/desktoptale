@@ -132,7 +132,7 @@ namespace Desktoptale
 
         private void ShowInfoScreen()
         {
-            MessageBox.Show($"{ProgramInfo.NAME} {ProgramInfo.VERSION}\nCreated by {ProgramInfo.AUTHOR}\n\n{ProgramInfo.CREDITS}\n\n{ProgramInfo.DISCLAIMER}", "About");
+            MessageBox.Show($"{ProgramInfo.NAME} {ProgramInfo.VERSION}\nCreated by {ProgramInfo.AUTHOR}\n\n{ProgramInfo.CREDITS}\n{ProgramInfo.DISCLAIMER}", "About");
         }
 
         public void LoadContent(ContentManager contentManager) {}

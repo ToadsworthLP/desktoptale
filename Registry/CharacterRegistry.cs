@@ -10,6 +10,7 @@ namespace Desktoptale.Registry
         public static readonly CharacterType STARLO = new CharacterType("Starlo", "Undertale Yellow", ctx => new Starlo(ctx));
         public static readonly CharacterType CEROBA = new CharacterType("Ceroba", "Undertale Yellow", ctx => new Ceroba(ctx));
         public static readonly CharacterType AXIS = new CharacterType("Axis", "Undertale Yellow", ctx => new Axis(ctx));
+        public static readonly CharacterType KANAKO = new CharacterType("Kanako", "Undertale Yellow", ctx => new Kanako(ctx));
 
         public CharacterRegistry()
         {
@@ -19,6 +20,7 @@ namespace Desktoptale.Registry
             Add(STARLO);
             Add(CEROBA);
             Add(AXIS);
+            Add(KANAKO);
         }
     }
 }
