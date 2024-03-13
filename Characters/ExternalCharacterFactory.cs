@@ -3,7 +3,8 @@ using System.IO;
 using System.Windows.Forms;
 using Desktoptale.Registry;
 using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace Desktoptale.Characters
 {
@@ -12,12 +13,17 @@ namespace Desktoptale.Characters
         private string rootPath;
         private SpriteCache spriteCache;
         private GraphicsDevice graphicsDevice;
+        private IDeserializer deserializer;
 
         public ExternalCharacterFactory(string rootPath, GraphicsDevice graphicsDevice)
         {
             this.rootPath = rootPath;
             this.graphicsDevice = graphicsDevice;
             spriteCache = new SpriteCache(this.graphicsDevice);
+
+            deserializer = new DeserializerBuilder()
+                .WithNamingConvention(PascalCaseNamingConvention.Instance)
+                .Build();
         }
 
         public void AddAllToRegistry(IRegistry<CharacterType, int> registry)
@@ -27,33 +33,33 @@ namespace Desktoptale.Characters
                 return;
             }
             
-            foreach (string jsonPath in Directory.EnumerateFiles(rootPath, "*.json", SearchOption.AllDirectories))
+            foreach (string definitionPath in Directory.EnumerateFiles(rootPath, "*.yaml", SearchOption.AllDirectories))
             {
-                string json;
+                string definitionString;
                 try
                 {
-                    json = File.ReadAllText(jsonPath);
+                    definitionString = File.ReadAllText(definitionPath);
                 }
                 catch (Exception e)
                 {
-                    ShowJsonReadError(jsonPath);
+                    ShowDefinitionReadError(definitionPath);
                     continue;
                 }
                 
-                AddToRegistry(registry, jsonPath, json);
+                AddToRegistry(registry, definitionPath, definitionString);
             }
         }
 
-        private void AddToRegistry(IRegistry<CharacterType, int> registry, string path, string json)
+        private void AddToRegistry(IRegistry<CharacterType, int> registry, string path, string definitionString)
         {
             ExternalCharacterDefinition externalCharacterDefinition;
             try
             {
-                externalCharacterDefinition = JsonConvert.DeserializeObject<ExternalCharacterDefinition>(json);
+                externalCharacterDefinition = deserializer.Deserialize<ExternalCharacterDefinition>(definitionString);
             }
             catch (Exception e)
             {
-                ShowJsonParseError(path, e.Message);
+                ShowDefinitionParseError(path, e.Message);
                 return;
             }
 
@@ -91,7 +97,9 @@ namespace Desktoptale.Characters
                 sprite = new OrientedAnimatedSprite(
                     GetSpriteForOrientation(state.Up, basePath),
                     GetSpriteForOrientation(state.Down, basePath),
-                    GetSpriteForOrientation(state.Left, basePath)
+                    GetSpriteForOrientation(state.Left, basePath),
+                    GetSpriteForOrientation(state.Left, basePath),
+                    true
                 );
             }
             else
@@ -100,7 +108,8 @@ namespace Desktoptale.Characters
                     GetSpriteForOrientation(state.Up, basePath),
                     GetSpriteForOrientation(state.Down, basePath),
                     GetSpriteForOrientation(state.Left, basePath),
-                    GetSpriteForOrientation(state.Right, basePath)
+                    GetSpriteForOrientation(state.Right, basePath),
+                    false
                 );
             }
             
@@ -124,7 +133,7 @@ namespace Desktoptale.Characters
             
             AnimatedSprite sprite = new AnimatedSprite(texture, spriteDefinition.FrameCount);
             sprite.Framerate = spriteDefinition.FrameRate;
-            sprite.Loop = spriteDefinition.Loop;
+            sprite.Loop = true;
             sprite.StartFrame = spriteDefinition.StartFrame;
 
             return sprite;
@@ -216,14 +225,14 @@ namespace Desktoptale.Characters
             MessageBox.Show($"Failed to load sprite at {path}.", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
         
-        private void ShowJsonReadError(string path)
+        private void ShowDefinitionReadError(string path)
         {
-            MessageBox.Show($"Failed to read JSON file {path}.", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show($"Failed to read definition file {path}.", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
-        private void ShowJsonParseError(string path, string error)
+        private void ShowDefinitionParseError(string path, string error)
         {
-            MessageBox.Show($"Failed to parse JSON file {path}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show($"Failed to parse definition file {path}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void ShowDefinitionError(string name, string error)

@@ -55,7 +55,7 @@ namespace Desktoptale
 
         public void Update(GameTime gameTime)
         {
-            if (Playing)
+            if (Playing && frameCount > 1)
             {
                 if (justStarted)
                 {

@@ -22,7 +22,6 @@
             public double FrameRate { get; set; }
             public int FrameCount { get; set; } = 1;
             public int StartFrame { get; set; }
-            public bool Loop { get; set; } = true;
         }
     }
 }

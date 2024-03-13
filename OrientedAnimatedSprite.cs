@@ -107,7 +107,7 @@ namespace Desktoptale
             flipRightSprite = true;
         }
 
-        public OrientedAnimatedSprite(AnimatedSprite upSprite, AnimatedSprite downSprite, AnimatedSprite leftSprite, AnimatedSprite rightSprite)
+        public OrientedAnimatedSprite(AnimatedSprite upSprite, AnimatedSprite downSprite, AnimatedSprite leftSprite, AnimatedSprite rightSprite, bool flipRightSprite = false)
         {
             this.upSprite = upSprite;
             this.downSprite = downSprite;
@@ -115,17 +115,7 @@ namespace Desktoptale
             this.rightSprite = rightSprite;
             
             Orientation = Orientation.Down;
-        }
-        
-        public OrientedAnimatedSprite(AnimatedSprite upSprite, AnimatedSprite downSprite, AnimatedSprite leftSprite)
-        {
-            this.upSprite = upSprite;
-            this.downSprite = downSprite;
-            this.leftSprite = leftSprite;
-            this.rightSprite = leftSprite;
-            
-            Orientation = Orientation.Down;
-            flipRightSprite = true;
+            this.flipRightSprite = flipRightSprite;
         }
 
         public void Play()
