@@ -21,6 +21,11 @@ namespace Desktoptale.Registry
         public static readonly CharacterType AXIS = new CharacterType("Axis", "Undertale Yellow", ctx => new Axis(ctx));
         public static readonly CharacterType KANAKO = new CharacterType("Kanako", "Undertale Yellow", ctx => new Kanako(ctx));
         
+        public static readonly CharacterType KRIS = new CharacterType("Kris", "Deltarune", ctx => new Kris(ctx));
+        public static readonly CharacterType KRIS_DW = new CharacterType("Kris (Dark World)", "Deltarune", ctx => new KrisDW(ctx));
+        public static readonly CharacterType SUSIE = new CharacterType("Susie", "Deltarune", ctx => new Susie(ctx));
+        public static readonly CharacterType SUSIE_DW = new CharacterType("Susie (Dark World)", "Deltarune", ctx => new SusieDW(ctx));
+        
         public CharacterRegistry()
         {
             Add(FRISK);
@@ -39,6 +44,11 @@ namespace Desktoptale.Registry
             Add(CEROBA);
             Add(AXIS);
             Add(KANAKO);
+
+            Add(KRIS);
+            Add(KRIS_DW);
+            Add(SUSIE);
+            Add(SUSIE_DW);
         }
     }
 }
