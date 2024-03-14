@@ -4,7 +4,7 @@
     {
         public const string NAME = "Desktoptale";
         public const string AUTHOR = "ToadsworthLP";
-        public const string VERSION = "1.1.0-beta1";
+        public const string VERSION = "1.1.0-beta2";
         public const string DISCLAIMER = "UNDERTALE and DELTARUNE created by Toby Fox\nUndertale Yellow created by Team UTY\nNot affiliated with or endorsed by Team UTY or Toby Fox";
         
         public const string CREDITS = @"Additional Credits:

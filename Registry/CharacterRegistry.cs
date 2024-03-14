@@ -22,8 +22,9 @@ namespace Desktoptale.Registry
         public static readonly CharacterType MOOCH = new CharacterType("Mooch", "Undertale Yellow", ctx => new StandardCharacter(ctx, "Mooch", true));
         public static readonly CharacterType STARLO = new CharacterType("Starlo", "Undertale Yellow", ctx => new Starlo(ctx));
         public static readonly CharacterType CEROBA = new CharacterType("Ceroba", "Undertale Yellow", ctx => new Ceroba(ctx));
-        public static readonly CharacterType AXIS = new CharacterType("Axis", "Undertale Yellow", ctx => new Axis(ctx));
         public static readonly CharacterType KANAKO = new CharacterType("Kanako", "Undertale Yellow", ctx => new Kanako(ctx));
+        public static readonly CharacterType CHUJIN = new CharacterType("Chujin", "Undertale Yellow", ctx => new Chujin(ctx));
+        public static readonly CharacterType AXIS = new CharacterType("Axis", "Undertale Yellow", ctx => new Axis(ctx));
         
         public static readonly CharacterType KRIS = new CharacterType("Kris", "Deltarune", ctx => new StandardCharacter(ctx, "Kris", false));
         public static readonly CharacterType KRIS_DW = new CharacterType("Kris (Dark World)", "Deltarune", ctx => new StandardCharacter(ctx, "KrisDW", true));
@@ -54,8 +55,9 @@ namespace Desktoptale.Registry
             Add(MOOCH);
             Add(STARLO);
             Add(CEROBA);
-            Add(AXIS);
+            Add(CHUJIN);
             Add(KANAKO);
+            Add(AXIS);
 
             Add(KRIS);
             Add(KRIS_DW);
