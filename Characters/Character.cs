@@ -13,6 +13,8 @@ namespace Desktoptale.Characters
         public Vector2 Position;
         public Vector2 Velocity;
         public Vector2 Scale;
+        
+        public Orientation Orientation = Orientation.Down;
     
         public InputManager InputManager { get; }
         public StateMachine<Character> StateMachine { get; protected set; }
@@ -28,6 +30,7 @@ namespace Desktoptale.Characters
         public IAnimatedSprite CurrentSprite { get; set; }
         public bool IsBeingDragged => dragging;
         public bool EnableIdleMovement { get; set; }
+        public bool EnabledAutoOrientation { get; set; } = true;
 
         protected virtual IState<Character> InitialState => IdleState;
     
@@ -36,8 +39,7 @@ namespace Desktoptale.Characters
         private SpriteBatch spriteBatch;
 
         private bool dragging;
-        private Orientation orientation = Orientation.Down;
-    
+        
         private Subscription scaleChangeRequestedSubscription;
         private Subscription idleMovementChangeRequestedSubscription;
 
@@ -79,8 +81,16 @@ namespace Desktoptale.Characters
         public virtual void Update(GameTime gameTime)
         {
             StateMachine.Update(gameTime);
-        
-            UpdateOrientation();
+
+            if (EnabledAutoOrientation)
+            {
+                UpdateOrientation();
+            }
+            
+            if (CurrentSprite is OrientedAnimatedSprite sprite)
+            {
+                sprite.Orientation = Orientation;
+            }
         
             Position.X += (int)Math.Round(Velocity.X);
             Position.Y += (int)Math.Round(Velocity.Y);
@@ -126,12 +136,7 @@ namespace Desktoptale.Characters
             Orientation? updatedOrientation = GetOrientationFromVelocity(Velocity);
             if (updatedOrientation != null)
             {
-                orientation = updatedOrientation.Value;
-            }
-
-            if (CurrentSprite is OrientedAnimatedSprite sprite)
-            {
-                sprite.Orientation = orientation;
+                Orientation = updatedOrientation.Value;
             }
         }
 
@@ -196,23 +201,30 @@ namespace Desktoptale.Characters
             Point idleSize = IdleSprite is OrientedAnimatedSprite orientedIdle
                 ? orientedIdle.GetMaximumFrameSize()
                 : IdleSprite.FrameSize;
-
-            Point walkSize = WalkSprite is OrientedAnimatedSprite orientedWalk
-                ? orientedWalk.GetMaximumFrameSize()
-                : WalkSprite.FrameSize;
-
-            Point runSize = RunSprite is OrientedAnimatedSprite orientedRun
-                ? orientedRun.GetMaximumFrameSize()
-                : RunSprite.FrameSize;
-
-            size.X = Math.Max(size.X, idleSize.X);
-            size.X = Math.Max(size.X, walkSize.X);
-            size.X = Math.Max(size.X, runSize.X);
             
+            size.X = Math.Max(size.X, idleSize.X);
             size.Y = Math.Max(size.Y, idleSize.Y);
-            size.Y = Math.Max(size.Y, walkSize.Y);
-            size.Y = Math.Max(size.Y, runSize.Y);
 
+            if (WalkSprite != null)
+            {
+                Point walkSize = WalkSprite is OrientedAnimatedSprite orientedWalk
+                    ? orientedWalk.GetMaximumFrameSize()
+                    : WalkSprite.FrameSize;
+                
+                size.X = Math.Max(size.X, walkSize.X);
+                size.Y = Math.Max(size.Y, walkSize.Y);
+            }
+
+            if (RunSprite != null)
+            {
+                Point runSize = RunSprite is OrientedAnimatedSprite orientedRun
+                    ? orientedRun.GetMaximumFrameSize()
+                    : RunSprite.FrameSize;
+                
+                size.X = Math.Max(size.X, runSize.X);
+                size.Y = Math.Max(size.Y, runSize.Y);
+            }
+            
             return new Point((int)(size.X * Scale.X), (int)(size.Y * Scale.Y));
         }
 
