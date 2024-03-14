@@ -16,6 +16,10 @@ namespace Desktoptale.Registry
         public static readonly CharacterType CLOVER = new CharacterType("Clover", "Undertale Yellow", ctx => new Clover(ctx));
         public static readonly CharacterType DALV = new CharacterType("Dalv", "Undertale Yellow", ctx => new Dalv(ctx));
         public static readonly CharacterType MARTLET = new CharacterType("Martlet", "Undertale Yellow", ctx => new Martlet(ctx));
+        public static readonly CharacterType ED = new CharacterType("Ed", "Undertale Yellow", ctx => new StandardCharacter(ctx, "Ed", false));
+        public static readonly CharacterType MORAY = new CharacterType("Moray", "Undertale Yellow", ctx => new Moray(ctx));
+        public static readonly CharacterType ACE = new CharacterType("Ace", "Undertale Yellow", ctx => new StandardCharacter(ctx, "Ace", false));
+        public static readonly CharacterType MOOCH = new CharacterType("Mooch", "Undertale Yellow", ctx => new StandardCharacter(ctx, "Mooch", true));
         public static readonly CharacterType STARLO = new CharacterType("Starlo", "Undertale Yellow", ctx => new Starlo(ctx));
         public static readonly CharacterType CEROBA = new CharacterType("Ceroba", "Undertale Yellow", ctx => new Ceroba(ctx));
         public static readonly CharacterType AXIS = new CharacterType("Axis", "Undertale Yellow", ctx => new Axis(ctx));
@@ -44,6 +48,10 @@ namespace Desktoptale.Registry
             Add(CLOVER);
             Add(DALV);
             Add(MARTLET);
+            Add(ED);
+            Add(MORAY);
+            Add(ACE);
+            Add(MOOCH);
             Add(STARLO);
             Add(CEROBA);
             Add(AXIS);
