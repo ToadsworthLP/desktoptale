@@ -5,11 +5,11 @@ namespace Desktoptale.Registry
     public class CharacterRegistry : IntKeyRegistry<CharacterType>
     {
         public static readonly CharacterType FRISK = new CharacterType("Frisk", "Undertale", ctx => new Frisk(ctx));
-        public static readonly CharacterType TORIEL = new CharacterType("Toriel", "Undertale", ctx => new Toriel(ctx));
-        public static readonly CharacterType PAPYRUS = new CharacterType("Papyrus", "Undertale", ctx => new Papyrus(ctx));
-        public static readonly CharacterType SANS = new CharacterType("Sans", "Undertale", ctx => new Sans(ctx));
+        public static readonly CharacterType TORIEL = new CharacterType("Toriel", "Undertale", ctx => new StandardCharacter(ctx, "Toriel", false));
+        public static readonly CharacterType PAPYRUS = new CharacterType("Papyrus", "Undertale", ctx => new StandardCharacter(ctx, "Papyrus", true));
+        public static readonly CharacterType SANS = new CharacterType("Sans", "Undertale", ctx => new StandardCharacter(ctx, "Sans", false));
         public static readonly CharacterType UNDYNE = new CharacterType("Undyne", "Undertale", ctx => new Undyne(ctx));
-        public static readonly CharacterType UNDYNE_ARMORED = new CharacterType("Undyne (Armored)", "Undertale", ctx => new UndyneArmored(ctx));
+        public static readonly CharacterType UNDYNE_ARMORED = new CharacterType("Undyne (Armored)", "Undertale", ctx => new StandardCharacter(ctx, "UndyneArmored", true));
         public static readonly CharacterType ALPHYS = new CharacterType("Alphys", "Undertale", ctx => new Alphys(ctx));
         public static readonly CharacterType ASGORE = new CharacterType("Asgore", "Undertale", ctx => new Asgore(ctx));
         
@@ -21,10 +21,14 @@ namespace Desktoptale.Registry
         public static readonly CharacterType AXIS = new CharacterType("Axis", "Undertale Yellow", ctx => new Axis(ctx));
         public static readonly CharacterType KANAKO = new CharacterType("Kanako", "Undertale Yellow", ctx => new Kanako(ctx));
         
-        public static readonly CharacterType KRIS = new CharacterType("Kris", "Deltarune", ctx => new Kris(ctx));
-        public static readonly CharacterType KRIS_DW = new CharacterType("Kris (Dark World)", "Deltarune", ctx => new KrisDW(ctx));
-        public static readonly CharacterType SUSIE = new CharacterType("Susie", "Deltarune", ctx => new Susie(ctx));
-        public static readonly CharacterType SUSIE_DW = new CharacterType("Susie (Dark World)", "Deltarune", ctx => new SusieDW(ctx));
+        public static readonly CharacterType KRIS = new CharacterType("Kris", "Deltarune", ctx => new StandardCharacter(ctx, "Kris", false));
+        public static readonly CharacterType KRIS_DW = new CharacterType("Kris (Dark World)", "Deltarune", ctx => new StandardCharacter(ctx, "KrisDW", true));
+        public static readonly CharacterType SUSIE = new CharacterType("Susie", "Deltarune", ctx => new StandardCharacter(ctx, "Susie", false));
+        public static readonly CharacterType SUSIE_DW = new CharacterType("Susie (Dark World)", "Deltarune", ctx => new StandardCharacter(ctx, "SusieDW", false));
+        public static readonly CharacterType RALSEI = new CharacterType("Ralsei", "Deltarune", ctx => new StandardCharacter(ctx, "Ralsei", false));
+        public static readonly CharacterType RALSEI_HATTED = new CharacterType("Ralsei (Hatted)", "Deltarune", ctx => new StandardCharacter(ctx, "RalseiHat", false));
+        public static readonly CharacterType NOELLE = new CharacterType("Noelle", "Deltarune", ctx => new StandardCharacter(ctx, "Noelle", false));
+        public static readonly CharacterType NOELLE_DW = new CharacterType("Noelle (Dark World)", "Deltarune", ctx => new StandardCharacter(ctx, "NoelleDW", false));
         
         public CharacterRegistry()
         {
@@ -49,6 +53,10 @@ namespace Desktoptale.Registry
             Add(KRIS_DW);
             Add(SUSIE);
             Add(SUSIE_DW);
+            Add(RALSEI_HATTED);
+            Add(RALSEI);
+            Add(NOELLE);
+            Add(NOELLE_DW);
         }
     }
 }
