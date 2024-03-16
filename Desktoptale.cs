@@ -20,6 +20,9 @@ namespace Desktoptale
 
         private Character character;
         private ISet<IGameObject> gameObjects;
+        
+        private const int FORCE_TOPMOST_WINDOW_INTERVAL = 30;
+        private int forceTopmostWindowCounter = 0;
 
         public Desktoptale()
         {
@@ -93,8 +96,14 @@ namespace Desktoptale
             {
                 gameObject.Update(gameTime);
             }
-            
-            WindowsUtils.MakeTopmostWindow(Window);
+
+            if (forceTopmostWindowCounter % FORCE_TOPMOST_WINDOW_INTERVAL == 0)
+            {
+                WindowsUtils.MakeTopmostWindow(Window);
+                forceTopmostWindowCounter = 0;
+            }
+
+            forceTopmostWindowCounter++;
             
             base.Update(gameTime);
         }

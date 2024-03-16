@@ -26,7 +26,8 @@ namespace Desktoptale
 
         [DllImport("dwmapi.dll")]
         static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref int[] pMarInset);
-
+        #endregion
+        
         const int GWL_EXSTYLE = -20;
         const int LWA_ALPHA = 0x00000002;
         const int WS_EX_LAYERED = 0x00080000;
@@ -37,35 +38,34 @@ namespace Desktoptale
         const int SWP_NOMOVE = 0x0002;
         const int SWP_NOSIZE = 0x0001;
         const int S_OK = 0x00000000;
-        #endregion
     
         public static void MakeWindowOverlay(GameWindow window)
-    {
-        // Set to layered, transparent window.
-        SetLastError(0);
-        int ret = SetWindowLong(window.Handle, GWL_EXSTYLE, WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST);
-        if (ret == 0 && Marshal.GetLastWin32Error() != 0)
-            throw new Win32Exception(Marshal.GetLastWin32Error());
-        
-        // Set to top-most window.
-        if (!SetWindowPos(window.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE))
-            throw new Win32Exception(Marshal.GetLastWin32Error());
+        {
+            // Set to layered, transparent window.
+            SetLastError(0);
+            int ret = SetWindowLong(window.Handle, GWL_EXSTYLE, WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST);
+            if (ret == 0 && Marshal.GetLastWin32Error() != 0)
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            
+            // Set to top-most window.
+            if (!SetWindowPos(window.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
 
-        // Required in order to make layered window visible.
-        if (!SetLayeredWindowAttributes(window.Handle, 0, 255, LWA_ALPHA))
-            throw new Win32Exception(Marshal.GetLastWin32Error());
+            // Required in order to make layered window visible.
+            if (!SetLayeredWindowAttributes(window.Handle, 0, 255, LWA_ALPHA))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
 
-        int[] margins = { -1 };
-        if ((ret = DwmExtendFrameIntoClientArea(window.Handle, ref margins)) != S_OK)
-            throw new Win32Exception(ret);
+            int[] margins = { -1 };
+            if ((ret = DwmExtendFrameIntoClientArea(window.Handle, ref margins)) != S_OK)
+                throw new Win32Exception(ret);
 
-        window.IsBorderless = true;
-    }
+            window.IsBorderless = true;
+        }
 
         public static void MakeTopmostWindow(GameWindow window)
-    {
-        if (!SetWindowPos(window.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE))
-            throw new Win32Exception(Marshal.GetLastWin32Error());
-    }
+        {
+            if (!SetWindowPos(window.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
     }
 }

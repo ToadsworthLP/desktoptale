@@ -39,6 +39,7 @@ namespace Desktoptale.Characters
         private SpriteBatch spriteBatch;
 
         private bool dragging;
+        private Vector2 previousPosition;
         
         private Subscription scaleChangeRequestedSubscription;
         private Subscription idleMovementChangeRequestedSubscription;
@@ -72,6 +73,8 @@ namespace Desktoptale.Characters
             StateMachine.StateChanged += (state, newState) => UpdateOrientation();
         
             UpdateWindowSize(GetMaximumFrameSize());
+            window.Position = new Point((int)Position.X, (int)Position.Y);
+            previousPosition = Position;
             
             InputManager.GrabFocus();
         }
@@ -91,6 +94,8 @@ namespace Desktoptale.Characters
             {
                 sprite.Orientation = Orientation;
             }
+
+            previousPosition = Position;
         
             Position.X += (int)Math.Round(Velocity.X);
             Position.Y += (int)Math.Round(Velocity.Y);
@@ -99,7 +104,10 @@ namespace Desktoptale.Characters
         
             PreventLeavingScreenArea();
 
-            window.Position = new Point((int)Position.X, (int)Position.Y);
+            if (previousPosition != Position)
+            {
+                window.Position = new Point((int)Position.X, (int)Position.Y);
+            }
         
             CurrentSprite.Update(gameTime);
         }
