@@ -55,7 +55,7 @@ namespace Desktoptale
             contextMenu.Initialize();
             gameObjects.Add(contextMenu);
             
-            MessageBus.Send(new CharacterChangeRequestedMessage { Character = CharacterRegistry.CLOVER});
+            MessageBus.Send(new CharacterChangeRequestedMessage { Character = CharacterRegistry.FRISK});
             MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = 2 });
             MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = true });
             MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = false });
