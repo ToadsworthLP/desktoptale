@@ -21,8 +21,10 @@ namespace Desktoptale
         private Character character;
         private ISet<IGameObject> gameObjects;
         
-        private const int FORCE_TOPMOST_WINDOW_INTERVAL = 30;
+        private const int FORCE_TOPMOST_WINDOW_INTERVAL = 20;
         private int forceTopmostWindowCounter = 0;
+        private bool enableRepeatedForceTopmost = false;
+        private bool firstFrame = true;
 
         public Desktoptale()
         {
@@ -48,6 +50,7 @@ namespace Desktoptale
             base.Initialize();
             
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
+            MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
             
             inputManager = new InputManager(this, GraphicsDevice);
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -90,6 +93,13 @@ namespace Desktoptale
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if (firstFrame)
+            {
+                WindowsUtils.MakeTopmostWindow(Window);
+
+                firstFrame = false;
+            }
+            
             inputManager.Update();
             
             foreach (var gameObject in gameObjects)
@@ -97,13 +107,16 @@ namespace Desktoptale
                 gameObject.Update(gameTime);
             }
 
-            if (forceTopmostWindowCounter % FORCE_TOPMOST_WINDOW_INTERVAL == 0)
+            if (enableRepeatedForceTopmost)
             {
-                WindowsUtils.MakeTopmostWindow(Window);
-                forceTopmostWindowCounter = 0;
-            }
+                if (forceTopmostWindowCounter % FORCE_TOPMOST_WINDOW_INTERVAL == 0)
+                {
+                    WindowsUtils.MakeTopmostWindow(Window);
+                    forceTopmostWindowCounter = 1;
+                }
 
-            forceTopmostWindowCounter++;
+                forceTopmostWindowCounter++;
+            }
             
             base.Update(gameTime);
         }
@@ -160,6 +173,19 @@ namespace Desktoptale
             character = newCharacter;
             
             MessageBus.Send(new CharacterChangeSuccessMessage { Character = message.Character });
+        }
+
+        private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangeRequestedMessage message)
+        {
+            if (message.Enabled)
+            {
+                enableRepeatedForceTopmost = true;
+                forceTopmostWindowCounter = 0;
+            }
+            else
+            {
+                enableRepeatedForceTopmost = false;
+            }
         }
     }
 }

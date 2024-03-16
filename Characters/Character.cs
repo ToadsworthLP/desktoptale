@@ -40,6 +40,7 @@ namespace Desktoptale.Characters
 
         private bool dragging;
         private Vector2 previousPosition;
+        private bool firstFrame = true;
         
         private Subscription scaleChangeRequestedSubscription;
         private Subscription idleMovementChangeRequestedSubscription;
@@ -73,8 +74,6 @@ namespace Desktoptale.Characters
             StateMachine.StateChanged += (state, newState) => UpdateOrientation();
         
             UpdateWindowSize(GetMaximumFrameSize());
-            window.Position = new Point((int)Position.X, (int)Position.Y);
-            previousPosition = Position;
             
             InputManager.GrabFocus();
         }
@@ -83,6 +82,12 @@ namespace Desktoptale.Characters
     
         public virtual void Update(GameTime gameTime)
         {
+            if (firstFrame)
+            {
+                window.Position = new Point((int)Position.X, (int)Position.Y);
+                firstFrame = false;
+            }
+            
             StateMachine.Update(gameTime);
 
             if (EnabledAutoOrientation)
