@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
 using Desktoptale.Characters;
 using Desktoptale.Messages;
@@ -16,7 +15,7 @@ namespace Desktoptale
         private GameWindow window;
         private InputManager inputManager;
         private GraphicsDevice graphicsDevice;
-        private IRegistry<CharacterType, int> characterRegistry;
+        private IRegistry<CharacterType, string> characterRegistry;
         
         private int currentScaleFactor;
         private CharacterType currentCharacter;
@@ -26,7 +25,7 @@ namespace Desktoptale
 
         private bool open = false;
 
-        public ContextMenu(GameWindow window, InputManager inputManager, GraphicsDevice graphicsDevice, IRegistry<CharacterType, int> characterRegistry)
+        public ContextMenu(GameWindow window, InputManager inputManager, GraphicsDevice graphicsDevice, IRegistry<CharacterType, string> characterRegistry)
         {
             this.window = window;
             this.inputManager = inputManager;

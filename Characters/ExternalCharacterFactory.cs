@@ -26,7 +26,7 @@ namespace Desktoptale.Characters
                 .Build();
         }
 
-        public void AddAllToRegistry(IRegistry<CharacterType, int> registry)
+        public void AddAllToRegistry(IRegistry<CharacterType, string> registry)
         {
             if (!Directory.Exists(rootPath))
             {
@@ -50,7 +50,7 @@ namespace Desktoptale.Characters
             }
         }
 
-        private void AddToRegistry(IRegistry<CharacterType, int> registry, string path, string definitionString)
+        private void AddToRegistry(IRegistry<CharacterType, string> registry, string path, string definitionString)
         {
             ExternalCharacterDefinition externalCharacterDefinition;
             try

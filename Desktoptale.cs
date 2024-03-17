@@ -12,7 +12,7 @@ namespace Desktoptale
 {
     public class Desktoptale : Game
     {
-        private IRegistry<CharacterType, int> characterRegistry { get; }
+        private IRegistry<CharacterType, string> characterRegistry { get; }
         
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;

@@ -2,7 +2,7 @@
 
 namespace Desktoptale.Registry
 {
-    public class CharacterRegistry : IntKeyRegistry<CharacterType>
+    public class CharacterRegistry : Registry<CharacterType>
     {
         public static readonly CharacterType FRISK = new CharacterType("Frisk", "Undertale", ctx => new Frisk(ctx));
         public static readonly CharacterType FLOWEY = new CharacterType("Flowey", "Undertale", ctx => new Flowey(ctx));

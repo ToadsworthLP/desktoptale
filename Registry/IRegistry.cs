@@ -8,5 +8,6 @@ namespace Desktoptale.Registry
         TElement Get(TIdentifier id);
         TIdentifier GetId(TElement element);
         ICollection<TElement> GetAll();
+        ICollection<TIdentifier> GetAllIds();
     }
 }

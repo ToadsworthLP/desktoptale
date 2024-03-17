@@ -14,5 +14,10 @@ namespace Desktoptale.Characters
             Category = category;
             FactoryFunction = factoryFunction;
         }
+
+        public override string ToString()
+        {
+            return $"{Category}/{Name}";
+        }
     }
 }
