@@ -24,6 +24,8 @@ namespace Desktoptale
         private bool unfocusedMovementEnabled = false;
         private WindowsUtils.WindowInfo currentContainingWindow;
 
+        private bool open = false;
+
         public ContextMenu(GameWindow window, InputManager inputManager, GraphicsDevice graphicsDevice, IRegistry<CharacterType, int> characterRegistry)
         {
             this.window = window;
@@ -52,6 +54,8 @@ namespace Desktoptale
 
         private void OpenContextMenu(Point mousePosition)
         {
+            if (open) return;
+            
             ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
             
             ToolStripMenuItem characterItem = new ToolStripMenuItem("Character");
@@ -113,7 +117,18 @@ namespace Desktoptale
             
             ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (o, e) => ShowInfoScreen());
             contextMenuStrip.Items.Add(infoItem);
+
+            contextMenuStrip.Closed += (o, e) =>
+            {
+                open = false;
+                MessageBus.Send(new ContextMenuStateChangedMessage() { Open = open });
+            };
             
+            contextMenuStrip.Opened += (o, e) =>
+            {
+                open = true;
+                MessageBus.Send(new ContextMenuStateChangedMessage() { Open = open });
+            };
             contextMenuStrip.Show(mousePosition.X, mousePosition.Y);
         }
 

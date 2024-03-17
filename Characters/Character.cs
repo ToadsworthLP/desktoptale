@@ -40,6 +40,7 @@ namespace Desktoptale.Characters
 
         private Rectangle boundary;
 
+        private bool enableDragging = true;
         private bool dragging;
         private Vector2 previousPosition;
         private bool firstFrame = true;
@@ -47,6 +48,7 @@ namespace Desktoptale.Characters
         private Subscription scaleChangeRequestedSubscription;
         private Subscription idleMovementChangeRequestedSubscription;
         private Subscription boundaryChangeSubscription;
+        private Subscription contextMenuStateChangeSubscription;
         
         public Character(CharacterCreationContext characterCreationContext)
         {
@@ -67,6 +69,7 @@ namespace Desktoptale.Characters
             scaleChangeRequestedSubscription = MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
             idleMovementChangeRequestedSubscription = MessageBus.Subscribe<IdleMovementChangeRequestedMessage>(OnIdleMovementChangeRequestedMessage);
             boundaryChangeSubscription = MessageBus.Subscribe<UpdateBoundaryMessage>(OnBoundaryUpdateMessage);
+            contextMenuStateChangeSubscription = MessageBus.Subscribe<ContextMenuStateChangedMessage>(OnContextMenuStateChangedMessage);
 
             IdleState = new IdleState();
             WalkState = new WalkState(90f);
@@ -109,8 +112,11 @@ namespace Desktoptale.Characters
         
             Position.X += (int)Math.Round(Velocity.X);
             Position.Y += (int)Math.Round(Velocity.Y);
-        
-            DragCharacter();
+
+            if (enableDragging)
+            {
+                DragCharacter();
+            }
         
             PreventLeavingScreenArea();
 
@@ -135,6 +141,8 @@ namespace Desktoptale.Characters
         {
             MessageBus.Unsubscribe(scaleChangeRequestedSubscription);
             MessageBus.Unsubscribe(idleMovementChangeRequestedSubscription);
+            MessageBus.Unsubscribe(boundaryChangeSubscription);
+            MessageBus.Unsubscribe(contextMenuStateChangeSubscription);
         }
 
         private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
@@ -276,6 +284,11 @@ namespace Desktoptale.Characters
         private void OnBoundaryUpdateMessage(UpdateBoundaryMessage message)
         {
             boundary = message.Boundary;
+        }
+
+        private void OnContextMenuStateChangedMessage(ContextMenuStateChangedMessage message)
+        {
+            enableDragging = !message.Open;
         }
     }
 }

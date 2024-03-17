@@ -38,9 +38,6 @@ namespace Desktoptale
             characterRegistry = new CharacterRegistry();
             
             WindowsUtils.MakeWindowOverlay(Window);
-
-            var test = WindowsUtils.GetOpenWindows();
-            var test2 = WindowsUtils.GetWindowRect(test[0].hWnd);
         }
 
         /// <summary>
