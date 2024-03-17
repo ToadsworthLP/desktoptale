@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.Xna.Framework;
 
 namespace Desktoptale
@@ -26,6 +28,34 @@ namespace Desktoptale
 
         [DllImport("dwmapi.dll")]
         static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref int[] pMarInset);
+        
+        [DllImport("USER32.DLL")]
+        private static extern bool EnumWindows(EnumWindowsProc enumFunc, int lParam);
+
+        [DllImport("USER32.DLL")]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+        [DllImport("USER32.DLL")]
+        private static extern int GetWindowTextLength(IntPtr hWnd);
+
+        [DllImport("USER32.DLL")]
+        private static extern bool IsWindowVisible(IntPtr hWnd);
+
+        [DllImport("USER32.DLL")]
+        private static extern IntPtr GetShellWindow();
+        
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetWindowRect(IntPtr hWnd, out NativeRect lpNativeRect);
+        
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NativeRect
+        {
+            public int Left;        // x position of upper-left corner
+            public int Top;         // y position of upper-left corner
+            public int Right;       // x position of lower-right corner
+            public int Bottom;      // y position of lower-right corner
+        }
         #endregion
         
         const int GWL_EXSTYLE = -20;
@@ -38,7 +68,8 @@ namespace Desktoptale
         const int SWP_NOMOVE = 0x0002;
         const int SWP_NOSIZE = 0x0001;
         const int S_OK = 0x00000000;
-    
+        private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
+        
         public static void MakeWindowOverlay(GameWindow window)
         {
             // Set to layered, transparent window.
@@ -66,6 +97,54 @@ namespace Desktoptale
         {
             if (!SetWindowPos(window.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        public static IList<WindowInfo> GetOpenWindows()
+        {
+            IntPtr shellWindow = GetShellWindow();
+            IList<WindowInfo> windows = new List<WindowInfo>();
+
+            EnumWindows(delegate(IntPtr hWnd, int lParam)
+            {
+                if (hWnd == shellWindow) return true;
+                if (!IsWindowVisible(hWnd)) return true;
+
+                int length = GetWindowTextLength(hWnd);
+                if (length == 0) return true;
+
+                StringBuilder builder = new StringBuilder(length);
+                GetWindowText(hWnd, builder, length + 1);
+
+                string title = builder.ToString();
+                if (title == "Windows Input Experience") return true;
+                if (title == ProgramInfo.NAME) return true;
+
+                windows.Add(new WindowInfo() {Title = title, hWnd = hWnd});
+                return true;
+            }, 0);
+
+            return windows;
+        }
+
+        public class WindowInfo
+        {
+            public string Title;
+            public IntPtr hWnd;
+        }
+
+        public static Rectangle GetWindowRect(IntPtr hWnd)
+        {
+            if(!GetWindowRect(hWnd, out var nativeRect))
+            {
+                return Rectangle.Empty;
+            }
+            
+            return new Rectangle(
+                nativeRect.Left,
+                nativeRect.Top,
+                nativeRect.Right - nativeRect.Left,
+                nativeRect.Bottom - nativeRect.Top
+            );
         }
     }
 }

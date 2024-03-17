@@ -22,6 +22,7 @@ namespace Desktoptale
         private CharacterType currentCharacter;
         private bool idleMovementEnabled = true;
         private bool unfocusedMovementEnabled = false;
+        private WindowsUtils.WindowInfo currentContainingWindow;
 
         public ContextMenu(GameWindow window, InputManager inputManager, GraphicsDevice graphicsDevice, IRegistry<CharacterType, int> characterRegistry)
         {
@@ -37,6 +38,7 @@ namespace Desktoptale
             MessageBus.Subscribe<CharacterChangeSuccessMessage>(OnCharacterChangeSuccessMessage);
             MessageBus.Subscribe<IdleMovementChangeRequestedMessage>(OnIdleMovementChangeRequestedMessage);
             MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
+            MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
         }
         
         public void Update(GameTime gameTime)
@@ -103,11 +105,37 @@ namespace Desktoptale
             ToolStripMenuItem unfocusedMovementItem = new ToolStripMenuItem($"Unfocused Movement", null, (o, e) => MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = !unfocusedMovementEnabled}));
             unfocusedMovementItem.Checked = unfocusedMovementEnabled;
             settingsItem.DropDownItems.Add(unfocusedMovementItem);
+
+            ToolStripMenuItem stayInWindowItem = new ToolStripMenuItem("Stay in Window", null, (o, e) => { });
+            settingsItem.DropDownItems.Add(stayInWindowItem);
+            
+            SetupWindowSelectItems(stayInWindowItem);
             
             ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (o, e) => ShowInfoScreen());
             contextMenuStrip.Items.Add(infoItem);
             
             contextMenuStrip.Show(mousePosition.X, mousePosition.Y);
+        }
+
+        private void SetupWindowSelectItems(ToolStripMenuItem parent)
+        {
+            ToolStripMenuItem noneItem = new ToolStripMenuItem("None", null, (o, e) =>
+            {
+                MessageBus.Send(new ChangeContainingWindowMessage() { Window = null });
+            });
+            noneItem.Checked = currentContainingWindow == null;
+            parent.DropDownItems.Add(noneItem);
+            
+            IList<WindowsUtils.WindowInfo> windows = WindowsUtils.GetOpenWindows();
+            foreach (WindowsUtils.WindowInfo windowInfo in windows)
+            {
+                ToolStripMenuItem item = new ToolStripMenuItem(windowInfo.Title, null, (o, e) =>
+                {
+                    MessageBus.Send(new ChangeContainingWindowMessage() {Window = windowInfo});
+                });
+                item.Checked = currentContainingWindow != null && currentContainingWindow.hWnd == windowInfo.hWnd;
+                parent.DropDownItems.Add(item);
+            }
         }
         
         private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
@@ -128,6 +156,11 @@ namespace Desktoptale
         private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangeRequestedMessage message)
         {
             unfocusedMovementEnabled = message.Enabled;
+        }
+        
+        private void OnChangeContainingWindowMessage(ChangeContainingWindowMessage message)
+        {
+            currentContainingWindow = message.Window;
         }
 
         private void ShowInfoScreen()

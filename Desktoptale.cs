@@ -21,10 +21,11 @@ namespace Desktoptale
         private Character character;
         private ISet<IGameObject> gameObjects;
         
-        private const int FORCE_TOPMOST_WINDOW_INTERVAL = 20;
-        private int forceTopmostWindowCounter = 0;
+        private const int WINDOW_STATE_UPDATE_INTERVAL = 20;
+        private int windowStateUpdateCounter = 0;
         private bool enableRepeatedForceTopmost = false;
         private bool firstFrame = true;
+        private WindowsUtils.WindowInfo containingWindow;
 
         public Desktoptale()
         {
@@ -37,6 +38,9 @@ namespace Desktoptale
             characterRegistry = new CharacterRegistry();
             
             WindowsUtils.MakeWindowOverlay(Window);
+
+            var test = WindowsUtils.GetOpenWindows();
+            var test2 = WindowsUtils.GetWindowRect(test[0].hWnd);
         }
 
         /// <summary>
@@ -51,6 +55,7 @@ namespace Desktoptale
             
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
             MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
+            MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
             
             inputManager = new InputManager(this, GraphicsDevice);
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -107,16 +112,15 @@ namespace Desktoptale
                 gameObject.Update(gameTime);
             }
 
-            if (enableRepeatedForceTopmost)
+            if (windowStateUpdateCounter % WINDOW_STATE_UPDATE_INTERVAL == 0)
             {
-                if (forceTopmostWindowCounter % FORCE_TOPMOST_WINDOW_INTERVAL == 0)
-                {
-                    WindowsUtils.MakeTopmostWindow(Window);
-                    forceTopmostWindowCounter = 1;
-                }
-
-                forceTopmostWindowCounter++;
+                if(enableRepeatedForceTopmost) WindowsUtils.MakeTopmostWindow(Window);
+                if(containingWindow != null) UpdateBounds();
+                
+                windowStateUpdateCounter = 1;
             }
+
+            windowStateUpdateCounter++;
             
             base.Update(gameTime);
         }
@@ -180,11 +184,45 @@ namespace Desktoptale
             if (message.Enabled)
             {
                 enableRepeatedForceTopmost = true;
-                forceTopmostWindowCounter = 0;
+                windowStateUpdateCounter = 0;
             }
             else
             {
                 enableRepeatedForceTopmost = false;
+            }
+        }
+
+        private void OnChangeContainingWindowMessage(ChangeContainingWindowMessage message)
+        {
+            containingWindow = message.Window;
+            if (message.Window != null)
+            {
+                Rectangle bounds = WindowsUtils.GetWindowRect(message.Window.hWnd);
+                MessageBus.Send(new UpdateBoundaryMessage() { Boundary = bounds });
+            }
+            else
+            {
+                MessageBus.Send(new UpdateBoundaryMessage() { 
+                    Boundary = new Rectangle(
+                        Point.Zero, 
+                        new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
+                                        GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height)) 
+                    }
+                );
+            }
+        }
+
+        private void UpdateBounds()
+        {
+            Rectangle bounds = WindowsUtils.GetWindowRect(containingWindow.hWnd);
+
+            if (bounds.IsEmpty)
+            {
+                MessageBus.Send(new ChangeContainingWindowMessage() { Window = null });
+            }
+            else
+            {
+                MessageBus.Send(new UpdateBoundaryMessage() { Boundary = bounds });
             }
         }
     }

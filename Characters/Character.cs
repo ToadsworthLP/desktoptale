@@ -38,13 +38,16 @@ namespace Desktoptale.Characters
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
+        private Rectangle boundary;
+
         private bool dragging;
         private Vector2 previousPosition;
         private bool firstFrame = true;
         
         private Subscription scaleChangeRequestedSubscription;
         private Subscription idleMovementChangeRequestedSubscription;
-
+        private Subscription boundaryChangeSubscription;
+        
         public Character(CharacterCreationContext characterCreationContext)
         {
             this.spriteBatch = characterCreationContext.SpriteBatch;
@@ -63,6 +66,7 @@ namespace Desktoptale.Characters
         {
             scaleChangeRequestedSubscription = MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
             idleMovementChangeRequestedSubscription = MessageBus.Subscribe<IdleMovementChangeRequestedMessage>(OnIdleMovementChangeRequestedMessage);
+            boundaryChangeSubscription = MessageBus.Subscribe<UpdateBoundaryMessage>(OnBoundaryUpdateMessage);
 
             IdleState = new IdleState();
             WalkState = new WalkState(90f);
@@ -85,6 +89,7 @@ namespace Desktoptale.Characters
             if (firstFrame)
             {
                 window.Position = new Point((int)Position.X, (int)Position.Y);
+                boundary = GetScreenRect();
                 firstFrame = false;
             }
             
@@ -184,16 +189,18 @@ namespace Desktoptale.Characters
 
         private void PreventLeavingScreenArea()
         {
-            Point screenSize = GetScreenSize();
-            Point windowSize = GetWindowSize();
+            float scaledWidth = CurrentSprite.FrameSize.X * Scale.X;
+            float scaledHeight = CurrentSprite.FrameSize.Y * Scale.Y;
+            
+            if (Position.X < boundary.X) Position.X = boundary.X;
+            if (Position.X + scaledWidth > boundary.X + boundary.Width) Position.X = boundary.X + boundary.Width - scaledWidth;
+            if (Position.Y < boundary.Y) Position.Y = boundary.Y;
+            if (Position.Y + scaledHeight > boundary.Y + boundary.Height) Position.Y = boundary.Y + boundary.Height - scaledHeight;
+        }
 
-            float xPivot = CurrentSprite.FrameSize.X * Scale.X / 2;
-            float yPivot = CurrentSprite.FrameSize.Y * Scale.X / 2;
-
-            if (Position.X < -windowSize.X + xPivot) Position.X = -windowSize.X + xPivot;
-            if (Position.Y < -windowSize.Y + yPivot) Position.Y = -windowSize.Y + yPivot;
-            if (Position.X > screenSize.X - xPivot) Position.X = screenSize.X - xPivot;
-            if (Position.Y > screenSize.Y - yPivot) Position.Y = screenSize.Y - yPivot;
+        private Rectangle GetScreenRect()
+        {
+            return new Rectangle(Point.Zero, GetScreenSize());
         }
 
         private Point GetScreenSize()
@@ -264,6 +271,11 @@ namespace Desktoptale.Characters
                 Position.X += xShift;
                 Position.Y += yShift;
             }
+        }
+
+        private void OnBoundaryUpdateMessage(UpdateBoundaryMessage message)
+        {
+            boundary = message.Boundary;
         }
     }
 }
