@@ -144,7 +144,17 @@ namespace Desktoptale
             IList<WindowsUtils.WindowInfo> windows = WindowsUtils.GetOpenWindows();
             foreach (WindowsUtils.WindowInfo windowInfo in windows)
             {
-                ToolStripMenuItem item = new ToolStripMenuItem(windowInfo.Title, null, (o, e) =>
+                string title;
+                if (windowInfo.Title.Length > 50)
+                {
+                    title = $"{windowInfo.Title.Substring(0, 47)}... [{windowInfo.ProcessName}]";
+                }
+                else
+                {
+                    title = $"{windowInfo.Title} [{windowInfo.ProcessName}]";
+                }
+                
+                ToolStripMenuItem item = new ToolStripMenuItem(title, null, (o, e) =>
                 {
                     MessageBus.Send(new ChangeContainingWindowMessage() {Window = windowInfo});
                 });

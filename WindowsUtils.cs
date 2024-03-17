@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -56,6 +57,9 @@ namespace Desktoptale
             public int Right;       // x position of lower-right corner
             public int Bottom;      // y position of lower-right corner
         }
+        
+        [DllImport("user32.dll", SetLastError=true)]
+        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
         #endregion
         
         const int GWL_EXSTYLE = -20;
@@ -119,7 +123,14 @@ namespace Desktoptale
                 if (title == "Windows Input Experience") return true;
                 if (title == ProgramInfo.NAME) return true;
 
-                windows.Add(new WindowInfo() {Title = title, hWnd = hWnd});
+                string processName = "???";
+                uint processId;
+                if (GetWindowThreadProcessId(hWnd, out processId) != 0)
+                {
+                    processName = Process.GetProcessById((int)processId).ProcessName;
+                }
+
+                windows.Add(new WindowInfo() {Title = title, ProcessName = processName, hWnd = hWnd});
                 return true;
             }, 0);
 
@@ -129,6 +140,7 @@ namespace Desktoptale
         public class WindowInfo
         {
             public string Title;
+            public string ProcessName;
             public IntPtr hWnd;
         }
 
