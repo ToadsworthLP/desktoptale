@@ -5,6 +5,7 @@ namespace Desktoptale
 {
     public static class Program
     {
+        [STAThread]
         public static void Main(string[] args)
         {
             if (args != null && args.Length > 0)

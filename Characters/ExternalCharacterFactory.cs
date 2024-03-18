@@ -222,32 +222,32 @@ namespace Desktoptale.Characters
 
         private void ShowSpriteLoadError(string path)
         {
-            MessageBox.Show($"Failed to load sprite at {path}.", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            WindowsUtils.ShowMessageBox($"Failed to load sprite at {path}.", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
         
         private void ShowDefinitionReadError(string path)
         {
-            MessageBox.Show($"Failed to read definition file {path}.", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            WindowsUtils.ShowMessageBox($"Failed to read definition file {path}.", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void ShowDefinitionParseError(string path, string error)
         {
-            MessageBox.Show($"Failed to parse definition file {path}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            WindowsUtils.ShowMessageBox($"Failed to parse definition file {path}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void ShowDefinitionError(string name, string error)
         {
-            MessageBox.Show($"Failed to load character {name}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            WindowsUtils.ShowMessageBox($"Failed to load character {name}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
         
         private void ShowStateDefinitionError(string characterName, string stateName, string error)
         {
-            MessageBox.Show($"Failed to load state {stateName} of character {characterName}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            WindowsUtils.ShowMessageBox($"Failed to load state {stateName} of character {characterName}:\n{error}", "Custom Character Loader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
         
         private void ShowSpriteDefinitionError(string characterName, string stateName, string orientation, string error)
         {
-            MessageBox.Show($"Failed to load sprite {orientation} of state {stateName} of character {characterName}:\n{error}","Custom Character Loader" , MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            WindowsUtils.ShowMessageBox($"Failed to load sprite {orientation} of state {stateName} of character {characterName}:\n{error}","Custom Character Loader" , MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }

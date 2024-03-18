@@ -2,9 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
+using Microsoft.Win32;
 using Microsoft.Xna.Framework;
+using System.Windows.Forms;
 
 namespace Desktoptale
 {
@@ -67,6 +72,9 @@ namespace Desktoptale
         
         [DllImport("kernel32.dll")]
         public static extern bool FreeConsole();
+        
+        [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
         #endregion
         
         const int GWL_EXSTYLE = -20;
@@ -86,6 +94,12 @@ namespace Desktoptale
             public string Title;
             public string ProcessName;
             public IntPtr hWnd;
+        }
+
+        public class SaveDialogResult
+        {
+            public bool Success;
+            public Stream OutputStream;
         }
         
         public static void MakeWindowOverlay(GameWindow window)
@@ -188,6 +202,53 @@ namespace Desktoptale
         public static void AttachConsole()
         {
             AttachConsole(ATTACH_PARENT_PROCESS);
+        }
+        
+        public static void RegisterForFileExtension(string extension)
+        {
+            try
+            {
+                string applicationPath = Assembly.GetExecutingAssembly().Location;
+                RegistryKey fileReg =
+                    Microsoft.Win32.Registry.CurrentUser.CreateSubKey($"Software\\Classes\\.{extension}");
+                fileReg.CreateSubKey("shell\\open\\command").SetValue("", $"\"{applicationPath}\" \"%1\"");
+                fileReg.Close();
+
+                SHChangeNotify(0x08000000, 0x0000, IntPtr.Zero, IntPtr.Zero);
+
+                ShowMessageBox($"Successfully associated Desktoptale preset files (.{extension}) with this installation of Desktoptale!", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception e)
+            {
+                ShowMessageBox($"Failed to associate Desktoptale preset files (.{extension}) with this installation of Desktoptale!", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            
+        }
+
+        public static void ShowMessageBox(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+        {
+            MessageBox.Show(text, caption, buttons, icon);
+        }
+
+        public static SaveDialogResult OpenSaveDialog(string filter, string defaultName = "")
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+
+            dialog.FileName = defaultName;
+            dialog.Filter = filter;
+            dialog.FilterIndex = 1;
+            dialog.RestoreDirectory = true;
+ 
+            if(dialog.ShowDialog() == DialogResult.OK)
+            {
+                return new SaveDialogResult()
+                {
+                    Success = true,
+                    OutputStream = dialog.OpenFile()
+                };
+            }
+
+            return new SaveDialogResult() { Success = false };
         }
     }
 }

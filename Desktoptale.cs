@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Windows.Forms;
 using Desktoptale.Characters;
 using Desktoptale.Messages;
 using Desktoptale.Messaging;
@@ -12,24 +15,34 @@ namespace Desktoptale
 {
     public class Desktoptale : Game
     {
-        private Settings settings { get; }
+        private Settings settings;
         private IRegistry<CharacterType, string> characterRegistry { get; }
         
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private InputManager inputManager;
+        private PresetManager presetManager;
         
         private Character character;
         private ISet<IGameObject> gameObjects;
         
-        private const int WINDOW_STATE_UPDATE_INTERVAL = 30;
+        private const int WINDOW_STATE_UPDATE_INTERVAL_MIN = 28;
+        private const int WINDOW_STATE_UPDATE_INTERVAL_MAX = 30;
         private int windowStateUpdateCounter = 0;
+        private int nextWindowStateUpdate = 0;
         private bool firstFrame = true;
+        private bool alwaysOnTop;
         private WindowsUtils.WindowInfo containingWindow;
+        private string applicationPath;
+
+        private Random rng;
 
         public Desktoptale(Settings settings)
         {
+            applicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            
             this.settings = settings;
+            this.rng = new Random();
             
             graphics = new GraphicsDeviceManager(this);
             Window.Title = ProgramInfo.NAME;
@@ -41,19 +54,26 @@ namespace Desktoptale
             
             WindowsUtils.MakeWindowOverlay(Window);
         }
-
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
+        
         protected override void Initialize()
         {
             base.Initialize();
             
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
             MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
+            MessageBus.Subscribe<AlwaysOnTopChangeRequestedMessage>(OnAlwaysOnTopChangeRequestedMessage);
+
+            // Keep settings object up-to-date
+            MessageBus.Subscribe<CharacterChangeSuccessMessage>(msg => settings.Character = msg.Character.ToString());
+            MessageBus.Subscribe<ScaleChangeRequestedMessage>(msg => settings.Scale = (int)msg.ScaleFactor);
+            MessageBus.Subscribe<IdleMovementChangeRequestedMessage>(msg => settings.IdleRoaming = msg.Enabled);
+            MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(msg => settings.UnfocusedInput = msg.Enabled);
+            MessageBus.Subscribe<AlwaysOnTopChangeRequestedMessage>(msg => settings.AlwaysOnTop = msg.Enabled);
+            MessageBus.Subscribe<ChangeContainingWindowMessage>(msg => settings.Window = msg.Window?.ProcessName);
+            
+            // Preset loading
+            presetManager = new PresetManager(settings);
+            presetManager.LoadPreset();
             
             inputManager = new InputManager(this, GraphicsDevice);
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -64,6 +84,7 @@ namespace Desktoptale
             contextMenu.Initialize();
             gameObjects.Add(contextMenu);
 
+            // Send initialization messages
             CharacterType initialCharacter = CharacterRegistry.FRISK;
             if (settings.Character != null)
             {
@@ -74,15 +95,17 @@ namespace Desktoptale
                 catch (IndexOutOfRangeException e)
                 {
                     Console.WriteLine($"Failed to switch character: Invalid character registry key: {settings.Character}");
+                    WindowsUtils.ShowMessageBox($"Could not find character: {settings.Character}\nIf this character is a custom character, please make sure that it is installed properly.", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
-            MessageBus.Send(new CharacterChangeRequestedMessage { Character = initialCharacter });
             
+            MessageBus.Send(new CharacterChangeRequestedMessage { Character = initialCharacter });
             MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = settings.Scale });
             MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = settings.IdleRoaming });
+            MessageBus.Send(new AlwaysOnTopChangeRequestedMessage() { Enabled = settings.AlwaysOnTop });
             MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = settings.UnfocusedInput });
 
-            if (settings.Window != null)
+            if (!string.IsNullOrWhiteSpace(settings.Window))
             {
                 WindowsUtils.WindowInfo target = WindowsUtils.GetWindowByName(settings.Window);
                 if (target != null)
@@ -95,33 +118,20 @@ namespace Desktoptale
                 }
             }
         }
-
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
+        
         protected override void LoadContent()
         {
-            ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory("Content/Custom/", graphics.GraphicsDevice);
+            ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory(Path.Combine(applicationPath, "Content/Custom/"), graphics.GraphicsDevice);
             externalCharacterFactory.AddAllToRegistry(characterRegistry);
             
             if(settings.PrintRegistryKeys) PrintRegistryKeys();
         }
-
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
+        
         protected override void UnloadContent()
         {
             Content.Unload();
         }
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
             if (firstFrame)
@@ -138,23 +148,20 @@ namespace Desktoptale
                 gameObject.Update(gameTime);
             }
 
-            if (windowStateUpdateCounter % WINDOW_STATE_UPDATE_INTERVAL == 0)
+            if (windowStateUpdateCounter >= nextWindowStateUpdate)
             {
-                WindowsUtils.MakeTopmostWindow(Window);
+                if(alwaysOnTop) WindowsUtils.MakeTopmostWindow(Window);
                 if(containingWindow != null) UpdateBounds();
                 
-                windowStateUpdateCounter = 1;
+                windowStateUpdateCounter = 0;
+                nextWindowStateUpdate = rng.Next(WINDOW_STATE_UPDATE_INTERVAL_MIN, WINDOW_STATE_UPDATE_INTERVAL_MAX + 1);
             }
 
             windowStateUpdateCounter++;
             
             base.Update(gameTime);
         }
-
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Transparent);
@@ -180,6 +187,7 @@ namespace Desktoptale
             catch (Exception e)
             {
                 Console.WriteLine($"Failed to switch character: {e.Message}");
+                WindowsUtils.ShowMessageBox($"Failed to switch character: {e.Message}", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -223,6 +231,11 @@ namespace Desktoptale
                     }
                 );
             }
+        }
+
+        private void OnAlwaysOnTopChangeRequestedMessage(AlwaysOnTopChangeRequestedMessage message)
+        {
+            alwaysOnTop = message.Enabled;
         }
 
         private void UpdateBounds()

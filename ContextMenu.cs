@@ -22,6 +22,7 @@ namespace Desktoptale
         private bool idleMovementEnabled = true;
         private bool unfocusedMovementEnabled = false;
         private WindowsUtils.WindowInfo currentContainingWindow;
+        private bool alwaysOnTopEnabled = false;
 
         private bool open = false;
 
@@ -39,6 +40,7 @@ namespace Desktoptale
             MessageBus.Subscribe<CharacterChangeSuccessMessage>(OnCharacterChangeSuccessMessage);
             MessageBus.Subscribe<IdleMovementChangeRequestedMessage>(OnIdleMovementChangeRequestedMessage);
             MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
+            MessageBus.Subscribe<AlwaysOnTopChangeRequestedMessage>(OnAlwaysOnTopChangeRequestedMessage);
             MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
         }
         
@@ -60,6 +62,75 @@ namespace Desktoptale
             ToolStripMenuItem characterItem = new ToolStripMenuItem("Character");
             contextMenuStrip.Items.Add(characterItem);
 
+            SetupCharacterItems(characterItem);
+
+            ToolStripMenuItem scaleItem = new ToolStripMenuItem("Scale");
+            contextMenuStrip.Items.Add(scaleItem);
+
+            SetupScaleOptions(scaleItem);
+            
+            ToolStripMenuItem settingsItem = new ToolStripMenuItem("Settings");
+            contextMenuStrip.Items.Add(settingsItem);
+            
+            SetupSettingsItems(settingsItem);
+            
+            ToolStripMenuItem savePresetItem = new ToolStripMenuItem("Save Preset...", null, (o, e) => { MessageBus.Send(new SavePresetRequestedMessage()); });
+            contextMenuStrip.Items.Add(savePresetItem);
+            
+            ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (o, e) => ShowInfoScreen());
+            contextMenuStrip.Items.Add(infoItem);
+
+            contextMenuStrip.Closed += (o, e) =>
+            {
+                open = false;
+                MessageBus.Send(new ContextMenuStateChangedMessage() { Open = open });
+            };
+            
+            contextMenuStrip.Opened += (o, e) =>
+            {
+                open = true;
+                MessageBus.Send(new ContextMenuStateChangedMessage() { Open = open });
+            };
+            contextMenuStrip.Show(mousePosition.X, mousePosition.Y);
+        }
+
+        private void SetupSettingsItems(ToolStripMenuItem settingsItem)
+        {
+            ToolStripMenuItem idleMovementItem = new ToolStripMenuItem($"Idle Roaming", null, (o, e) => MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = !idleMovementEnabled}));
+            idleMovementItem.Checked = idleMovementEnabled;
+            settingsItem.DropDownItems.Add(idleMovementItem);
+            
+            ToolStripMenuItem unfocusedMovementItem = new ToolStripMenuItem($"Unfocused Input", null, (o, e) =>
+            {
+                MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = !unfocusedMovementEnabled });
+                MessageBus.Send(new AlwaysOnTopChangeRequestedMessage { Enabled = true });
+            });
+            unfocusedMovementItem.Checked = unfocusedMovementEnabled;
+            settingsItem.DropDownItems.Add(unfocusedMovementItem);
+
+            ToolStripMenuItem alwaysOnTopItem = new ToolStripMenuItem($"Force Always on Top", null, (o, e) =>
+            {
+                if (unfocusedMovementEnabled && alwaysOnTopEnabled)
+                {
+                    WindowsUtils.ShowMessageBox("The Unfocused Input option requires Force Always on Top to be enabled. To disable Force Always on Top, please disable Unfocused Input first.", "Desktoptale", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                
+                MessageBus.Send(new AlwaysOnTopChangeRequestedMessage { Enabled = !alwaysOnTopEnabled });
+            });
+            alwaysOnTopItem.Checked = alwaysOnTopEnabled;
+            settingsItem.DropDownItems.Add(alwaysOnTopItem);
+
+            ToolStripMenuItem stayInWindowItem = new ToolStripMenuItem("Stay in Window", null, (o, e) => { });
+            settingsItem.DropDownItems.Add(stayInWindowItem);
+            SetupWindowSelectItems(stayInWindowItem);
+            
+            ToolStripMenuItem associatePresetItem = new ToolStripMenuItem("Associate Preset Files", null, (o, e) => { MessageBus.Send(new SetPresetFileAssociationRequestedMessage()); });
+            settingsItem.DropDownItems.Add(associatePresetItem);
+        }
+
+        private void SetupCharacterItems(ToolStripMenuItem characterItem)
+        {
             IDictionary<string, ToolStripMenuItem> categoryItems = new Dictionary<string, ToolStripMenuItem>();
 
             foreach (CharacterType character in characterRegistry.GetAll())
@@ -86,49 +157,17 @@ namespace Desktoptale
 
                 parent.DropDownItems.Add(characterSelectItem);
             }
-            
-            ToolStripMenuItem scaleItem = new ToolStripMenuItem("Scale");
-            contextMenuStrip.Items.Add(scaleItem);
+        }
 
-            for (int i = 1; i < 5; i++)
+        private void SetupScaleOptions(ToolStripMenuItem scaleItem)
+        {
+            for (int i = 1; i < 9; i++)
             {
                 var scaleFactor = i;
                 ToolStripMenuItem scaleSelectItem = new ToolStripMenuItem($"{i}x", null, (o, e) => MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = scaleFactor }));
                 scaleSelectItem.Checked = currentScaleFactor == i;
                 scaleItem.DropDownItems.Add(scaleSelectItem);
             }
-            
-            ToolStripMenuItem settingsItem = new ToolStripMenuItem("Settings");
-            contextMenuStrip.Items.Add(settingsItem);
-            
-            ToolStripMenuItem idleMovementItem = new ToolStripMenuItem($"Idle Roaming", null, (o, e) => MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = !idleMovementEnabled}));
-            idleMovementItem.Checked = idleMovementEnabled;
-            settingsItem.DropDownItems.Add(idleMovementItem);
-            
-            ToolStripMenuItem unfocusedMovementItem = new ToolStripMenuItem($"Unfocused Movement", null, (o, e) => MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = !unfocusedMovementEnabled}));
-            unfocusedMovementItem.Checked = unfocusedMovementEnabled;
-            settingsItem.DropDownItems.Add(unfocusedMovementItem);
-
-            ToolStripMenuItem stayInWindowItem = new ToolStripMenuItem("Stay in Window", null, (o, e) => { });
-            settingsItem.DropDownItems.Add(stayInWindowItem);
-            
-            SetupWindowSelectItems(stayInWindowItem);
-            
-            ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (o, e) => ShowInfoScreen());
-            contextMenuStrip.Items.Add(infoItem);
-
-            contextMenuStrip.Closed += (o, e) =>
-            {
-                open = false;
-                MessageBus.Send(new ContextMenuStateChangedMessage() { Open = open });
-            };
-            
-            contextMenuStrip.Opened += (o, e) =>
-            {
-                open = true;
-                MessageBus.Send(new ContextMenuStateChangedMessage() { Open = open });
-            };
-            contextMenuStrip.Show(mousePosition.X, mousePosition.Y);
         }
 
         private void SetupWindowSelectItems(ToolStripMenuItem parent)
@@ -187,9 +226,14 @@ namespace Desktoptale
             currentContainingWindow = message.Window;
         }
 
+        private void OnAlwaysOnTopChangeRequestedMessage(AlwaysOnTopChangeRequestedMessage message)
+        {
+            alwaysOnTopEnabled = message.Enabled;
+        }
+
         private void ShowInfoScreen()
         {
-            MessageBox.Show($"{ProgramInfo.NAME} {ProgramInfo.VERSION}\nCreated by {ProgramInfo.AUTHOR}\n\n{ProgramInfo.CREDITS}\n{ProgramInfo.DISCLAIMER}", "About");
+            WindowsUtils.ShowMessageBox($"{ProgramInfo.NAME} {ProgramInfo.VERSION}\nCreated by {ProgramInfo.AUTHOR}\n\n{ProgramInfo.CREDITS}\n{ProgramInfo.DISCLAIMER}", "About", MessageBoxButtons.OK, MessageBoxIcon.None);
         }
 
         public void LoadContent(ContentManager contentManager) {}
