@@ -60,6 +60,13 @@ namespace Desktoptale
         
         [DllImport("user32.dll", SetLastError=true)]
         static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+        
+        [DllImport("kernel32.dll")]
+        private static extern bool AttachConsole(int dwProcessId);
+        private const int ATTACH_PARENT_PROCESS = -1;
+        
+        [DllImport("kernel32.dll")]
+        public static extern bool FreeConsole();
         #endregion
         
         const int GWL_EXSTYLE = -20;
@@ -157,6 +164,11 @@ namespace Desktoptale
                 nativeRect.Right - nativeRect.Left,
                 nativeRect.Bottom - nativeRect.Top
             );
+        }
+
+        public static void AttachConsole()
+        {
+            AttachConsole(ATTACH_PARENT_PROCESS);
         }
     }
 }

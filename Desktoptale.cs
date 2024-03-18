@@ -12,12 +12,13 @@ namespace Desktoptale
 {
     public class Desktoptale : Game
     {
+        private Settings settings { get; }
         private IRegistry<CharacterType, string> characterRegistry { get; }
         
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private InputManager inputManager;
-
+        
         private Character character;
         private ISet<IGameObject> gameObjects;
         
@@ -27,8 +28,10 @@ namespace Desktoptale
         private bool firstFrame = true;
         private WindowsUtils.WindowInfo containingWindow;
 
-        public Desktoptale()
+        public Desktoptale(Settings settings)
         {
+            this.settings = settings;
+            
             graphics = new GraphicsDeviceManager(this);
             Window.Title = ProgramInfo.NAME;
             
@@ -63,10 +66,11 @@ namespace Desktoptale
             contextMenu.Initialize();
             gameObjects.Add(contextMenu);
             
-            MessageBus.Send(new CharacterChangeRequestedMessage { Character = CharacterRegistry.FRISK});
-            MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = 2 });
-            MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = true });
-            MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = false });
+            MessageBus.Send(new CharacterChangeRequestedMessage { Character = CharacterRegistry.FRISK}); // TODO restore this from settings if set
+            MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = settings.Scale });
+            MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = settings.IdleRoaming });
+            MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = settings.UnfocusedInput });
+            // TODO restore containing window from settings if set
         }
 
         /// <summary>
@@ -77,6 +81,8 @@ namespace Desktoptale
         {
             ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory("Content/Custom/", graphics.GraphicsDevice);
             externalCharacterFactory.AddAllToRegistry(characterRegistry);
+            
+            if(settings.PrintRegistryKeys) PrintRegistryKeys();
         }
 
         /// <summary>
@@ -220,6 +226,15 @@ namespace Desktoptale
             else
             {
                 MessageBus.Send(new UpdateBoundaryMessage() { Boundary = bounds });
+            }
+        }
+
+        private void PrintRegistryKeys()
+        {
+            Console.WriteLine("Currently registered characters:");
+            foreach (string key in characterRegistry.GetAllIds())
+            {
+                Console.WriteLine(key);
             }
         }
     }
