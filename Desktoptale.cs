@@ -83,6 +83,8 @@ namespace Desktoptale
             ContextMenu contextMenu = new ContextMenu(Window, inputManager, GraphicsDevice, characterRegistry);
             contextMenu.Initialize();
             gameObjects.Add(contextMenu);
+            
+            FirstStartCheck();
 
             // Send initialization messages
             CharacterType initialCharacter = CharacterRegistry.FRISK;
@@ -258,6 +260,28 @@ namespace Desktoptale
             foreach (string key in characterRegistry.GetAllIds())
             {
                 Console.WriteLine(key);
+            }
+        }
+
+        private void FirstStartCheck()
+        {
+            string path = Path.Combine(applicationPath, ".desktoptale");
+            if (!File.Exists(path))
+            {
+                DisplayWelcomeMessage();
+                File.Create(path).Dispose();
+                File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.Hidden);
+            }
+        }
+
+        private void DisplayWelcomeMessage()
+        {
+            DialogResult result = WindowsUtils.ShowMessageBox(ProgramInfo.WELCOME_MESSAGE, ProgramInfo.NAME,
+                MessageBoxButtons.YesNo, MessageBoxIcon.None);
+
+            if (result == DialogResult.Yes)
+            {
+                MessageBus.Send(new SetPresetFileAssociationRequestedMessage());
             }
         }
     }

@@ -225,9 +225,9 @@ namespace Desktoptale
             
         }
 
-        public static void ShowMessageBox(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+        public static DialogResult ShowMessageBox(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
         {
-            MessageBox.Show(text, caption, buttons, icon);
+            return MessageBox.Show(text, caption, buttons, icon);
         }
 
         public static SaveDialogResult OpenSaveDialog(string filter, string defaultName = "")
