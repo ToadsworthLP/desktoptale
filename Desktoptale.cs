@@ -269,8 +269,12 @@ namespace Desktoptale
             if (!File.Exists(path))
             {
                 DisplayWelcomeMessage();
-                File.Create(path).Dispose();
-                File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.Hidden);
+                try
+                {
+                    File.Create(path).Dispose();
+                    File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.Hidden);
+                }
+                catch (Exception e) {}
             }
         }
 
