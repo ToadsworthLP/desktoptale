@@ -10,6 +10,7 @@ namespace Desktoptale
             if (args != null && args.Length > 0)
             {
                 WindowsUtils.AttachConsole();
+                Console.WriteLine();
                 
                 Parser parser = new Parser(config =>
                 {

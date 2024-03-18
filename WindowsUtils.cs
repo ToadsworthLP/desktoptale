@@ -81,6 +81,13 @@ namespace Desktoptale
         const int S_OK = 0x00000000;
         private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
         
+        public class WindowInfo
+        {
+            public string Title;
+            public string ProcessName;
+            public IntPtr hWnd;
+        }
+        
         public static void MakeWindowOverlay(GameWindow window)
         {
             // Set to layered, transparent window.
@@ -144,11 +151,23 @@ namespace Desktoptale
             return windows;
         }
 
-        public class WindowInfo
+        public static WindowInfo GetWindowByName(string name)
         {
-            public string Title;
-            public string ProcessName;
-            public IntPtr hWnd;
+            IList<WindowInfo> allWindows = GetOpenWindows();
+            
+            // First, try matching by the exact window title
+            foreach (WindowInfo window in allWindows)
+            {
+                if (window.Title == name) return window;
+            }
+            
+            // Then try matching by process name
+            foreach (WindowInfo window in allWindows)
+            {
+                if (window.ProcessName == name) return window;
+            }
+
+            return null;
         }
 
         public static Rectangle GetWindowRect(IntPtr hWnd)

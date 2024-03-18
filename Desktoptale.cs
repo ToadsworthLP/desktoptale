@@ -22,9 +22,8 @@ namespace Desktoptale
         private Character character;
         private ISet<IGameObject> gameObjects;
         
-        private const int WINDOW_STATE_UPDATE_INTERVAL = 20;
+        private const int WINDOW_STATE_UPDATE_INTERVAL = 30;
         private int windowStateUpdateCounter = 0;
-        private bool enableRepeatedForceTopmost = false;
         private bool firstFrame = true;
         private WindowsUtils.WindowInfo containingWindow;
 
@@ -54,7 +53,6 @@ namespace Desktoptale
             base.Initialize();
             
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
-            MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
             MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
             
             inputManager = new InputManager(this, GraphicsDevice);
@@ -65,12 +63,37 @@ namespace Desktoptale
             ContextMenu contextMenu = new ContextMenu(Window, inputManager, GraphicsDevice, characterRegistry);
             contextMenu.Initialize();
             gameObjects.Add(contextMenu);
+
+            CharacterType initialCharacter = CharacterRegistry.FRISK;
+            if (settings.Character != null)
+            {
+                try
+                {
+                    initialCharacter = characterRegistry.Get(settings.Character);
+                }
+                catch (IndexOutOfRangeException e)
+                {
+                    Console.WriteLine($"Failed to switch character: Invalid character registry key: {settings.Character}");
+                }
+            }
+            MessageBus.Send(new CharacterChangeRequestedMessage { Character = initialCharacter });
             
-            MessageBus.Send(new CharacterChangeRequestedMessage { Character = CharacterRegistry.FRISK}); // TODO restore this from settings if set
             MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = settings.Scale });
             MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = settings.IdleRoaming });
             MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = settings.UnfocusedInput });
-            // TODO restore containing window from settings if set
+
+            if (settings.Window != null)
+            {
+                WindowsUtils.WindowInfo target = WindowsUtils.GetWindowByName(settings.Window);
+                if (target != null)
+                {
+                    MessageBus.Send(new ChangeContainingWindowMessage() { Window = target });
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to attach to window: Window or process {settings.Window} could not be found.");
+                }
+            }
         }
 
         /// <summary>
@@ -117,7 +140,7 @@ namespace Desktoptale
 
             if (windowStateUpdateCounter % WINDOW_STATE_UPDATE_INTERVAL == 0)
             {
-                if(enableRepeatedForceTopmost) WindowsUtils.MakeTopmostWindow(Window);
+                WindowsUtils.MakeTopmostWindow(Window);
                 if(containingWindow != null) UpdateBounds();
                 
                 windowStateUpdateCounter = 1;
@@ -180,19 +203,6 @@ namespace Desktoptale
             character = newCharacter;
             
             MessageBus.Send(new CharacterChangeSuccessMessage { Character = message.Character });
-        }
-
-        private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangeRequestedMessage message)
-        {
-            if (message.Enabled)
-            {
-                enableRepeatedForceTopmost = true;
-                windowStateUpdateCounter = 0;
-            }
-            else
-            {
-                enableRepeatedForceTopmost = false;
-            }
         }
 
         private void OnChangeContainingWindowMessage(ChangeContainingWindowMessage message)
