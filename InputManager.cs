@@ -73,11 +73,15 @@ namespace Desktoptale
 
         private void UpdateMouseInput()
         {
-            if (graphics.Viewport.Bounds.Contains(PointerPosition))
+            if (!game.IsActive)
             {
+                LeftClickPressed = false;
+                LeftClickJustPressed = false;
+                previousFrameLeftClick = false;
                 RightClickPressed = false;
                 RightClickJustPressed = false;
                 previousFrameRightClick = false;
+                return;
             }
             
             previousFrameLeftClick = LeftClickPressed;
@@ -96,6 +100,13 @@ namespace Desktoptale
             if (LeftClickJustPressed || RightClickJustPressed)
             {
                 focused = graphics.Viewport.Bounds.Contains(PointerPosition);
+            }
+            
+            if (!graphics.Viewport.Bounds.Contains(PointerPosition))
+            {
+                RightClickPressed = false;
+                RightClickJustPressed = false;
+                previousFrameRightClick = false;
             }
         }
         
