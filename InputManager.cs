@@ -73,6 +73,13 @@ namespace Desktoptale
 
         private void UpdateMouseInput()
         {
+            if (graphics.Viewport.Bounds.Contains(PointerPosition))
+            {
+                RightClickPressed = false;
+                RightClickJustPressed = false;
+                previousFrameRightClick = false;
+            }
+            
             previousFrameLeftClick = LeftClickPressed;
             previousFrameRightClick = RightClickPressed;
             
