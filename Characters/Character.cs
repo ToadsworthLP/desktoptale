@@ -196,6 +196,8 @@ namespace Desktoptale.Characters
 
         private void PreventLeavingScreenArea()
         {
+            if(previousPosition == Position) return;
+            
             float scaledWidth = CurrentSprite.FrameSize.X * Scale.X;
             float scaledHeight = CurrentSprite.FrameSize.Y * Scale.Y;
             
