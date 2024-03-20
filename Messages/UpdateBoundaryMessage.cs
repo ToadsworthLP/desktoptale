@@ -4,6 +4,6 @@ namespace Desktoptale.Messages
 {
     public class UpdateBoundaryMessage
     {
-        public Rectangle Boundary { get; set; }
+        public Rectangle? Boundary { get; set; }
     }
 }

@@ -9,6 +9,7 @@ using Desktoptale.Messaging;
 using Desktoptale.Registry;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace Desktoptale
@@ -225,13 +226,7 @@ namespace Desktoptale
             }
             else
             {
-                MessageBus.Send(new UpdateBoundaryMessage() { 
-                    Boundary = new Rectangle(
-                        Point.Zero, 
-                        new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
-                                        GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height)) 
-                    }
-                );
+                MessageBus.Send(new UpdateBoundaryMessage() {  Boundary = null });
             }
         }
 

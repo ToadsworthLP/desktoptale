@@ -38,7 +38,7 @@ namespace Desktoptale.Characters
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        private Rectangle boundary;
+        private Rectangle? boundary;
 
         private bool enableDragging = true;
         private bool dragging;
@@ -92,7 +92,6 @@ namespace Desktoptale.Characters
             if (firstFrame)
             {
                 window.Position = new Point((int)Position.X, (int)Position.Y);
-                boundary = GetScreenRect();
                 firstFrame = false;
             }
             
@@ -200,28 +199,29 @@ namespace Desktoptale.Characters
             float scaledWidth = CurrentSprite.FrameSize.X * Scale.X;
             float scaledHeight = CurrentSprite.FrameSize.Y * Scale.Y;
             
-            if (Position.X < boundary.X) Position.X = boundary.X;
-            if (Position.X + scaledWidth > boundary.X + boundary.Width) Position.X = boundary.X + boundary.Width - scaledWidth;
-            if (Position.Y < boundary.Y) Position.Y = boundary.Y;
-            if (Position.Y + scaledHeight > boundary.Y + boundary.Height) Position.Y = boundary.Y + boundary.Height - scaledHeight;
+            if (boundary.HasValue)
+            {
+                if (Position.X < boundary.Value.X) Position.X = boundary.Value.X;
+                if (Position.X + scaledWidth > boundary.Value.X + boundary.Value.Width) Position.X = boundary.Value.X + boundary.Value.Width - scaledWidth;
+                if (Position.Y < boundary.Value.Y) Position.Y = boundary.Value.Y;
+                if (Position.Y + scaledHeight > boundary.Value.Y + boundary.Value.Height) Position.Y = boundary.Value.Y + boundary.Value.Height - scaledHeight;
+            }
+            else
+            {
+                Rectangle xRect = new Rectangle((int)Position.X, (int)previousPosition.Y, (int)scaledWidth, (int)scaledHeight);
+                if (!WindowsUtils.IsRectOnFullyOnScreen(xRect))
+                {
+                    Position = new Vector2(previousPosition.X, Position.Y);
+                }
+                
+                Rectangle yRect = new Rectangle((int)previousPosition.X, (int)Position.Y, (int)scaledWidth, (int)scaledHeight);
+                if (!WindowsUtils.IsRectOnFullyOnScreen(yRect))
+                {
+                    Position = new Vector2(Position.X, previousPosition.Y);
+                }
+            }
         }
-
-        private Rectangle GetScreenRect()
-        {
-            return new Rectangle(Point.Zero, GetScreenSize());
-        }
-
-        private Point GetScreenSize()
-        {
-            return new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
-                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
-        }
-
-        private Point GetWindowSize()
-        {
-            return new Point((int)(CurrentSprite.FrameSize.X * Scale.X), (int)(CurrentSprite.FrameSize.Y * Scale.Y));
-        }
-
+        
         private Point GetMaximumFrameSize()
         {
             Point size = new Point(0, 0);

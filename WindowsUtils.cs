@@ -9,7 +9,6 @@ using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using Microsoft.Xna.Framework;
-using System.Windows.Forms;
 
 namespace Desktoptale
 {
@@ -18,22 +17,19 @@ namespace Desktoptale
     {
         #region DllImports
         [DllImport("kernel32.dll")]
-        static extern void SetLastError(uint dwErrCode);
+        private static extern void SetLastError(uint dwErrCode);
 
         [DllImport("user32.dll", SetLastError = true)]
-        static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
         [DllImport("user32.dll", SetLastError = true)]
-        static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
 
         [DllImport("user32.dll", SetLastError = true)]
-        static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
         [DllImport("dwmapi.dll")]
-        static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref int[] pMarInset);
+        private static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref int[] pMarInset);
         
         [DllImport("USER32.DLL")]
         private static extern bool EnumWindows(EnumWindowsProc enumFunc, int lParam);
@@ -52,19 +48,19 @@ namespace Desktoptale
         
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool GetWindowRect(IntPtr hWnd, out NativeRect lpNativeRect);
+        private static extern bool GetWindowRect(IntPtr hWnd, out NativeRect lpNativeRect);
         
         [StructLayout(LayoutKind.Sequential)]
-        public struct NativeRect
+        private struct NativeRect
         {
-            public int Left;        // x position of upper-left corner
-            public int Top;         // y position of upper-left corner
-            public int Right;       // x position of lower-right corner
-            public int Bottom;      // y position of lower-right corner
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
         }
         
         [DllImport("user32.dll", SetLastError=true)]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
         
         [DllImport("kernel32.dll")]
         private static extern bool AttachConsole(int dwProcessId);
@@ -74,19 +70,39 @@ namespace Desktoptale
         public static extern bool FreeConsole();
         
         [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
+        private static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr MonitorFromPoint(NativePoint pt, int flags);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct NativePoint { 
+            public int x;
+            public int y;
+            
+            public NativePoint(int x, int y) {
+                this.x = x; 
+                this.y = y;
+            }
+
+            public NativePoint(Point point)
+            {
+                this.x = point.X;
+                this.y = point.Y;
+            }
+        } 
         #endregion
         
-        const int GWL_EXSTYLE = -20;
-        const int LWA_ALPHA = 0x00000002;
-        const int WS_EX_LAYERED = 0x00080000;
-        const int WS_EX_TOPMOST = 0x00000008;
-        const int WS_EX_TRANSPARENT = 0x00000020;
-        const int WS_EX_NOACTIVATE = 0x08000000;
-        static readonly IntPtr HWND_TOPMOST = (IntPtr)(-1);
-        const int SWP_NOMOVE = 0x0002;
-        const int SWP_NOSIZE = 0x0001;
-        const int S_OK = 0x00000000;
+        private const int GWL_EXSTYLE = -20;
+        private const int LWA_ALPHA = 0x00000002;
+        private const int WS_EX_LAYERED = 0x00080000;
+        private const int WS_EX_TOPMOST = 0x00000008;
+        private const int WS_EX_TRANSPARENT = 0x00000020;
+        private const int WS_EX_NOACTIVATE = 0x08000000;
+        private static readonly IntPtr HWND_TOPMOST = (IntPtr)(-1);
+        private const int SWP_NOMOVE = 0x0002;
+        private const int SWP_NOSIZE = 0x0001;
+        private const int S_OK = 0x00000000;
         private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
         
         public class WindowInfo
@@ -98,8 +114,10 @@ namespace Desktoptale
 
         public class SaveDialogResult
         {
-            public bool Success;
+            public DialogState Result;
             public Stream OutputStream;
+            
+            public enum DialogState { Succeeded, Cancelled, Failed }
         }
         
         public static void MakeWindowOverlay(GameWindow window)
@@ -238,17 +256,38 @@ namespace Desktoptale
             dialog.Filter = filter;
             dialog.FilterIndex = 1;
             dialog.RestoreDirectory = true;
- 
-            if(dialog.ShowDialog() == DialogResult.OK)
+
+            DialogResult result = dialog.ShowDialog();
+            if(result == DialogResult.OK)
             {
                 return new SaveDialogResult()
                 {
-                    Success = true,
+                    Result = SaveDialogResult.DialogState.Succeeded,
                     OutputStream = dialog.OpenFile()
                 };
             }
 
-            return new SaveDialogResult() { Success = false };
+            if (result == DialogResult.Cancel)
+            {
+                return new SaveDialogResult() { Result = SaveDialogResult.DialogState.Cancelled };
+            }
+
+            return new SaveDialogResult() { Result = SaveDialogResult.DialogState.Failed };
+        }
+
+        public static bool IsPointOnScreen(Point point)
+        {
+            return MonitorFromPoint(new NativePoint(point), 0) != IntPtr.Zero;
+        }
+
+        public static bool IsRectOnFullyOnScreen(Rectangle rectangle)
+        {
+            Point topLeft = rectangle.Location;
+            Point topRight = rectangle.Location + new Point(rectangle.Width, 0);
+            Point bottomLeft = rectangle.Location + new Point(0, rectangle.Height);
+            Point bottomRight = rectangle.Location + new Point(rectangle.Width, rectangle.Height);
+
+            return IsPointOnScreen(topLeft) && IsPointOnScreen(topRight) && IsPointOnScreen(bottomLeft) && IsPointOnScreen(bottomRight);
         }
     }
 }
