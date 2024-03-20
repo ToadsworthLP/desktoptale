@@ -73,13 +73,6 @@ namespace Desktoptale
 
         private void UpdateMouseInput()
         {
-            if (!game.IsActive)
-            {
-                LeftClickPressed = false;
-                RightClickPressed = false;
-                return;
-            }
-            
             previousFrameLeftClick = LeftClickPressed;
             previousFrameRightClick = RightClickPressed;
             
