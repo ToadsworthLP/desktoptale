@@ -38,6 +38,8 @@ namespace Desktoptale.Registry
         public static readonly CharacterType RALSEI_HATTED = new CharacterType("Ralsei (Hatted)", "Deltarune", ctx => new StandardCharacter(ctx, "RalseiHat", false));
         public static readonly CharacterType NOELLE = new CharacterType("Noelle", "Deltarune", ctx => new StandardCharacter(ctx, "Noelle", false));
         public static readonly CharacterType NOELLE_DW = new CharacterType("Noelle (Dark World)", "Deltarune", ctx => new StandardCharacter(ctx, "NoelleDW", false));
+        public static readonly CharacterType BERDLEY = new CharacterType("Berdley", "Deltarune", ctx => new StandardCharacter(ctx, "Berdley", true));
+        public static readonly CharacterType BERDLEY_DW = new CharacterType("Berdley (Dark World)", "Deltarune", ctx => new StandardCharacter(ctx, "BerdleyDW", true));
         
         public CharacterRegistry()
         {
@@ -75,6 +77,8 @@ namespace Desktoptale.Registry
             Add(RALSEI);
             Add(NOELLE);
             Add(NOELLE_DW);
+            Add(BERDLEY);
+            Add(BERDLEY_DW);
         }
     }
 }
