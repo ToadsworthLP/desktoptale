@@ -7,11 +7,16 @@ namespace Desktoptale.Characters
     {
         private string name;
         private bool hasRightSprite;
+        private int upFrames, downFrames, leftFrames, rightFrames;
 
-        public StandardCharacter(CharacterCreationContext characterCreationContext, string name, bool hasRightSprite) : base(characterCreationContext)
+        public StandardCharacter(CharacterCreationContext characterCreationContext, string name, bool hasRightSprite, int upFrames = 4, int downFrames = 4, int leftFrames = 4, int rightFrames = 4) : base(characterCreationContext)
         {
             this.name = name;
             this.hasRightSprite = hasRightSprite;
+            this.upFrames = upFrames;
+            this.downFrames = downFrames;
+            this.leftFrames = leftFrames;
+            this.rightFrames = rightFrames;
         }
     
         public override void LoadContent(ContentManager contentManager)
@@ -21,20 +26,18 @@ namespace Desktoptale.Characters
             if (hasRightSprite)
             {
                 idleSprite = new OrientedAnimatedSprite(
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"),    
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), 
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"),
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Right"),
-                    4
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"), upFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), downFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"), leftFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Right"), rightFrames
                 );
             }
             else
             {
                 idleSprite = new OrientedAnimatedSprite(
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"),    
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), 
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"),
-                    4
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"), upFrames,  
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), downFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"), leftFrames
                 );
             }
             
@@ -47,20 +50,18 @@ namespace Desktoptale.Characters
             if (hasRightSprite)
             {
                 walkSprite = new OrientedAnimatedSprite(
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"),    
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), 
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"),
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Right"),
-                    4
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"), upFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), downFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"), leftFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Right"), rightFrames
                 );
             }
             else
             {
                 walkSprite = new OrientedAnimatedSprite(
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"),    
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), 
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"),
-                    4
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"), upFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), downFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"), leftFrames
                 );
             }
             
@@ -74,20 +75,18 @@ namespace Desktoptale.Characters
             if (hasRightSprite)
             {
                 runSprite = new OrientedAnimatedSprite(
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"),    
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), 
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"),
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Right"),
-                    4
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"), upFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), downFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"), leftFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Right"), rightFrames
                 );
             }
             else
             {
                 runSprite = new OrientedAnimatedSprite(
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"),    
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), 
-                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"),
-                    4
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Up"), upFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Down"), downFrames,
+                    contentManager.Load<Texture2D>($"Included/{name}/Spr_{name}_Walk_Left"), leftFrames
                 );
             }
             

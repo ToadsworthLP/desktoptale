@@ -11,6 +11,8 @@
 @sdvlex, @RedCactusSound, @Comfnani - Testing
 @yigarjpg - Custom Starlo running animation
 @Inky_125 - Custom Chujin sprites
+UnderFail - Custom Chara sprites
+FanFictionGamer - Custom Asriel sprites
 ";
 
         public const string WELCOME_MESSAGE = @"Welcome to Desktoptale!
