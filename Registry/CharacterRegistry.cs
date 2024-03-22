@@ -41,6 +41,9 @@ namespace Desktoptale.Registry
         public static readonly CharacterType NOELLE_DW = new CharacterType("Noelle (Dark World)", "Deltarune", ctx => new StandardCharacter(ctx, "NoelleDW", false));
         public static readonly CharacterType BERDLEY = new CharacterType("Berdley", "Deltarune", ctx => new StandardCharacter(ctx, "Berdley", true));
         public static readonly CharacterType BERDLEY_DW = new CharacterType("Berdley (Dark World)", "Deltarune", ctx => new StandardCharacter(ctx, "BerdleyDW", true));
+        public static readonly CharacterType LANCER = new CharacterType("Lancer", "Deltarune", ctx => new Lancer(ctx));
+        public static readonly CharacterType QUEEN = new CharacterType("Queen", "Deltarune", ctx => new Queen(ctx));
+        public static readonly CharacterType SPAMTON = new CharacterType("Spamton G. Spamton", "Deltarune", ctx => new Spamton(ctx));
 
         public static readonly CharacterType RED_SOUL = new CharacterType("Red Soul", "Souls", ctx => new Soul(ctx, new Color(1f, 0f, 0f)));
         public static readonly CharacterType CYAN_SOUL = new CharacterType("Cyan Soul", "Souls", ctx => new Soul(ctx, new Color(0.2588235294f, 0.9882352941f, 1f)));
@@ -89,6 +92,9 @@ namespace Desktoptale.Registry
             Add(NOELLE_DW);
             Add(BERDLEY);
             Add(BERDLEY_DW);
+            Add(LANCER);
+            Add(QUEEN);
+            Add(SPAMTON);
 
             Add(RED_SOUL);
             Add(CYAN_SOUL);
