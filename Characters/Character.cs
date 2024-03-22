@@ -33,10 +33,10 @@ namespace Desktoptale.Characters
         public bool EnabledAutoOrientation { get; set; } = true;
 
         protected virtual IState<Character> InitialState => IdleState;
-    
-        private GameWindow window;
-        private GraphicsDeviceManager graphics;
-        private SpriteBatch spriteBatch;
+
+        protected GameWindow window;
+        protected GraphicsDeviceManager graphics;
+        protected SpriteBatch spriteBatch;
 
         private Rectangle? boundary;
 

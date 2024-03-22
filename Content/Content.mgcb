@@ -1552,6 +1552,18 @@
 /processorParam:TextureFormat=Color
 /build:Included/Sans/Spr_Sans_Walk_Up.png
 
+#begin Included/Soul/Spr_Soul.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Soul/Spr_Soul.png
+
 #begin Included/Starlo/Spr_Starlo_Idle_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor

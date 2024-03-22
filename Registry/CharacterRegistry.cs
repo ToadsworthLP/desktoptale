@@ -1,4 +1,5 @@
 ﻿using Desktoptale.Characters;
+using Microsoft.Xna.Framework;
 
 namespace Desktoptale.Registry
 {
@@ -40,6 +41,15 @@ namespace Desktoptale.Registry
         public static readonly CharacterType NOELLE_DW = new CharacterType("Noelle (Dark World)", "Deltarune", ctx => new StandardCharacter(ctx, "NoelleDW", false));
         public static readonly CharacterType BERDLEY = new CharacterType("Berdley", "Deltarune", ctx => new StandardCharacter(ctx, "Berdley", true));
         public static readonly CharacterType BERDLEY_DW = new CharacterType("Berdley (Dark World)", "Deltarune", ctx => new StandardCharacter(ctx, "BerdleyDW", true));
+
+        public static readonly CharacterType RED_SOUL = new CharacterType("Red Soul", "Souls", ctx => new Soul(ctx, new Color(1f, 0f, 0f)));
+        public static readonly CharacterType CYAN_SOUL = new CharacterType("Cyan Soul", "Souls", ctx => new Soul(ctx, new Color(0.2588235294f, 0.9882352941f, 1f)));
+        public static readonly CharacterType ORANGE_SOUL = new CharacterType("Orange Soul", "Souls", ctx => new Soul(ctx, new Color(0.9882352941f, 0.6509803922f, 0f)));
+        public static readonly CharacterType BLUE_SOUL = new CharacterType("Blue Soul", "Souls", ctx => new Soul(ctx, new Color(0f, 0.2352941176f, 1f)));
+        public static readonly CharacterType PURPLE_SOUL = new CharacterType("Purple Soul", "Souls", ctx => new Soul(ctx, new Color(0.8352941176f, 0.2078431373f, 0.8509803922f)));
+        public static readonly CharacterType GREEN_SOUL = new CharacterType("Green Soul", "Souls", ctx => new Soul(ctx, new Color(0f, 0.7529411765f, 0f)));
+        public static readonly CharacterType YELLOW_SOUL = new CharacterType("Yellow Soul", "Souls", ctx => new Soul(ctx, new Color(1f, 1f, 0f)));
+        public static readonly CharacterType MONSTER_SOUL = new CharacterType("Monster Soul", "Souls", ctx => new Soul(ctx, new Color(1f, 1f, 1f), true));
         
         public CharacterRegistry()
         {
@@ -79,6 +89,15 @@ namespace Desktoptale.Registry
             Add(NOELLE_DW);
             Add(BERDLEY);
             Add(BERDLEY_DW);
+
+            Add(RED_SOUL);
+            Add(CYAN_SOUL);
+            Add(ORANGE_SOUL);
+            Add(BLUE_SOUL);
+            Add(PURPLE_SOUL);
+            Add(GREEN_SOUL);
+            Add(YELLOW_SOUL);
+            Add(MONSTER_SOUL);
         }
     }
 }
