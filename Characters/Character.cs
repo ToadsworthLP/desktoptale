@@ -72,8 +72,8 @@ namespace Desktoptale.Characters
             contextMenuStateChangeSubscription = MessageBus.Subscribe<ContextMenuStateChangedMessage>(OnContextMenuStateChangedMessage);
 
             IdleState = new IdleState();
-            WalkState = new WalkState(90f);
-            RunState = new RunState(180f);
+            WalkState = new WalkState(90f, true);
+            RunState = new RunState(180f, true);
             RandomMovementState = new RandomMovementState(90);
             RandomMovementWaitState = new RandomMovementWaitState();
         

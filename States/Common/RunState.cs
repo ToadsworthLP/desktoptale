@@ -1,11 +1,10 @@
-﻿using System;
-using Desktoptale.Characters;
+﻿using Desktoptale.Characters;
 
 namespace Desktoptale.States.Common
 {
     public class RunState : WalkState
     {
-        public RunState(float speed) : base(speed)
+        public RunState(float speed, bool useRawInput) : base(speed, useRawInput)
         {
         }
 
@@ -30,7 +29,7 @@ namespace Desktoptale.States.Common
             }
         
             context.Target.Velocity = 
-                context.Target.InputManager.DirectionalInput *
+                (UseRawInput ? context.Target.InputManager.RawDirectionalInput : context.Target.InputManager.DirectionalInput) *
                 Speed *
                 (float)context.Time.ElapsedGameTime.TotalSeconds *
                 MathF.Min(context.Target.Scale.X, context.Target.Scale.Y);

@@ -34,8 +34,8 @@ namespace Desktoptale.Characters
             base.Initialize();
             
             IdleState = InitialState;
-            WalkState = new WalkState(100f);
-            RunState = new RunState(50f);
+            WalkState = new WalkState(100f, false);
+            RunState = new RunState(50f, false);
         }
 
         public override void Draw(GameTime gameTime)

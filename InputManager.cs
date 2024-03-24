@@ -9,6 +9,7 @@ namespace Desktoptale
     public class InputManager
     {
         public Vector2 DirectionalInput { get; private set; }
+        public Vector2 RawDirectionalInput { get; private set; }
         public Point PointerPosition { get; private set; }
         public bool LeftClickPressed { get; private set; }
         public bool LeftClickJustPressed { get; private set; }
@@ -64,6 +65,8 @@ namespace Desktoptale
             if (keyboardState.IsKeyDown(Keys.Down)) input.Y += 1f;
             if (keyboardState.IsKeyDown(Keys.Left)) input.X -= 1f;
             if (keyboardState.IsKeyDown(Keys.Right)) input.X += 1f;
+
+            RawDirectionalInput = new Vector2(input.X, input.Y);
 
             if(input.LengthSquared() > float.Epsilon) input.Normalize();
             DirectionalInput = input;
