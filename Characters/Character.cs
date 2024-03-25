@@ -37,6 +37,7 @@ namespace Desktoptale.Characters
         protected GameWindow window;
         protected GraphicsDeviceManager graphics;
         protected SpriteBatch spriteBatch;
+        protected MonitorManager monitorManager;
 
         private Rectangle? boundary;
 
@@ -52,6 +53,7 @@ namespace Desktoptale.Characters
         
         public Character(CharacterCreationContext characterCreationContext)
         {
+            this.monitorManager = characterCreationContext.MonitorManager;
             this.spriteBatch = characterCreationContext.SpriteBatch;
             this.InputManager = characterCreationContext.InputManager;
             this.graphics = characterCreationContext.Graphics;
@@ -91,6 +93,7 @@ namespace Desktoptale.Characters
         {
             if (firstFrame)
             {
+                PreventLeavingScreenArea();
                 window.Position = new Point((int)Position.X, (int)Position.Y);
                 firstFrame = false;
             }
@@ -210,18 +213,42 @@ namespace Desktoptale.Characters
             }
             else
             {
-                Rectangle xRect = new Rectangle((int)Position.X, (int)previousPosition.Y, (int)scaledWidth, (int)scaledHeight);
-                if (!WindowsUtils.IsRectOnFullyOnScreen(xRect))
-                {
-                    Position = new Vector2(previousPosition.X, Position.Y);
-                }
+                Vector2 motion = Position - previousPosition;
+                Vector2 previousBoundingRectMin = previousPosition;
+                Vector2 previousBoundingRectMax = new Vector2(previousPosition.X + scaledWidth, previousPosition.Y + scaledHeight);
                 
-                Rectangle yRect = new Rectangle((int)previousPosition.X, (int)Position.Y, (int)scaledWidth, (int)scaledHeight);
-                if (!WindowsUtils.IsRectOnFullyOnScreen(yRect))
-                {
-                    Position = new Vector2(Position.X, previousPosition.Y);
-                }
+                Vector2 topLeft = new Vector2(Position.X, Position.Y);
+                Vector2 topRight = new Vector2(Position.X + scaledWidth, Position.Y);
+                Vector2 bottomLeft = new Vector2(Position.X, Position.Y + scaledHeight);
+                Vector2 bottomRight = new Vector2(Position.X + scaledWidth, Position.Y + scaledHeight);
+
+                Vector2 correctionMotion = Vector2.Zero;
+                int correctionCounter = 0;
+                correctionMotion += GetCorrectionMotion(topLeft, previousBoundingRectMin, previousBoundingRectMax, ref correctionCounter);
+                correctionMotion += GetCorrectionMotion(topRight, previousBoundingRectMin, previousBoundingRectMax, ref correctionCounter);
+                correctionMotion += GetCorrectionMotion(bottomLeft, previousBoundingRectMin, previousBoundingRectMax, ref correctionCounter);
+                correctionMotion += GetCorrectionMotion(bottomRight, previousBoundingRectMin, previousBoundingRectMax, ref correctionCounter);
+
+                Position = previousPosition + motion + correctionMotion / Math.Max(1, correctionCounter);
             }
+        }
+
+        private Vector2 GetCorrectionMotion(Vector2 newPosition, Vector2 boundingRectMin, Vector2 boundingRectMax, ref int counter)
+        {
+            if (ContainsInclusive(boundingRectMin, boundingRectMax, newPosition))
+            {
+                return Vector2.Zero;
+            }
+            
+            Vector2 corrected = monitorManager.GetClosestVisiblePoint(newPosition);
+            if(corrected != newPosition) counter++;
+            
+            return corrected - newPosition;
+        }
+
+        private bool ContainsInclusive(Vector2 min, Vector2 max, Vector2 value)
+        {
+            return min.X <= value.X && value.X <= max.X && min.Y <= value.Y && value.Y <= max.Y;
         }
         
         private Point GetMaximumFrameSize()

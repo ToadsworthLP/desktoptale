@@ -9,7 +9,6 @@ using Desktoptale.Messaging;
 using Desktoptale.Registry;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace Desktoptale
@@ -23,6 +22,7 @@ namespace Desktoptale
         private SpriteBatch spriteBatch;
         private InputManager inputManager;
         private PresetManager presetManager;
+        private MonitorManager monitorManager;
         
         private Character character;
         private ISet<IGameObject> gameObjects;
@@ -54,6 +54,8 @@ namespace Desktoptale
             characterRegistry = new CharacterRegistry();
             
             WindowsUtils.MakeWindowOverlay(Window);
+
+            monitorManager = new MonitorManager();
         }
         
         protected override void Initialize()
@@ -183,7 +185,7 @@ namespace Desktoptale
             try
             {
                 newCharacter = message.Character.FactoryFunction
-                    .Invoke(new CharacterCreationContext(graphics, Window, spriteBatch, inputManager));
+                    .Invoke(new CharacterCreationContext(graphics, Window, spriteBatch, inputManager, monitorManager));
 
                 newCharacter.LoadContent(Content);
             }

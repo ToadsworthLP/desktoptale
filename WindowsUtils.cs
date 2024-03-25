@@ -90,7 +90,68 @@ namespace Desktoptale
                 this.x = point.X;
                 this.y = point.Y;
             }
-        } 
+        }
+        
+        [StructLayout(LayoutKind.Sequential)]
+        private struct DisplayDevice
+        {
+            public int cb;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            public string DeviceName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+            public string DeviceString;
+            public DisplayDeviceStateFlags StateFlags;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+            public string DeviceID;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+            public string DeviceKey;
+
+            public void Initialize()
+            {
+                cb = 0;
+                DeviceName = new string((char)32, 32);
+                DeviceString = new string((char)32, 128);
+                DeviceID = new string((char)32, 128);
+                DeviceKey = new string((char)32, 128);
+                cb = Marshal.SizeOf(this);
+            }
+        }
+        
+        [Flags]
+        private enum DisplayDeviceStateFlags
+        {
+            AttachedToDesktop = 0x1,
+            MultiDriver = 0x2,
+            PrimaryDevice = 0x4,
+            MirroringDriver = 0x8,
+            VGACompatible = 0x10,
+            Removable = 0x20,
+            ModesPruned = 0x8000000,
+            Remote = 0x4000000,
+            Disconnect = 0x2000000,
+        }
+        
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct MonitorInfoEX
+        {
+            public int Size;
+            public NativeRect Monitor;
+            public NativeRect WorkArea;
+            public uint Flags;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            public string DeviceName;
+        }
+
+        private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr dwData);
+
+        [DllImport("user32.dll")]
+        private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumDelegate lpfnEnum, IntPtr dwData);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEX lpmi);
+
+        [DllImport("User32.dll")]
+        private static extern bool EnumDisplayDevices(byte[] lpDevice, uint iDevNum, ref DisplayDevice lpDisplayDevice, int dwFlags);
         #endregion
         
         private const int GWL_EXSTYLE = -20;
@@ -288,6 +349,57 @@ namespace Desktoptale
             Point bottomRight = rectangle.Location + new Point(rectangle.Width, rectangle.Height);
 
             return IsPointOnScreen(topLeft) && IsPointOnScreen(topRight) && IsPointOnScreen(bottomLeft) && IsPointOnScreen(bottomRight);
+        }
+
+        public static void RegisterDisplaySettingsChangedCallback(Action callback)
+        {
+            SystemEvents.DisplaySettingsChanged += new EventHandler((sender, args) => callback());
+        }
+
+        public static IList<MonitorManager.MonitorInfo> GetConnectedMonitors()
+        {
+            List<MonitorManager.MonitorInfo> allMonitors = new List<MonitorManager.MonitorInfo>();
+
+            bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref NativeRect lprcMonitor, IntPtr dwData)
+            {
+                MonitorInfoEX monitor = new MonitorInfoEX() { Size = Marshal.SizeOf(typeof(MonitorInfoEX)) };
+
+                if (GetMonitorInfo(hMonitor, ref monitor))
+                {
+                    DisplayDevice device = new DisplayDevice();
+                    device.Initialize();
+
+                    if (EnumDisplayDevices(ToLptString(monitor.DeviceName), 0, ref device, 0))
+                    {
+                        MonitorManager.MonitorInfo monitorInfo = new MonitorManager.MonitorInfo()
+                        {
+                            Name = device.DeviceString, 
+                            DeviceId = monitor.DeviceName, 
+                            Bounds = new Rectangle(monitor.Monitor.Left, monitor.Monitor.Top, monitor.Monitor.Right - monitor.Monitor.Left, monitor.Monitor.Bottom - monitor.Monitor.Top), 
+                            WorkingArea = new Rectangle(monitor.WorkArea.Left, monitor.WorkArea.Top, monitor.WorkArea.Right - monitor.WorkArea.Left, monitor.WorkArea.Bottom - monitor.WorkArea.Top),
+                        };
+                        allMonitors.Add(monitorInfo);
+                    }
+                }
+
+                return true;
+            }
+
+            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, MonitorEnumProc, IntPtr.Zero);
+            return allMonitors;
+        }
+
+        private static byte[] ToLptString(string str)
+        {
+            var lptArray = new byte[str.Length + 1];
+
+            var index = 0;
+            foreach (char c in str.ToCharArray())
+                lptArray[index++] = Convert.ToByte(c);
+
+            lptArray[index] = Convert.ToByte('\0');
+
+            return lptArray;
         }
     }
 }
