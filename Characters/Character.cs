@@ -223,27 +223,26 @@ namespace Desktoptale.Characters
                 Vector2 bottomRight = new Vector2(Position.X + scaledWidth, Position.Y + scaledHeight);
 
                 Vector2 correctionMotion = Vector2.Zero;
-                int correctionCounter = 0;
-                correctionMotion += GetCorrectionMotion(topLeft, previousBoundingRectMin, previousBoundingRectMax, ref correctionCounter);
-                correctionMotion += GetCorrectionMotion(topRight, previousBoundingRectMin, previousBoundingRectMax, ref correctionCounter);
-                correctionMotion += GetCorrectionMotion(bottomLeft, previousBoundingRectMin, previousBoundingRectMax, ref correctionCounter);
-                correctionMotion += GetCorrectionMotion(bottomRight, previousBoundingRectMin, previousBoundingRectMax, ref correctionCounter);
+                AddCorrectionMotion(topLeft, previousBoundingRectMin, previousBoundingRectMax, ref correctionMotion);
+                AddCorrectionMotion(topRight, previousBoundingRectMin, previousBoundingRectMax, ref correctionMotion);
+                AddCorrectionMotion(bottomLeft, previousBoundingRectMin, previousBoundingRectMax, ref correctionMotion);
+                AddCorrectionMotion(bottomRight, previousBoundingRectMin, previousBoundingRectMax, ref correctionMotion);
 
-                Position = previousPosition + motion + correctionMotion / Math.Max(1, correctionCounter);
+                Position = previousPosition + motion + correctionMotion;
             }
         }
 
-        private Vector2 GetCorrectionMotion(Vector2 newPosition, Vector2 boundingRectMin, Vector2 boundingRectMax, ref int counter)
+        private void AddCorrectionMotion(Vector2 newPosition, Vector2 boundingRectMin, Vector2 boundingRectMax, ref Vector2 correctionMotion)
         {
-            if (ContainsInclusive(boundingRectMin, boundingRectMax, newPosition))
+            if ((Math.Abs(correctionMotion.X) > float.Epsilon && Math.Abs(correctionMotion.Y) > float.Epsilon) || ContainsInclusive(boundingRectMin, boundingRectMax, newPosition))
             {
-                return Vector2.Zero;
+                return;
             }
             
             Vector2 corrected = monitorManager.GetClosestVisiblePoint(newPosition);
-            if(corrected != newPosition) counter++;
-            
-            return corrected - newPosition;
+            Vector2 motion = corrected - newPosition;
+            if (Math.Abs(motion.X) > float.Epsilon) correctionMotion.X = motion.X;
+            if (Math.Abs(motion.Y) > float.Epsilon) correctionMotion.Y = motion.Y;
         }
 
         private bool ContainsInclusive(Vector2 min, Vector2 max, Vector2 value)
