@@ -36,7 +36,6 @@ namespace Desktoptale.Characters
 
         protected GameWindow window;
         protected GraphicsDeviceManager graphics;
-        protected SpriteBatch spriteBatch;
         protected MonitorManager monitorManager;
 
         private Rectangle? boundary;
@@ -54,7 +53,6 @@ namespace Desktoptale.Characters
         public Character(CharacterCreationContext characterCreationContext)
         {
             this.monitorManager = characterCreationContext.MonitorManager;
-            this.spriteBatch = characterCreationContext.SpriteBatch;
             this.InputManager = characterCreationContext.InputManager;
             this.graphics = characterCreationContext.Graphics;
             this.window = characterCreationContext.Window;
@@ -130,13 +128,11 @@ namespace Desktoptale.Characters
             CurrentSprite.Update(gameTime);
         }
 
-        public virtual void Draw(GameTime gameTime)
+        public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             Vector2 center = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height);
             Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2f, CurrentSprite.FrameSize.Y);
             CurrentSprite.Draw(spriteBatch, center, Color.White, 0, origin, Scale, SpriteEffects.None, 0);
-            spriteBatch.End();
         }
 
         public virtual void Dispose()

@@ -237,7 +237,7 @@ namespace Desktoptale
         }
 
         public void LoadContent(ContentManager contentManager) {}
-        public void Draw(GameTime gameTime) {}
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {}
         public void Dispose() {}
     }
 }

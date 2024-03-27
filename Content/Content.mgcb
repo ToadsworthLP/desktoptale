@@ -304,7 +304,6 @@
 /processorParam:TextureFormat=Color
 /build:Included/Ceroba/Spr_Ceroba_Idle_Down.png
 
-
 #begin Included/Ceroba/Spr_Ceroba_Idle_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -724,6 +723,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Included/CloverVengeance/Spr_CloverVengeance_Walk_Up.png
+
+#begin Included/Common/CharacterSpriteEffect.dx11.mgfxo
+/copy:Included/Common/CharacterSpriteEffect.dx11.mgfxo
+
+#begin Included/Common/CharacterSpriteEffect.fx
+/copy:Included/Common/CharacterSpriteEffect.fx
 
 #begin Included/Dalv/Spr_Dalv_Idle_Down.png
 /importer:TextureImporter

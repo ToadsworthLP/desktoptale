@@ -38,6 +38,9 @@ namespace Desktoptale
 
         private Random rng;
 
+        private CharacterSpriteEffect characterSpriteEffect;
+        private readonly Color clearColor = new Color(0f, 0f, 0f, 0f);
+
         public Desktoptale(Settings settings)
         {
             applicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -53,9 +56,9 @@ namespace Desktoptale
             
             characterRegistry = new CharacterRegistry();
             
-            WindowsUtils.MakeWindowOverlay(Window);
-
             monitorManager = new MonitorManager();
+            
+            WindowsUtils.PrepareWindow(Window);
         }
         
         protected override void Initialize()
@@ -126,6 +129,8 @@ namespace Desktoptale
         
         protected override void LoadContent()
         {
+            characterSpriteEffect = new CharacterSpriteEffect(GraphicsDevice);
+            
             ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory(Path.Combine(applicationPath, "Content/Custom/"), graphics.GraphicsDevice);
             externalCharacterFactory.AddAllToRegistry(characterRegistry);
             
@@ -141,6 +146,7 @@ namespace Desktoptale
         {
             if (firstFrame)
             {
+                WindowsUtils.PrepareWindow(Window);
                 WindowsUtils.MakeTopmostWindow(Window);
 
                 firstFrame = false;
@@ -169,12 +175,14 @@ namespace Desktoptale
         
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Transparent);
+            GraphicsDevice.Clear(clearColor);
 
+            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: characterSpriteEffect);
             foreach (var gameObject in gameObjects)
             {
-                gameObject.Draw(gameTime);
+                gameObject.Draw(gameTime, spriteBatch);
             }
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

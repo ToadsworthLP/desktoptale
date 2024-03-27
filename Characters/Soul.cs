@@ -38,13 +38,11 @@ namespace Desktoptale.Characters
             RunState = new RunState(50f, false);
         }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             Vector2 center = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height);
             Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2f, CurrentSprite.FrameSize.Y);
             CurrentSprite.Draw(spriteBatch, center, color, 0, origin, Scale, flip ? SpriteEffects.FlipVertically : SpriteEffects.None, 0);
-            spriteBatch.End();
         }
     }
 }

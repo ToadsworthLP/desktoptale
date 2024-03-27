@@ -12,7 +12,6 @@ using Microsoft.Xna.Framework;
 
 namespace Desktoptale
 {
-    // Adapted from https://github.com/j3soon/OverlayWindow/tree/master
     public class WindowsUtils
     {
         #region DllImports
@@ -21,7 +20,9 @@ namespace Desktoptale
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-
+        
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern int GetWindowLong(IntPtr hWnd, int nIndex);
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
 
@@ -181,27 +182,44 @@ namespace Desktoptale
             public enum DialogState { Succeeded, Cancelled, Failed }
         }
         
-        public static void MakeWindowOverlay(GameWindow window)
+        public static void PrepareWindow(GameWindow window)
         {
-            // Set to layered, transparent window.
-            SetLastError(0);
-            int ret = SetWindowLong(window.Handle, GWL_EXSTYLE, WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST);
-            if (ret == 0 && Marshal.GetLastWin32Error() != 0)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+            Form form = (Form)Control.FromHandle(window.Handle);
             
-            // Set to top-most window.
-            if (!SetWindowPos(window.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE))
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-
-            // Required in order to make layered window visible.
-            if (!SetLayeredWindowAttributes(window.Handle, 0, 255, LWA_ALPHA))
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-
+            form.TopMost = true;
+            int previousStyle = GetWindowLong(form.Handle, GWL_EXSTYLE);
+            
+            SetLastError(0);
+            SetWindowLong(form.Handle, GWL_EXSTYLE, previousStyle | WS_EX_NOACTIVATE | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOPMOST);
+            
+            form.TransparencyKey = System.Drawing.Color.FromArgb(0, 0 ,0 ,0);
+            form.FormBorderStyle = FormBorderStyle.None;
+            
             int[] margins = { -1 };
-            if ((ret = DwmExtendFrameIntoClientArea(window.Handle, ref margins)) != S_OK)
-                throw new Win32Exception(ret);
-
-            window.IsBorderless = true;
+            SetLastError(0);
+            DwmExtendFrameIntoClientArea(window.Handle, ref margins);
+            
+            // int initialStyle = GetWindowLong(window.Handle, GWL_EXSTYLE);
+            //
+            // // Set to layered, transparent window.
+            // SetLastError(0);
+            // int ret = SetWindowLong(window.Handle, GWL_EXSTYLE, WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST | WS_EX_NOACTIVATE);
+            // if (ret == 0 && Marshal.GetLastWin32Error() != 0)
+            //     throw new Win32Exception(Marshal.GetLastWin32Error());
+            //
+            // // Set to top-most window.
+            // if (!SetWindowPos(window.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE))
+            //     throw new Win32Exception(Marshal.GetLastWin32Error());
+            //
+            // // Required in order to make layered window visible.
+            // if (!SetLayeredWindowAttributes(window.Handle, 0, 255, LWA_ALPHA))
+            //     throw new Win32Exception(Marshal.GetLastWin32Error());
+            //
+            // int[] margins = { -1 };
+            // if ((ret = DwmExtendFrameIntoClientArea(window.Handle, ref margins)) != S_OK)
+            //     throw new Win32Exception(ret);
+            //
+            // window.IsBorderless = true;
         }
 
         public static void MakeTopmostWindow(GameWindow window)
