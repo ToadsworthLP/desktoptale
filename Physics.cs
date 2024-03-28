@@ -5,46 +5,49 @@ namespace Desktoptale
 {
     public class Physics
     {
-        public ICollider ColliderUnderCursor { get; private set; }
+        public IPhysicsObject PhysicsObjectUnderCursor { get; private set; }
         public bool HasColliderUnderCursorChanged { get; private set; }
         
-        private ISet<ICollider> colliders;
+        private ISet<IPhysicsObject> colliders;
         private InputManager inputManager;
 
         public Physics(InputManager inputManager)
         {
             this.inputManager = inputManager;
             
-            colliders = new HashSet<ICollider>();
+            colliders = new HashSet<IPhysicsObject>();
         }
 
         public void Update()
         {
-            ICollider collider = GetColliderAtPosition(inputManager.PointerPosition.ToVector2());
-            if (ColliderUnderCursor != collider) HasColliderUnderCursorChanged = true;
-            ColliderUnderCursor = collider;
+            IPhysicsObject physicsObject = GetColliderAtPosition(inputManager.PointerPosition.ToVector2());
+            if (PhysicsObjectUnderCursor != physicsObject) HasColliderUnderCursorChanged = true;
+            PhysicsObjectUnderCursor = physicsObject;
+            
+            if(inputManager.LeftClickJustPressed) PhysicsObjectUnderCursor?.OnLeftClicked();
+            if(inputManager.RightClickJustPressed) PhysicsObjectUnderCursor?.OnRightClicked();
         }
 
-        public void AddCollider(ICollider collider)
+        public void AddCollider(IPhysicsObject physicsObject)
         {
-            colliders.Add(collider);
+            colliders.Add(physicsObject);
         }
 
-        public bool RemoveCollider(ICollider collider)
+        public bool RemoveCollider(IPhysicsObject physicsObject)
         {
-            return colliders.Remove(collider);
+            return colliders.Remove(physicsObject);
         }
 
-        public ICollider GetColliderAtPosition(Vector2 position)
+        public IPhysicsObject GetColliderAtPosition(Vector2 position)
         {
-            ICollider result = null;
-            float highestZ = float.MinValue;
-            foreach (ICollider collider in colliders)
+            IPhysicsObject result = null;
+            float lowestZ = float.MaxValue;
+            foreach (IPhysicsObject collider in colliders)
             {
-                if (collider.HitBox.Contains(position) && collider.Depth > highestZ)
+                if (collider.HitBox.Contains(position) && collider.Depth < lowestZ)
                 {
                     result = collider;
-                    highestZ = collider.Depth;
+                    lowestZ = collider.Depth;
                 }
             }
             

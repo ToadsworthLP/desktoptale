@@ -11,6 +11,7 @@ namespace Desktoptale
         public Vector2 DirectionalInput { get; private set; }
         public Vector2 RawDirectionalInput { get; private set; }
         public Point PointerPosition { get; private set; }
+        public Point VirtualScreenPointerPosition { get; private set; }
         public bool LeftClickPressed { get; private set; }
         public bool LeftClickJustPressed { get; private set; }
         public bool RightClickPressed { get; private set; }
@@ -20,15 +21,17 @@ namespace Desktoptale
         private bool previousFrameLeftClick, previousFrameRightClick;
         private Game game;
         private GraphicsDevice graphics;
+        private MonitorManager monitorManager;
 
         private bool unfocusedMovementEnabled = false;
     
-        public InputManager(Game game, GraphicsDevice graphics)
+        public InputManager(Game game, GraphicsDevice graphics, MonitorManager monitorManager)
         {
             this.game = game;
             this.graphics = graphics;
-            
-            MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
+            this.monitorManager = monitorManager;
+
+            MessageBus.Subscribe<UnfocusedMovementChangedMessage>(OnUnfocusedMovementChangeRequestedMessage);
         }
 
         public void Update()
@@ -69,15 +72,18 @@ namespace Desktoptale
             MouseState mouseState = Mouse.GetState();
             
             LeftClickPressed = mouseState.LeftButton == ButtonState.Pressed;
-            if (LeftClickPressed) LeftClickJustPressed = !previousFrameLeftClick;
+            //if (LeftClickPressed) LeftClickJustPressed = !previousFrameLeftClick;
+            LeftClickJustPressed = LeftClickPressed && !previousFrameLeftClick;
             
             RightClickPressed = mouseState.RightButton == ButtonState.Pressed;
-            if (RightClickPressed) RightClickJustPressed = !previousFrameRightClick;
+            //if (RightClickPressed) RightClickJustPressed = !previousFrameRightClick;
+            RightClickJustPressed = RightClickPressed && !previousFrameRightClick;
 
             PointerPosition = mouseState.Position;
+            VirtualScreenPointerPosition = monitorManager.ToVirtualScreenCoordinates(PointerPosition.ToVector2()).ToPoint();
         }
         
-        private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangeRequestedMessage message)
+        private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangedMessage message)
         {
             unfocusedMovementEnabled = message.Enabled;
         }

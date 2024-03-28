@@ -40,9 +40,8 @@ namespace Desktoptale.Characters
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            Vector2 center = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height);
-            Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2f, CurrentSprite.FrameSize.Y);
-            CurrentSprite.Draw(spriteBatch, center, color, 0, origin, Scale, flip ? SpriteEffects.FlipVertically : SpriteEffects.None, 0);
+            Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2f, CurrentSprite.FrameSize.Y / 2f);
+            CurrentSprite.Draw(spriteBatch, Position, color, 0, origin, Scale, flip ? SpriteEffects.FlipVertically : SpriteEffects.None, MathF.Clamp(Depth, 0, 1));
         }
     }
 }

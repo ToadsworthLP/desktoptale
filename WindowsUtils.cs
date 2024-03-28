@@ -168,13 +168,6 @@ namespace Desktoptale
         private const int SWP_NOSIZE = 0x0001;
         private const int S_OK = 0x00000000;
         private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
-        
-        public class WindowInfo
-        {
-            public string Title;
-            public string ProcessName;
-            public IntPtr hWnd;
-        }
 
         public class SaveDialogResult
         {

@@ -2,9 +2,12 @@
 
 namespace Desktoptale
 {
-    public interface ICollider
+    public interface IPhysicsObject
     {
         Rectangle HitBox { get; }
         float Depth { get; }
+
+        void OnLeftClicked();
+        void OnRightClicked();
     }
 }

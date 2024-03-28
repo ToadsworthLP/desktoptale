@@ -16,7 +16,7 @@ namespace Desktoptale.States.Soul
 
         public virtual void Update(StateUpdateContext<Character> context)
         {
-            if (context.Target.InputManager.DirectionalInput.LengthSquared() > float.Epsilon)
+            if (context.Target.IsActive && context.Target.InputManager.DirectionalInput.LengthSquared() > float.Epsilon)
             {
                 context.StateMachine.ChangeState(context.Target.WalkState);
                 return;

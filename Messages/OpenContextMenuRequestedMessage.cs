@@ -1,6 +1,6 @@
 ﻿namespace Desktoptale.Messages
 {
-    public class SavePresetRequestedMessage
+    public class OpenContextMenuRequestedMessage
     {
         public ICharacter Target { get; set; }
     }

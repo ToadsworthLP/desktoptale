@@ -1,6 +1,6 @@
 ﻿namespace Desktoptale.Messages
 {
-    public class SavePresetRequestedMessage
+    public class RemoveCharacterMessage
     {
         public ICharacter Target { get; set; }
     }

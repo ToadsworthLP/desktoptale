@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using CommandLine;
 using Desktoptale.Characters;
 using Desktoptale.Messages;
 using Desktoptale.Messaging;
@@ -23,30 +25,27 @@ namespace Desktoptale
         private InputManager inputManager;
         private PresetManager presetManager;
         private MonitorManager monitorManager;
+        private ContextMenu contextMenu;
         private Physics physics;
         
-        private Character character;
-        private ISet<IGameObject> gameObjects;
+        private ISet<ICharacter> characters;
         
-        private const int WINDOW_STATE_UPDATE_INTERVAL_MIN = 28;
-        private const int WINDOW_STATE_UPDATE_INTERVAL_MAX = 30;
+        private const int WINDOW_STATE_UPDATE_INTERVAL = 20;
         private int windowStateUpdateCounter = 0;
-        private int nextWindowStateUpdate = 0;
         private bool firstFrame = true;
-        private bool alwaysOnTop;
-        private WindowsUtils.WindowInfo containingWindow;
+        private WindowInfo containingWindow;
         private string applicationPath;
-
-        private Random rng;
+        private Point defaultCharacterStartPosition;
 
         private readonly Color clearColor = new Color(0f, 0f, 0f, 0f);
+
+        private ConcurrentQueue<Action> UpdateTaskQueue;
 
         public Desktoptale(Settings settings)
         {
             applicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             
             this.settings = settings;
-            this.rng = new Random();
             
             graphics = new GraphicsDeviceManager(this)
             {
@@ -64,77 +63,113 @@ namespace Desktoptale
             
             IsFixedTimeStep = true;
             TargetElapsedTime = TimeSpan.FromSeconds(1d/60d);
+            
+            UpdateTaskQueue = new ConcurrentQueue<Action>();
         }
         
         protected override void Initialize()
         {
             base.Initialize();
-            
+
+            MessageBus.Subscribe<OtherInstanceStartedMessage>(OnOtherInstanceStartedMessage);
+            MessageBus.Subscribe<AddCharacterMessage>(OnAddCharacterMessage);
+            MessageBus.Subscribe<RemoveCharacterMessage>(OnRemoveCharacterMessage);
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
             MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
-            MessageBus.Subscribe<AlwaysOnTopChangeRequestedMessage>(OnAlwaysOnTopChangeRequestedMessage);
             MessageBus.Subscribe<DisplaySettingsChangedMessage>(OnDisplaySettingsChangedMessage);
             
             // Keep settings object up-to-date
-            MessageBus.Subscribe<CharacterChangeSuccessMessage>(msg => settings.Character = msg.Character.ToString());
-            MessageBus.Subscribe<ScaleChangeRequestedMessage>(msg => settings.Scale = (int)msg.ScaleFactor);
-            MessageBus.Subscribe<IdleMovementChangeRequestedMessage>(msg => settings.IdleRoaming = msg.Enabled);
-            MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(msg => settings.UnfocusedInput = msg.Enabled);
-            MessageBus.Subscribe<AlwaysOnTopChangeRequestedMessage>(msg => settings.AlwaysOnTop = msg.Enabled);
-            MessageBus.Subscribe<ChangeContainingWindowMessage>(msg => settings.Window = msg.Window?.ProcessName);
+            // MessageBus.Subscribe<CharacterChangeSuccessMessage>(msg => settings.Character = msg.Character.ToString());
+            // MessageBus.Subscribe<ScaleChangeRequestedMessage>(msg => settings.Scale = (int)msg.ScaleFactor);
+            // MessageBus.Subscribe<IdleRoamingChangedMessage>(msg => settings.IdleRoaming = msg.Enabled);
+            // MessageBus.Subscribe<UnfocusedMovementChangedMessage>(msg => settings.UnfocusedInput = msg.Enabled);
+            // MessageBus.Subscribe<ChangeContainingWindowMessage>(msg => settings.Window = msg.Window?.ProcessName);
             
-            // Preset loading
-            presetManager = new PresetManager(settings);
-            presetManager.LoadPreset();
-            
-            inputManager = new InputManager(this, GraphicsDevice);
+            inputManager = new InputManager(this, GraphicsDevice, monitorManager);
+            presetManager = new PresetManager(characterRegistry);
             physics = new Physics(inputManager);
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            contextMenu = new ContextMenu(Window, inputManager, GraphicsDevice, characterRegistry);
             
-            gameObjects = new HashSet<IGameObject>();
-
-            ContextMenu contextMenu = new ContextMenu(Window, inputManager, GraphicsDevice, characterRegistry);
-            contextMenu.Initialize();
-            gameObjects.Add(contextMenu);
+            characters = new HashSet<ICharacter>();
             
             FirstStartCheck();
+
+            defaultCharacterStartPosition = monitorManager.ToMonoGameCoordinates(Window.ClientBounds.Center.ToVector2()).ToPoint();
             UpdateWindow();
             
-            // Send initialization messages
-            CharacterType initialCharacter = CharacterRegistry.TORIEL;
-            if (settings.Character != null)
-            {
-                try
-                {
-                    initialCharacter = characterRegistry.Get(settings.Character);
-                }
-                catch (IndexOutOfRangeException e)
-                {
-                    Console.WriteLine($"Failed to switch character: Invalid character registry key: {settings.Character}");
-                    WindowsUtils.ShowMessageBox($"Could not find character: {settings.Character}\nIf this character is a custom character, please make sure that it is installed properly.", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-            
-            MessageBus.Send(new CharacterChangeRequestedMessage { Character = initialCharacter });
-            MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = 2 });
-            MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = settings.IdleRoaming });
-            MessageBus.Send(new AlwaysOnTopChangeRequestedMessage() { Enabled = settings.AlwaysOnTop });
-            MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = settings.UnfocusedInput });
-            
-            if (!string.IsNullOrWhiteSpace(settings.Window))
-            {
-                WindowsUtils.WindowInfo target = WindowsUtils.GetWindowByName(settings.Window);
-                if (target != null)
-                {
-                    MessageBus.Send(new ChangeContainingWindowMessage() { Window = target });
-                }
-                else
-                {
-                    Console.WriteLine($"Failed to attach to window: Window or process {settings.Window} could not be found.");
-                }
-            }
+            AddCharacterFromSettings(settings);
         }
         
+        private void OnOtherInstanceStartedMessage(OtherInstanceStartedMessage message)
+        {
+            Settings settings = new Settings();
+            if (message.Args != null && message.Args.Length > 0)
+            {
+                Parser parser = new Parser(config =>
+                {
+                    config.AutoHelp = false;
+                    config.AutoVersion = false;
+                });
+                parser.ParseArguments<Settings>(message.Args)
+                    .WithParsed<Settings>((s) =>
+                    {
+                        settings = s;
+                    });
+            }
+            
+            UpdateTaskQueue.Enqueue(() => AddCharacterFromSettings(settings));
+        }
+
+        private void AddCharacterFromSettings(Settings sourceSettings)
+        {
+            // Preset loading
+            CharacterProperties characterProperties = presetManager.LoadPreset(sourceSettings.Preset);
+
+            // If no preset had been loaded, create a character according to the CLI settings
+            if (characterProperties == null)
+            {
+                CharacterType initialCharacter = CharacterRegistry.FRISK;
+                if (!string.IsNullOrWhiteSpace(sourceSettings.Character))
+                {
+                    try
+                    {
+                        initialCharacter = characterRegistry.Get(sourceSettings.Character);
+                    }
+                    catch (IndexOutOfRangeException e)
+                    {
+                        Console.WriteLine($"Failed to add character: Invalid character registry key: {sourceSettings.Character}");
+                        WindowsUtils.ShowMessageBox($"Could not find character: {sourceSettings.Character}\nIf this character is a custom character, please make sure that it is installed properly.", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+
+                WindowInfo stayInsideWindow = null;
+                if (!string.IsNullOrWhiteSpace(sourceSettings.Window))
+                {
+                    WindowInfo target = WindowsUtils.GetWindowByName(sourceSettings.Window);
+                    if (target != null)
+                    {
+                        stayInsideWindow = target;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Failed to attach to window: Window or process {sourceSettings.Window} could not be found.");
+                    }
+                }
+
+                characterProperties = new CharacterProperties(
+                    initialCharacter,
+                    defaultCharacterStartPosition.ToVector2(),
+                    new Vector2(sourceSettings.Scale),
+                    sourceSettings.IdleRoaming,
+                    sourceSettings.UnfocusedInput,
+                    stayInsideWindow
+                );
+            }
+            
+            MessageBus.Send(new AddCharacterMessage() { Properties = characterProperties });
+        }
+
         protected override void LoadContent()
         {
             ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory(Path.Combine(applicationPath, "Content/Custom/"), graphics.GraphicsDevice);
@@ -158,10 +193,17 @@ namespace Desktoptale
             
                 firstFrame = false;
             }
+
+            while (!UpdateTaskQueue.IsEmpty)
+            {
+                Action action = null;
+                UpdateTaskQueue.TryDequeue(out action);
+                action?.Invoke();
+            }
             
             inputManager.Update();
             
-            foreach (var gameObject in gameObjects)
+            foreach (var gameObject in characters)
             {
                 gameObject.Update(gameTime);
             }
@@ -169,7 +211,7 @@ namespace Desktoptale
             physics.Update();
             if (physics.HasColliderUnderCursorChanged)
             {
-                if (physics.ColliderUnderCursor == null)
+                if (physics.PhysicsObjectUnderCursor == null)
                 {
                     WindowsUtils.MakeClickthrough(Window);
                 }
@@ -179,13 +221,12 @@ namespace Desktoptale
                 }
             }
             
-            if (windowStateUpdateCounter >= nextWindowStateUpdate)
+            if (windowStateUpdateCounter >= WINDOW_STATE_UPDATE_INTERVAL)
             {
-                if(alwaysOnTop) WindowsUtils.MakeTopmostWindow(Window);
+                WindowsUtils.MakeTopmostWindow(Window);
                 if(containingWindow != null) UpdateBounds();
                 
                 windowStateUpdateCounter = 0;
-                nextWindowStateUpdate = rng.Next(WINDOW_STATE_UPDATE_INTERVAL_MIN, WINDOW_STATE_UPDATE_INTERVAL_MAX + 1);
             }
 
             windowStateUpdateCounter++;
@@ -198,7 +239,7 @@ namespace Desktoptale
             GraphicsDevice.Clear(clearColor);
 
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, samplerState: SamplerState.PointClamp);
-            foreach (var gameObject in gameObjects)
+            foreach (var gameObject in characters)
             {
                 gameObject.Draw(gameTime, spriteBatch);
             }
@@ -224,14 +265,51 @@ namespace Desktoptale
         {
             UpdateWindow();
         }
+
+        private void OnAddCharacterMessage(AddCharacterMessage message)
+        {
+            Character character;
+            try
+            {
+                character = message.Properties.Type.FactoryFunction
+                    .Invoke(new CharacterCreationContext(message.Properties, spriteBatch, inputManager, monitorManager));
+
+                character.LoadContent(Content);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Failed to add character: {e.Message}");
+                WindowsUtils.ShowMessageBox($"Failed to add character: {e.Message}", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
+            character.Initialize();
+            characters.Add(character);
+            physics.AddCollider(character);
+            
+            MessageBus.Send(new FocusCharacterMessage() {Character = character });
+        }
+
+        private void OnRemoveCharacterMessage(RemoveCharacterMessage message)
+        {
+            physics.RemoveCollider(message.Target);
+            characters.Remove(message.Target);
+            message.Target.Dispose();
+
+            if (characters.Count == 0)
+            {
+                Exit();
+            }
+        }
         
         private void OnCharacterChangeRequestedMessage(CharacterChangeRequestedMessage message)
         {
+            ICharacter oldCharacter = message.Target;
             Character newCharacter;
             try
             {
                 newCharacter = message.Character.FactoryFunction
-                    .Invoke(new CharacterCreationContext(graphics, Window, spriteBatch, inputManager, monitorManager));
+                    .Invoke(new CharacterCreationContext(new CharacterProperties(oldCharacter.Properties), spriteBatch, inputManager, monitorManager));
 
                 newCharacter.LoadContent(Content);
             }
@@ -241,28 +319,19 @@ namespace Desktoptale
                 WindowsUtils.ShowMessageBox($"Failed to switch character: {e.Message}", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-
-            if (character != null)
-            {
-                newCharacter.Position = character.Position;
-                newCharacter.Scale = character.Scale;
-                newCharacter.EnableIdleMovement = character.EnableIdleMovement;
-                gameObjects.Remove(character);
-                character.Dispose();
-            }
-            else
-            {
-                Point center = monitorManager.VirtualScreenBoundingRectangle.Center;
-                newCharacter.Position = new Vector2(center.X, center.Y);
-            }
             
+            
+            physics.RemoveCollider(oldCharacter);
+            characters.Remove(oldCharacter);
+            oldCharacter.Dispose();
+
+            newCharacter.Properties.Type = message.Character;
             newCharacter.Initialize();
-            gameObjects.Add(newCharacter);
-            physics.RemoveCollider(character);
+            characters.Add(newCharacter);
             physics.AddCollider(newCharacter);
-            character = newCharacter;
             
             MessageBus.Send(new CharacterChangeSuccessMessage { Character = message.Character });
+            MessageBus.Send(new FocusCharacterMessage() {Character = newCharacter });
         }
 
         private void OnChangeContainingWindowMessage(ChangeContainingWindowMessage message)
@@ -277,11 +346,6 @@ namespace Desktoptale
             {
                 MessageBus.Send(new UpdateBoundaryMessage() {  Boundary = null });
             }
-        }
-
-        private void OnAlwaysOnTopChangeRequestedMessage(AlwaysOnTopChangeRequestedMessage message)
-        {
-            alwaysOnTop = message.Enabled;
         }
 
         private void UpdateBounds()

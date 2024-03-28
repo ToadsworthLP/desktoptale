@@ -13,6 +13,8 @@ namespace Desktoptale.States.Flowey
 
         public void Update(StateUpdateContext<Character> context)
         {
+            if (!context.Target.IsActive) return;
+            
             Orientation? orientation = GetOrientationFromVelocity(context.Target.InputManager.DirectionalInput);
             if (orientation != null)
             {

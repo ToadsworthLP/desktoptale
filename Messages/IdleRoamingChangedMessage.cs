@@ -1,7 +1,8 @@
 ﻿namespace Desktoptale.Messages
 {
-    public class AlwaysOnTopChangeRequestedMessage
+    public class IdleRoamingChangedMessage
     {
+        public ICharacter Target { get; set; }
         public bool Enabled { get; set; }
     }
 }
