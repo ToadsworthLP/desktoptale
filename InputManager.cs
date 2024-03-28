@@ -29,7 +29,7 @@ namespace Desktoptale
             this.game = game;
             this.graphics = graphics;
             
-            MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
+            // MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
         }
 
         public void Update()
@@ -45,12 +45,12 @@ namespace Desktoptale
     
         private void UpdateKeyboardInput()
         {
-            if (!unfocusedMovementEnabled && (!game.IsActive || !focused))
-            {
-                DirectionalInput = Vector2.Zero;
-                RunButtonPressed = false;
-                return;
-            }
+            // if (!unfocusedMovementEnabled && (!game.IsActive || !focused))
+            // {
+            //     DirectionalInput = Vector2.Zero;
+            //     RunButtonPressed = false;
+            //     return;
+            // }
             
             KeyboardState keyboardState = Keyboard.GetState();
 
@@ -100,22 +100,15 @@ namespace Desktoptale
 
             PointerPosition = mouseState.Position;
 
-            if (LeftClickJustPressed || RightClickJustPressed)
-            {
-                focused = graphics.Viewport.Bounds.Contains(PointerPosition);
-            }
-            
-            if (!graphics.Viewport.Bounds.Contains(PointerPosition))
-            {
-                RightClickPressed = false;
-                RightClickJustPressed = false;
-                previousFrameRightClick = false;
-            }
+            // if (LeftClickJustPressed || RightClickJustPressed)
+            // {
+            //     focused = graphics.Viewport.Bounds.Contains(PointerPosition);
+            // }
         }
         
-        private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangeRequestedMessage message)
-        {
-            unfocusedMovementEnabled = message.Enabled;
-        }
+        // private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangeRequestedMessage message)
+        // {
+        //     unfocusedMovementEnabled = message.Enabled;
+        // }
     }
 }

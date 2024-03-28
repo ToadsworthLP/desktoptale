@@ -8,12 +8,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Desktoptale.Characters
 {
-    public abstract class Character : IGameObject
+    public abstract class Character : IGameObject, ICollider
     {
         public Vector2 Position;
         public Vector2 Velocity;
         public Vector2 Scale;
-        
+
+        public Rectangle HitBox { get; private set; }
+        public float Depth { get; private set; }
+
         public Orientation Orientation = Orientation.Down;
     
         public InputManager InputManager { get; }
@@ -44,6 +47,7 @@ namespace Desktoptale.Characters
         private bool dragging;
         private Vector2 previousPosition;
         private bool firstFrame = true;
+        private Point maxFrameSize;
         
         private Subscription scaleChangeRequestedSubscription;
         private Subscription idleMovementChangeRequestedSubscription;
@@ -79,8 +83,6 @@ namespace Desktoptale.Characters
         
             StateMachine = new StateMachine<Character>(this, InitialState);
             StateMachine.StateChanged += (state, newState) => UpdateOrientation();
-        
-            UpdateWindowSize(GetMaximumFrameSize());
             
             InputManager.GrabFocus();
         }
@@ -92,9 +94,12 @@ namespace Desktoptale.Characters
             if (firstFrame)
             {
                 PreventLeavingScreenArea();
-                window.Position = new Point((int)Position.X, (int)Position.Y);
+                maxFrameSize = GetMaximumFrameSize();
+                UpdateHitbox();
                 firstFrame = false;
             }
+            
+            previousPosition = Position;
             
             StateMachine.Update(gameTime);
 
@@ -107,32 +112,36 @@ namespace Desktoptale.Characters
             {
                 sprite.Orientation = Orientation;
             }
-
-            previousPosition = Position;
-        
+            
             Position.X += (int)Math.Round(Velocity.X);
             Position.Y += (int)Math.Round(Velocity.Y);
 
+            
             if (enableDragging)
             {
                 DragCharacter();
             }
-        
-            PreventLeavingScreenArea();
-
+            
             if (previousPosition != Position)
             {
-                window.Position = new Point((int)Position.X, (int)Position.Y);
+                UpdateHitbox();
             }
-        
+
+            Vector2 beforeCorrection = Position;
+            PreventLeavingScreenArea();
+            
+            if (beforeCorrection != Position)
+            {
+                UpdateHitbox();
+            }
+            
             CurrentSprite.Update(gameTime);
         }
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            Vector2 center = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height);
-            Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2f, CurrentSprite.FrameSize.Y);
-            CurrentSprite.Draw(spriteBatch, center, Color.White, 0, origin, Scale, SpriteEffects.None, 0);
+            Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2f, CurrentSprite.FrameSize.Y / 2f);
+            CurrentSprite.Draw(spriteBatch, Position, Color.White, 0, origin, Scale, SpriteEffects.None, MathF.Clamp(Depth, 0, 1));
         }
 
         public virtual void Dispose()
@@ -143,10 +152,20 @@ namespace Desktoptale.Characters
             MessageBus.Unsubscribe(contextMenuStateChangeSubscription);
         }
 
+        private void UpdateHitbox()
+        {
+            HitBox = new Rectangle((int)(Position.X - maxFrameSize.X / 2f), (int)(Position.Y - maxFrameSize.Y / 2f), maxFrameSize.X, maxFrameSize.Y);
+            Depth = (Position.Y + maxFrameSize.Y / 2f) / monitorManager.BoundingRectangle.Height;
+        }
+
         private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
         {
             Scale = new Vector2(message.ScaleFactor, message.ScaleFactor);
-            UpdateWindowSize(GetMaximumFrameSize());
+            maxFrameSize = GetMaximumFrameSize();
+            UpdateHitbox();
+            previousPosition = Vector2.Zero;
+            PreventLeavingScreenArea();
+            UpdateHitbox();
             InputManager.GrabFocus();
         }
         
@@ -177,7 +196,7 @@ namespace Desktoptale.Characters
         private void DragCharacter()
         {
             if (InputManager.LeftClickJustPressed &&
-                graphics.GraphicsDevice.Viewport.Bounds.Contains(InputManager.PointerPosition))
+                HitBox.Contains(InputManager.PointerPosition))
             {
                 dragging = true;
             } else if (!InputManager.LeftClickPressed)
@@ -187,9 +206,7 @@ namespace Desktoptale.Characters
 
             if (dragging)
             {
-                Point windowCenter = window.Position -
-                                     new Point(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
-                Position = (windowCenter + InputManager.PointerPosition).ToVector2();
+                Position = InputManager.PointerPosition.ToVector2();
             }
         }
 
@@ -210,20 +227,20 @@ namespace Desktoptale.Characters
             else
             {
                 Vector2 motion = Position - previousPosition;
-                Vector2 previousBoundingRectMin = previousPosition;
-                Vector2 previousBoundingRectMax = new Vector2(previousPosition.X + scaledWidth, previousPosition.Y + scaledHeight);
+                Vector2 previousBoundingRectMin = new Vector2(HitBox.Top, HitBox.Left);
+                Vector2 previousBoundingRectMax = new Vector2(HitBox.Bottom, HitBox.Right);
                 
-                Vector2 topLeft = new Vector2(Position.X, Position.Y);
-                Vector2 topRight = new Vector2(Position.X + scaledWidth, Position.Y);
-                Vector2 bottomLeft = new Vector2(Position.X, Position.Y + scaledHeight);
-                Vector2 bottomRight = new Vector2(Position.X + scaledWidth, Position.Y + scaledHeight);
+                Vector2 topLeft = new Vector2(HitBox.Left, HitBox.Top);
+                Vector2 topRight = new Vector2(HitBox.Right, HitBox.Top);
+                Vector2 bottomLeft = new Vector2(HitBox.Left, HitBox.Bottom);
+                Vector2 bottomRight = new Vector2(HitBox.Right, HitBox.Bottom);
 
                 Vector2 correctionMotion = Vector2.Zero;
                 AddCorrectionMotion(topLeft, previousBoundingRectMin, previousBoundingRectMax, ref correctionMotion);
                 AddCorrectionMotion(topRight, previousBoundingRectMin, previousBoundingRectMax, ref correctionMotion);
                 AddCorrectionMotion(bottomLeft, previousBoundingRectMin, previousBoundingRectMax, ref correctionMotion);
                 AddCorrectionMotion(bottomRight, previousBoundingRectMin, previousBoundingRectMax, ref correctionMotion);
-
+                
                 Position = previousPosition + motion + correctionMotion;
             }
         }
@@ -278,31 +295,6 @@ namespace Desktoptale.Characters
             }
             
             return new Point((int)(size.X * Scale.X), (int)(size.Y * Scale.Y));
-        }
-
-        private void UpdateWindowSize(Point windowSize)
-        {
-            int oldWidth = graphics.PreferredBackBufferWidth;
-            int oldHeight = graphics.PreferredBackBufferHeight;
-        
-            graphics.PreferredBackBufferWidth = windowSize.X;
-            graphics.PreferredBackBufferHeight = windowSize.Y;
-            graphics.ApplyChanges();
-
-            if (windowSize.X != 0 && windowSize.Y != 0)
-            {
-                int newWidth = windowSize.X;
-                int newHeight = windowSize.Y;
-
-                int widthDiff = oldWidth - newWidth;
-                int heightDiff = oldHeight - newHeight;
-
-                int xShift = widthDiff / 2;
-                int yShift = heightDiff;
-
-                Position.X += xShift;
-                Position.Y += yShift;
-            }
         }
 
         private void OnBoundaryUpdateMessage(UpdateBoundaryMessage message)

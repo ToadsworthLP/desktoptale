@@ -26,6 +26,9 @@ namespace Desktoptale
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
 
+        // [DllImport("user32.dll", SetLastError = true)]
+        // private static extern bool UpdateLayeredWindow(IntPtr hwnd, int crKey, int dwFlags);
+
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
@@ -157,6 +160,8 @@ namespace Desktoptale
         
         private const int GWL_EXSTYLE = -20;
         private const int LWA_ALPHA = 0x00000002;
+        private const int LWA_COLORKEY = 0x00000001;
+        private const int ULW_COLORKEY = 0x00000001;
         private const int WS_EX_LAYERED = 0x00080000;
         private const int WS_EX_TOPMOST = 0x00000008;
         private const int WS_EX_TRANSPARENT = 0x00000020;
@@ -184,20 +189,19 @@ namespace Desktoptale
         
         public static void PrepareWindow(GameWindow window)
         {
-            Form form = (Form)Control.FromHandle(window.Handle);
-            
-            form.TopMost = true;
-            int previousStyle = GetWindowLong(form.Handle, GWL_EXSTYLE);
+            window.IsBorderless = true;
             
             SetLastError(0);
-            SetWindowLong(form.Handle, GWL_EXSTYLE, previousStyle | WS_EX_NOACTIVATE | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOPMOST);
-            
-            form.TransparencyKey = System.Drawing.Color.FromArgb(0, 0 ,0 ,0);
-            form.FormBorderStyle = FormBorderStyle.None;
+            SetWindowLong(window.Handle, GWL_EXSTYLE, WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOPMOST);
+
+            if (!SetLayeredWindowAttributes(window.Handle, 0, 255, LWA_ALPHA))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
             
             int[] margins = { -1 };
             SetLastError(0);
             DwmExtendFrameIntoClientArea(window.Handle, ref margins);
+            // if (!UpdateLayeredWindow(window.Handle, 0x00FFFFFF, ULW_COLORKEY))
+            //     throw new Win32Exception(Marshal.GetLastWin32Error());
             
             // int initialStyle = GetWindowLong(window.Handle, GWL_EXSTYLE);
             //
@@ -220,6 +224,31 @@ namespace Desktoptale
             //     throw new Win32Exception(ret);
             //
             // window.IsBorderless = true;
+
+            // Form form = (Form)Control.FromHandle(window.Handle);
+            //
+            // form.TopMost = true;
+            // int previousStyle = GetWindowLong(form.Handle, GWL_EXSTYLE);
+            //
+            // SetLastError(0);
+            // SetWindowLong(form.Handle, GWL_EXSTYLE, previousStyle | WS_EX_NOACTIVATE | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOPMOST);
+            //
+            // form.TransparencyKey = System.Drawing.Color.FromArgb(0, 0 ,0 ,0);
+            // form.FormBorderStyle = FormBorderStyle.None;
+            //
+            // int[] margins = { -1 };
+            // SetLastError(0);
+            // DwmExtendFrameIntoClientArea(window.Handle, ref margins);
+        }
+
+        public static void MakeClickable(GameWindow window)
+        {
+            SetWindowLong(window.Handle, GWL_EXSTYLE, WS_EX_LAYERED | WS_EX_TOPMOST);
+        }
+        
+        public static void MakeClickthrough(GameWindow window)
+        {
+            SetWindowLong(window.Handle, GWL_EXSTYLE, WS_EX_TRANSPARENT |WS_EX_LAYERED | WS_EX_TOPMOST);
         }
 
         public static void MakeTopmostWindow(GameWindow window)

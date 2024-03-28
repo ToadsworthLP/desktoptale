@@ -23,6 +23,7 @@ namespace Desktoptale
         private InputManager inputManager;
         private PresetManager presetManager;
         private MonitorManager monitorManager;
+        private Physics physics;
         
         private Character character;
         private ISet<IGameObject> gameObjects;
@@ -48,17 +49,22 @@ namespace Desktoptale
             this.settings = settings;
             this.rng = new Random();
             
-            graphics = new GraphicsDeviceManager(this);
+            graphics = new GraphicsDeviceManager(this)
+            {
+                HardwareModeSwitch = false,
+                IsFullScreen = false,
+                GraphicsProfile = GraphicsProfile.HiDef
+            };
             Window.Title = ProgramInfo.NAME;
             
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             
             characterRegistry = new CharacterRegistry();
-            
             monitorManager = new MonitorManager();
             
-            WindowsUtils.PrepareWindow(Window);
+            IsFixedTimeStep = true;
+            TargetElapsedTime = TimeSpan.FromSeconds(1d/60d);
         }
         
         protected override void Initialize()
@@ -68,6 +74,7 @@ namespace Desktoptale
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
             MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
             MessageBus.Subscribe<AlwaysOnTopChangeRequestedMessage>(OnAlwaysOnTopChangeRequestedMessage);
+            MessageBus.Subscribe<DisplaySettingsChangedMessage>(OnDisplaySettingsChangedMessage);
             
             // Keep settings object up-to-date
             MessageBus.Subscribe<CharacterChangeSuccessMessage>(msg => settings.Character = msg.Character.ToString());
@@ -82,6 +89,7 @@ namespace Desktoptale
             presetManager.LoadPreset();
             
             inputManager = new InputManager(this, GraphicsDevice);
+            physics = new Physics(inputManager);
             spriteBatch = new SpriteBatch(GraphicsDevice);
             
             gameObjects = new HashSet<IGameObject>();
@@ -91,9 +99,10 @@ namespace Desktoptale
             gameObjects.Add(contextMenu);
             
             FirstStartCheck();
-
+            UpdateWindow();
+            
             // Send initialization messages
-            CharacterType initialCharacter = CharacterRegistry.FRISK;
+            CharacterType initialCharacter = CharacterRegistry.TORIEL;
             if (settings.Character != null)
             {
                 try
@@ -108,11 +117,11 @@ namespace Desktoptale
             }
             
             MessageBus.Send(new CharacterChangeRequestedMessage { Character = initialCharacter });
-            MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = settings.Scale });
+            MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = 2 });
             MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = settings.IdleRoaming });
             MessageBus.Send(new AlwaysOnTopChangeRequestedMessage() { Enabled = settings.AlwaysOnTop });
             MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = settings.UnfocusedInput });
-
+            
             if (!string.IsNullOrWhiteSpace(settings.Window))
             {
                 WindowsUtils.WindowInfo target = WindowsUtils.GetWindowByName(settings.Window);
@@ -148,7 +157,8 @@ namespace Desktoptale
             {
                 WindowsUtils.PrepareWindow(Window);
                 WindowsUtils.MakeTopmostWindow(Window);
-
+                UpdateWindow();
+            
                 firstFrame = false;
             }
             
@@ -158,7 +168,20 @@ namespace Desktoptale
             {
                 gameObject.Update(gameTime);
             }
-
+            
+            physics.Update();
+            if (physics.HasColliderUnderCursorChanged)
+            {
+                if (physics.ColliderUnderCursor == null)
+                {
+                    WindowsUtils.MakeClickthrough(Window);
+                }
+                else
+                {
+                    WindowsUtils.MakeClickable(Window);
+                }
+            }
+            
             if (windowStateUpdateCounter >= nextWindowStateUpdate)
             {
                 if(alwaysOnTop) WindowsUtils.MakeTopmostWindow(Window);
@@ -185,6 +208,24 @@ namespace Desktoptale
             spriteBatch.End();
 
             base.Draw(gameTime);
+            
+            if(gameTime.ElapsedGameTime.Milliseconds > 0) Console.WriteLine($"FPS: {1/(gameTime.ElapsedGameTime.Milliseconds / 1000f)}");
+        }
+
+        private void UpdateWindow()
+        {
+            Rectangle boundingRect = monitorManager.BoundingRectangle;
+            
+            graphics.PreferredBackBufferWidth = boundingRect.Width;
+            graphics.PreferredBackBufferHeight = boundingRect.Height;
+            graphics.ApplyChanges();
+            
+            Window.Position = boundingRect.Location;
+        }
+
+        private void OnDisplaySettingsChangedMessage(DisplaySettingsChangedMessage message)
+        {
+            UpdateWindow();
         }
         
         private void OnCharacterChangeRequestedMessage(CharacterChangeRequestedMessage message)
@@ -214,13 +255,14 @@ namespace Desktoptale
             }
             else
             {
-                Point screenSize = new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
-                    GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
-                newCharacter.Position = new Vector2(screenSize.X / 2.0f, screenSize.Y / 2.0f);
+                Point center = monitorManager.VirtualScreenBoundingRectangle.Center;
+                newCharacter.Position = new Vector2(center.X, center.Y);
             }
             
             newCharacter.Initialize();
             gameObjects.Add(newCharacter);
+            physics.RemoveCollider(character);
+            physics.AddCollider(newCharacter);
             character = newCharacter;
             
             MessageBus.Send(new CharacterChangeSuccessMessage { Character = message.Character });
