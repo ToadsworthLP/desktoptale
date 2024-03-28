@@ -21,7 +21,6 @@ namespace Desktoptale
         private Game game;
         private GraphicsDevice graphics;
 
-        private bool focused = true;
         private bool unfocusedMovementEnabled = false;
     
         public InputManager(Game game, GraphicsDevice graphics)
@@ -29,7 +28,7 @@ namespace Desktoptale
             this.game = game;
             this.graphics = graphics;
             
-            // MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
+            MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
         }
 
         public void Update()
@@ -37,21 +36,9 @@ namespace Desktoptale
             UpdateKeyboardInput();
             UpdateMouseInput();
         }
-
-        public void GrabFocus()
-        {
-            focused = true;
-        }
     
         private void UpdateKeyboardInput()
         {
-            // if (!unfocusedMovementEnabled && (!game.IsActive || !focused))
-            // {
-            //     DirectionalInput = Vector2.Zero;
-            //     RunButtonPressed = false;
-            //     return;
-            // }
-            
             KeyboardState keyboardState = Keyboard.GetState();
 
             Vector2 input = Vector2.Zero;
@@ -76,17 +63,6 @@ namespace Desktoptale
 
         private void UpdateMouseInput()
         {
-            // if (!game.IsActive)
-            // {
-            //     LeftClickPressed = false;
-            //     LeftClickJustPressed = false;
-            //     previousFrameLeftClick = false;
-            //     RightClickPressed = false;
-            //     RightClickJustPressed = false;
-            //     previousFrameRightClick = false;
-            //     return;
-            // }
-            
             previousFrameLeftClick = LeftClickPressed;
             previousFrameRightClick = RightClickPressed;
             
@@ -99,16 +75,11 @@ namespace Desktoptale
             if (RightClickPressed) RightClickJustPressed = !previousFrameRightClick;
 
             PointerPosition = mouseState.Position;
-
-            // if (LeftClickJustPressed || RightClickJustPressed)
-            // {
-            //     focused = graphics.Viewport.Bounds.Contains(PointerPosition);
-            // }
         }
         
-        // private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangeRequestedMessage message)
-        // {
-        //     unfocusedMovementEnabled = message.Enabled;
-        // }
+        private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangeRequestedMessage message)
+        {
+            unfocusedMovementEnabled = message.Enabled;
+        }
     }
 }

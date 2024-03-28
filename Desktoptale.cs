@@ -39,7 +39,6 @@ namespace Desktoptale
 
         private Random rng;
 
-        private CharacterSpriteEffect characterSpriteEffect;
         private readonly Color clearColor = new Color(0f, 0f, 0f, 0f);
 
         public Desktoptale(Settings settings)
@@ -138,8 +137,6 @@ namespace Desktoptale
         
         protected override void LoadContent()
         {
-            characterSpriteEffect = new CharacterSpriteEffect(GraphicsDevice);
-            
             ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory(Path.Combine(applicationPath, "Content/Custom/"), graphics.GraphicsDevice);
             externalCharacterFactory.AddAllToRegistry(characterRegistry);
             
@@ -200,7 +197,7 @@ namespace Desktoptale
         {
             GraphicsDevice.Clear(clearColor);
 
-            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: characterSpriteEffect);
+            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, samplerState: SamplerState.PointClamp);
             foreach (var gameObject in gameObjects)
             {
                 gameObject.Draw(gameTime, spriteBatch);

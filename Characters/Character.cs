@@ -83,8 +83,6 @@ namespace Desktoptale.Characters
         
             StateMachine = new StateMachine<Character>(this, InitialState);
             StateMachine.StateChanged += (state, newState) => UpdateOrientation();
-            
-            InputManager.GrabFocus();
         }
 
         public virtual void LoadContent(ContentManager contentManager) { }
@@ -166,7 +164,6 @@ namespace Desktoptale.Characters
             previousPosition = Vector2.Zero;
             PreventLeavingScreenArea();
             UpdateHitbox();
-            InputManager.GrabFocus();
         }
         
         private void OnIdleMovementChangeRequestedMessage(IdleMovementChangeRequestedMessage message)
