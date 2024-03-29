@@ -305,7 +305,7 @@ namespace Desktoptale
                 message.Target.Properties.Scale,
                 message.Target.Properties.IdleRoamingEnabled,
                 message.Target.Properties.UnfocusedInputEnabled,
-                null
+                message.Target.TrackedWindow?.Window
             );
             
             Character newCharacter;
