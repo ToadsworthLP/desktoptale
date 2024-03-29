@@ -52,11 +52,11 @@ namespace Desktoptale
             
             SetupSettingsItems(settingsItem, target);
             
-            ToolStripMenuItem removeItem = new ToolStripMenuItem("Remove", null, (o, e) => { MessageBus.Send(new RemoveCharacterMessage() { Target = target }); });
-            contextMenuStrip.Items.Add(removeItem);
-            
             ToolStripMenuItem savePresetItem = new ToolStripMenuItem("Save Preset...", null, (o, e) => { MessageBus.Send(new SavePresetRequestedMessage() { Target = target }); });
             contextMenuStrip.Items.Add(savePresetItem);
+            
+            ToolStripMenuItem removeItem = new ToolStripMenuItem("Remove", null, (o, e) => { MessageBus.Send(new RemoveCharacterMessage() { Target = target }); });
+            contextMenuStrip.Items.Add(removeItem);
 
             contextMenuStrip.Items.Add(new ToolStripSeparator());
             
