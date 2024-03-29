@@ -72,6 +72,11 @@ namespace Desktoptale
             }
 
             var result = new Rectangle((int)min.X, (int)min.Y, (int)(max.X - min.X), (int)(max.Y - min.Y));
+            
+            // Shrink it by one pixel on every side to convince Windows that it's not a fullscreen window
+            // This makes sure that fullscreen content behind it (e.g. videos) continue to play instead of being "optimized" away
+            result.Inflate(-1, -1);
+            
             return result;
         }
         

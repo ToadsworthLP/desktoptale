@@ -78,13 +78,6 @@ namespace Desktoptale
             MessageBus.Subscribe<RemoveCharacterMessage>(OnRemoveCharacterMessage);
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
             MessageBus.Subscribe<DisplaySettingsChangedMessage>(OnDisplaySettingsChangedMessage);
-            
-            // Keep settings object up-to-date
-            // MessageBus.Subscribe<CharacterChangeSuccessMessage>(msg => settings.Character = msg.Character.ToString());
-            // MessageBus.Subscribe<ScaleChangeRequestedMessage>(msg => settings.Scale = (int)msg.ScaleFactor);
-            // MessageBus.Subscribe<IdleRoamingChangedMessage>(msg => settings.IdleRoaming = msg.Enabled);
-            // MessageBus.Subscribe<UnfocusedMovementChangedMessage>(msg => settings.UnfocusedInput = msg.Enabled);
-            // MessageBus.Subscribe<ChangeContainingWindowMessage>(msg => settings.Window = msg.Window?.ProcessName);
 
             inputManager = new InputManager(this, GraphicsDevice, monitorManager);
             presetManager = new PresetManager(characterRegistry);
