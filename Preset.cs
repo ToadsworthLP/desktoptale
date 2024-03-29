@@ -6,12 +6,12 @@ namespace Desktoptale
 {
     public class Preset
     {
-        public const int FILE_FORMAT_VERSION = 0;
+        public const int FILE_FORMAT_VERSION = 1;
 
         public int Version { get; set; }
         public string Character { get; set; }
-        public float XPosition { get; set; }
-        public float YPosition { get; set; }
+        public float XPosition { get; set; } = -1;
+        public float YPosition { get; set; } = -1;
         public int Scale { get; set; }
         public bool IdleRoaming { get; set; }
         public bool UnfocusedInput { get; set; }

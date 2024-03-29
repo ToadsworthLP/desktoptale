@@ -126,6 +126,8 @@ namespace Desktoptale
         {
             // Preset loading
             CharacterProperties characterProperties = presetManager.LoadPreset(sourceSettings.Preset);
+            if (characterProperties != null && characterProperties.Position.X < 0 && characterProperties.Position.Y < 0)
+                characterProperties.Position = defaultCharacterStartPosition.ToVector2();
 
             // If no preset had been loaded, create a character according to the CLI settings
             if (characterProperties == null)

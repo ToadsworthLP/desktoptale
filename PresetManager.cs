@@ -5,6 +5,7 @@ using Desktoptale.Characters;
 using Desktoptale.Messages;
 using Desktoptale.Messaging;
 using Desktoptale.Registry;
+using Microsoft.Xna.Framework;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -15,6 +16,7 @@ namespace Desktoptale
         public const string PRESET_FILE_EXTENSION = "dt";
 
         private ISerializer serializer;
+        private IDeserializer deserializer;
         private IRegistry<CharacterType, string> characterRegistry;
 
         public PresetManager(IRegistry<CharacterType, string> characterRegistry)
@@ -23,6 +25,11 @@ namespace Desktoptale
             
             serializer = new SerializerBuilder()
                 .WithNamingConvention(PascalCaseNamingConvention.Instance)
+                .Build();
+            
+            deserializer = new DeserializerBuilder()
+                .WithNamingConvention(PascalCaseNamingConvention.Instance)
+                .IgnoreUnmatchedProperties()
                 .Build();
             
             MessageBus.Subscribe<SavePresetRequestedMessage>(OnSavePresetRequestedMessage);
@@ -35,13 +42,9 @@ namespace Desktoptale
             
             try
             {
-                var deserializer = new DeserializerBuilder()
-                    .WithNamingConvention(PascalCaseNamingConvention.Instance)
-                    .Build();
-                
                 string serialized = File.ReadAllText(path);
 
-                if (!serialized.StartsWith($"Version: {Preset.FILE_FORMAT_VERSION}"))
+                if (!serialized.StartsWith($"Version: 0") && !serialized.StartsWith($"Version: {Preset.FILE_FORMAT_VERSION}"))
                 {
                     throw new Exception("Unknown file format. You might be trying to open a preset created using a newer version of Desktoptale in an older version.");
                 }
