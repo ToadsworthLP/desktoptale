@@ -37,6 +37,7 @@ namespace Desktoptale
         private WindowInfo containingWindow;
         private string applicationPath;
         private Point defaultCharacterStartPosition;
+        private Random rng = new Random();
 
         private readonly Color clearColor = new Color(0f, 0f, 0f, 0f);
 
@@ -78,6 +79,7 @@ namespace Desktoptale
             MessageBus.Subscribe<RemoveCharacterMessage>(OnRemoveCharacterMessage);
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
             MessageBus.Subscribe<DisplaySettingsChangedMessage>(OnDisplaySettingsChangedMessage);
+            MessageBus.Subscribe<AddCharacterRequestedMessage>(OnAddCharacterRequestedMessage);
 
             inputManager = new InputManager(this, GraphicsDevice, monitorManager);
             presetManager = new PresetManager(characterRegistry);
@@ -293,6 +295,40 @@ namespace Desktoptale
             {
                 Exit();
             }
+        }
+        
+        private void OnAddCharacterRequestedMessage(AddCharacterRequestedMessage message)
+        {
+            CharacterProperties characterProperties = new CharacterProperties(
+                message.Character,
+                message.Target.Properties.Position + new Vector2((float)((rng.NextDouble() - 0.5d) * message.Target.HitBox.Width), (message.Target.HitBox.Height / 2f)),
+                message.Target.Properties.Scale,
+                message.Target.Properties.IdleRoamingEnabled,
+                message.Target.Properties.UnfocusedInputEnabled,
+                null
+            );
+            
+            Character newCharacter;
+            try
+            {
+                newCharacter = message.Character.FactoryFunction
+                    .Invoke(new CharacterCreationContext(characterProperties, spriteBatch, inputManager, monitorManager, windowTracker));
+
+                newCharacter.LoadContent(Content);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Failed to switch character: {e.Message}");
+                WindowsUtils.ShowMessageBox($"Failed to switch character: {e.Message}", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            newCharacter.Properties.Type = message.Character;
+            newCharacter.Initialize();
+            characters.Add(newCharacter);
+            physics.AddCollider(newCharacter);
+            
+            MessageBus.Send(new FocusCharacterMessage() {Character = newCharacter });
         }
         
         private void OnCharacterChangeRequestedMessage(CharacterChangeRequestedMessage message)

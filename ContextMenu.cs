@@ -12,9 +12,6 @@ namespace Desktoptale
     {
         private InputManager inputManager;
         private IRegistry<CharacterType, string> characterRegistry;
-        
-        private int currentScaleFactor;
-        private CharacterType currentCharacter;
 
         private ContextMenuStrip currentContextMenuStrip = null;
 
@@ -23,8 +20,6 @@ namespace Desktoptale
             this.inputManager = inputManager;
             this.characterRegistry = characterRegistry;
             
-            MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
-            MessageBus.Subscribe<CharacterChangeSuccessMessage>(OnCharacterChangeSuccessMessage);
             MessageBus.Subscribe<OpenContextMenuRequestedMessage>(OnOpenContextMenuRequested);
         }
         
@@ -42,10 +37,10 @@ namespace Desktoptale
         {
             ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
             
-            ToolStripMenuItem characterItem = new ToolStripMenuItem("Character");
-            contextMenuStrip.Items.Add(characterItem);
+            ToolStripMenuItem switchCharacterItem = new ToolStripMenuItem("Character");
+            contextMenuStrip.Items.Add(switchCharacterItem);
 
-            SetupCharacterItems(characterItem, target);
+            SetupSwitchCharacterItems(switchCharacterItem, target);
 
             ToolStripMenuItem scaleItem = new ToolStripMenuItem("Scale");
             contextMenuStrip.Items.Add(scaleItem);
@@ -63,8 +58,12 @@ namespace Desktoptale
             ToolStripMenuItem savePresetItem = new ToolStripMenuItem("Save Preset...", null, (o, e) => { MessageBus.Send(new SavePresetRequestedMessage() { Target = target }); });
             contextMenuStrip.Items.Add(savePresetItem);
 
-            ToolStripSeparator separator = new ToolStripSeparator();
-            contextMenuStrip.Items.Add(separator);
+            contextMenuStrip.Items.Add(new ToolStripSeparator());
+            
+            ToolStripMenuItem addCharacterItem = new ToolStripMenuItem("Add New");
+            contextMenuStrip.Items.Add(addCharacterItem);
+            
+            SetupAddCharacterItems(addCharacterItem, target);
             
             ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (o, e) => ShowInfoScreen());
             contextMenuStrip.Items.Add(infoItem);
@@ -105,14 +104,14 @@ namespace Desktoptale
             settingsItem.DropDownItems.Add(associatePresetItem);
         }
 
-        private void SetupCharacterItems(ToolStripMenuItem characterItem, ICharacter target)
+        private void SetupSwitchCharacterItems(ToolStripMenuItem characterItem, ICharacter target)
         {
             IDictionary<string, ToolStripMenuItem> categoryItems = new Dictionary<string, ToolStripMenuItem>();
 
             foreach (CharacterType character in characterRegistry.GetAll())
             {
                 ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(character.Name, null, (o, e) => MessageBus.Send(new CharacterChangeRequestedMessage { Character = character, Target = target}));
-                characterSelectItem.Checked = currentCharacter == character;
+                characterSelectItem.Checked = target.Properties.Type == character;
                 
                 ToolStripMenuItem parent;
                 if (character.Category == null)
@@ -135,13 +134,42 @@ namespace Desktoptale
             }
         }
 
+        private void SetupAddCharacterItems(ToolStripMenuItem characterItem, ICharacter target)
+        {
+            IDictionary<string, ToolStripMenuItem> categoryItems = new Dictionary<string, ToolStripMenuItem>();
+
+            foreach (CharacterType character in characterRegistry.GetAll())
+            {
+                ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(character.Name, null, (o, e) => MessageBus.Send(new AddCharacterRequestedMessage { Character = character, Target = target}));
+                
+                ToolStripMenuItem parent;
+                if (character.Category == null)
+                {
+                    parent = characterItem;
+                }
+                else
+                {
+                    if (!categoryItems.ContainsKey(character.Category))
+                    {
+                        ToolStripMenuItem categoryItem = new ToolStripMenuItem(character.Category);
+                        characterItem.DropDownItems.Add(categoryItem);
+                        categoryItems.Add(character.Category, categoryItem);
+                    }
+
+                    parent = categoryItems[character.Category];
+                }
+
+                parent.DropDownItems.Add(characterSelectItem);
+            }
+        }
+        
         private void SetupScaleOptions(ToolStripMenuItem scaleItem, ICharacter target)
         {
             for (int i = 1; i < 9; i++)
             {
                 var scaleFactor = i;
                 ToolStripMenuItem scaleSelectItem = new ToolStripMenuItem($"{i}x", null, (o, e) => MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = scaleFactor, Target = target }));
-                scaleSelectItem.Checked = currentScaleFactor == i;
+                scaleSelectItem.Checked = (int)target.Scale.X == i;
                 scaleItem.DropDownItems.Add(scaleSelectItem);
             }
         }
@@ -176,16 +204,6 @@ namespace Desktoptale
                 item.Checked = target.TrackedWindow != null && target.TrackedWindow.Window.hWnd == windowInfo.hWnd;
                 parent.DropDownItems.Add(item);
             }
-        }
-        
-        private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
-        {
-            currentScaleFactor = (int)message.ScaleFactor;
-        }
-
-        private void OnCharacterChangeSuccessMessage(CharacterChangeSuccessMessage message)
-        {
-            currentCharacter = message.Character;
         }
 
         private void ShowInfoScreen()
