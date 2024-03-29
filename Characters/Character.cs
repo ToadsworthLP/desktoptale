@@ -11,6 +11,7 @@ namespace Desktoptale.Characters
     public abstract class Character : ICharacter
     {
         public CharacterProperties Properties => properties;
+        public TrackedWindow TrackedWindow => trackedWindow;
 
         public Vector2 Position
         {
@@ -61,10 +62,11 @@ namespace Desktoptale.Characters
         protected virtual IState<Character> InitialState => IdleState;
         
         protected MonitorManager MonitorManager;
+        protected WindowTracker WindowTracker;
 
         private CharacterProperties properties;
 
-        private Rectangle? boundary;
+        private TrackedWindow trackedWindow;
 
         private bool focused;
         private bool enableDragging = true;
@@ -77,15 +79,17 @@ namespace Desktoptale.Characters
         private Subscription scaleChangeRequestedSubscription;
         private Subscription idleMovementChangeRequestedSubscription;
         private Subscription unfocusedMovementChangedSubscription;
-        private Subscription boundaryChangeSubscription;
         private Subscription contextMenuStateChangeSubscription;
         private Subscription focusCharacterSubscription;
+        private Subscription unfocusCharacterSubscription;
+        private Subscription changeContainingWindowSubscription;
         
         public Character(CharacterCreationContext characterCreationContext)
         {
-            this.properties = characterCreationContext.Properties;
-            this.MonitorManager = characterCreationContext.MonitorManager;
-            this.InputManager = characterCreationContext.InputManager;
+            properties = characterCreationContext.Properties;
+            MonitorManager = characterCreationContext.MonitorManager;
+            WindowTracker = characterCreationContext.WindowTracker;
+            InputManager = characterCreationContext.InputManager;
         }
 
         public void UpdateSprite(IAnimatedSprite sprite)
@@ -102,9 +106,10 @@ namespace Desktoptale.Characters
             scaleChangeRequestedSubscription = MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
             idleMovementChangeRequestedSubscription = MessageBus.Subscribe<IdleRoamingChangedMessage>(OnIdleRoamingChangedMessage);
             unfocusedMovementChangedSubscription = MessageBus.Subscribe<UnfocusedMovementChangedMessage>(OnUnfocusedMovementChangedMessage);
-            boundaryChangeSubscription = MessageBus.Subscribe<UpdateBoundaryMessage>(OnBoundaryUpdateMessage);
             contextMenuStateChangeSubscription = MessageBus.Subscribe<ContextMenuStateChangedMessage>(OnContextMenuStateChangedMessage);
             focusCharacterSubscription = MessageBus.Subscribe<FocusCharacterMessage>(OnFocusCharacterMessage);
+            unfocusCharacterSubscription = MessageBus.Subscribe<UnfocusAllCharactersMessage>(OnUnfocusCharacterMessage);
+            changeContainingWindowSubscription = MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
 
             IdleState = new IdleState();
             WalkState = new WalkState(90f, true);
@@ -162,7 +167,7 @@ namespace Desktoptale.Characters
                 UpdatePhysicsProperties();
             }
             
-            CurrentSprite.Update(gameTime); ;
+            CurrentSprite.Update(gameTime);
         }
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -176,9 +181,16 @@ namespace Desktoptale.Characters
             MessageBus.Unsubscribe(scaleChangeRequestedSubscription);
             MessageBus.Unsubscribe(idleMovementChangeRequestedSubscription);
             MessageBus.Unsubscribe(unfocusedMovementChangedSubscription);
-            MessageBus.Unsubscribe(boundaryChangeSubscription);
             MessageBus.Unsubscribe(contextMenuStateChangeSubscription);
             MessageBus.Unsubscribe(focusCharacterSubscription);
+            MessageBus.Unsubscribe(unfocusCharacterSubscription);
+            MessageBus.Unsubscribe(changeContainingWindowSubscription);
+
+            if (trackedWindow != null)
+            {
+                WindowTracker.Unsubscribe(trackedWindow.Window);
+                trackedWindow.WindowDestroyed -= OnContainingWindowDestroyed;
+            }
         }
 
         private void UpdatePhysicsProperties()
@@ -228,6 +240,35 @@ namespace Desktoptale.Characters
             focused = message.Character == this;
         }
 
+        private void OnUnfocusCharacterMessage(UnfocusAllCharactersMessage message)
+        {
+            focused = false;
+        }
+
+        private void OnChangeContainingWindowMessage(ChangeContainingWindowMessage message)
+        {
+            if (message.Target != this) return;
+
+            if (message.Window == null)
+            {
+                WindowTracker.Unsubscribe(trackedWindow.Window);
+                trackedWindow.WindowDestroyed -= OnContainingWindowDestroyed;
+                trackedWindow = null;
+            }
+            else
+            {
+                trackedWindow = WindowTracker.Subscribe(message.Window);
+                trackedWindow.WindowDestroyed += OnContainingWindowDestroyed;
+            }
+        }
+
+        private void OnContainingWindowDestroyed()
+        {
+            WindowTracker.Unsubscribe(trackedWindow.Window);
+            trackedWindow.WindowDestroyed -= OnContainingWindowDestroyed;
+            trackedWindow = null;
+        }
+
         private void UpdateOrientation()
         {
             Orientation? updatedOrientation = GetOrientationFromVelocity(Velocity);
@@ -273,22 +314,22 @@ namespace Desktoptale.Characters
 
         private void PreventLeavingScreenArea()
         {
-            if(previousPosition == Position) return;
-            
             float scaledWidth = CurrentSprite.FrameSize.X * Scale.X;
             float scaledHeight = CurrentSprite.FrameSize.Y * Scale.Y;
             
-            if (boundary.HasValue)
+            if (trackedWindow != null)
             {
                 Vector2 position = Position;
-                if (position.X < boundary.Value.X) position.X = boundary.Value.X;
-                if (position.X + scaledWidth > boundary.Value.X + boundary.Value.Width) position.X = boundary.Value.X + boundary.Value.Width - scaledWidth;
-                if (position.Y < boundary.Value.Y) position.Y = boundary.Value.Y;
-                if (position.Y + scaledHeight > boundary.Value.Y + boundary.Value.Height) position.Y = boundary.Value.Y + boundary.Value.Height - scaledHeight;
+                if (position.X - scaledWidth / 2 < trackedWindow.Bounds.X) position.X = trackedWindow.Bounds.X + scaledWidth / 2;
+                if (position.X + scaledWidth / 2 > trackedWindow.Bounds.X + trackedWindow.Bounds.Width) position.X = trackedWindow.Bounds.X + trackedWindow.Bounds.Width - scaledWidth / 2;
+                if (position.Y - scaledHeight / 2 < trackedWindow.Bounds.Y) position.Y = trackedWindow.Bounds.Y + scaledHeight / 2;
+                if (position.Y + scaledHeight / 2 > trackedWindow.Bounds.Y + trackedWindow.Bounds.Height) position.Y = trackedWindow.Bounds.Y + trackedWindow.Bounds.Height - scaledHeight / 2;
                 Position = position;
             }
             else
             {
+                if(previousPosition == Position) return;
+                
                 Vector2 motion = Position - previousPosition;
                 Vector2 previousBoundingRectMin = new Vector2(HitBox.Top, HitBox.Left);
                 Vector2 previousBoundingRectMax = new Vector2(HitBox.Bottom, HitBox.Right);
@@ -360,17 +401,8 @@ namespace Desktoptale.Characters
             return new Point((int)(size.X * Scale.X), (int)(size.Y * Scale.Y));
         }
 
-        private void OnBoundaryUpdateMessage(UpdateBoundaryMessage message)
-        {
-            if(message.Target != this) return;
-            
-            boundary = message.Boundary;
-        }
-
         private void OnContextMenuStateChangedMessage(ContextMenuStateChangedMessage message)
         {
-            if(message.Target != this) return;
-            
             enableDragging = !message.Open;
         }
     }

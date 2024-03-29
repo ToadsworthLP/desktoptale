@@ -5,38 +5,26 @@ using Desktoptale.Messages;
 using Desktoptale.Messaging;
 using Desktoptale.Registry;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Desktoptale
 {
     public class ContextMenu
     {
-        private GameWindow window;
         private InputManager inputManager;
-        private GraphicsDevice graphicsDevice;
         private IRegistry<CharacterType, string> characterRegistry;
         
         private int currentScaleFactor;
         private CharacterType currentCharacter;
-        private bool idleMovementEnabled = true;
-        private bool unfocusedMovementEnabled = false;
-        private WindowInfo currentContainingWindow;
-        
+
         private ContextMenuStrip currentContextMenuStrip = null;
 
-        public ContextMenu(GameWindow window, InputManager inputManager, GraphicsDevice graphicsDevice, IRegistry<CharacterType, string> characterRegistry)
+        public ContextMenu(InputManager inputManager, IRegistry<CharacterType, string> characterRegistry)
         {
-            this.window = window;
             this.inputManager = inputManager;
-            this.graphicsDevice = graphicsDevice;
             this.characterRegistry = characterRegistry;
             
             MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
             MessageBus.Subscribe<CharacterChangeSuccessMessage>(OnCharacterChangeSuccessMessage);
-            MessageBus.Subscribe<IdleRoamingChangedMessage>(OnIdleMovementChangeRequestedMessage);
-            MessageBus.Subscribe<UnfocusedMovementChangedMessage>(OnUnfocusedMovementChangeRequestedMessage);
-            MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
             MessageBus.Subscribe<OpenContextMenuRequestedMessage>(OnOpenContextMenuRequested);
         }
         
@@ -69,11 +57,14 @@ namespace Desktoptale
             
             SetupSettingsItems(settingsItem, target);
             
-            ToolStripMenuItem savePresetItem = new ToolStripMenuItem("Save Preset...", null, (o, e) => { MessageBus.Send(new SavePresetRequestedMessage() { Target = target }); });
-            contextMenuStrip.Items.Add(savePresetItem);
-            
             ToolStripMenuItem removeItem = new ToolStripMenuItem("Remove", null, (o, e) => { MessageBus.Send(new RemoveCharacterMessage() { Target = target }); });
             contextMenuStrip.Items.Add(removeItem);
+            
+            ToolStripMenuItem savePresetItem = new ToolStripMenuItem("Save Preset...", null, (o, e) => { MessageBus.Send(new SavePresetRequestedMessage() { Target = target }); });
+            contextMenuStrip.Items.Add(savePresetItem);
+
+            ToolStripSeparator separator = new ToolStripSeparator();
+            contextMenuStrip.Items.Add(separator);
             
             ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (o, e) => ShowInfoScreen());
             contextMenuStrip.Items.Add(infoItem);
@@ -95,15 +86,15 @@ namespace Desktoptale
 
         private void SetupSettingsItems(ToolStripMenuItem settingsItem, ICharacter target)
         {
-            ToolStripMenuItem idleMovementItem = new ToolStripMenuItem($"Idle Roaming", null, (o, e) => MessageBus.Send(new IdleRoamingChangedMessage { Enabled = !idleMovementEnabled, Target = target}));
-            idleMovementItem.Checked = idleMovementEnabled;
+            ToolStripMenuItem idleMovementItem = new ToolStripMenuItem($"Idle Roaming", null, (o, e) => MessageBus.Send(new IdleRoamingChangedMessage { Enabled = !target.Properties.IdleRoamingEnabled, Target = target}));
+            idleMovementItem.Checked = target.Properties.IdleRoamingEnabled;
             settingsItem.DropDownItems.Add(idleMovementItem);
             
             ToolStripMenuItem unfocusedMovementItem = new ToolStripMenuItem($"Unfocused Input", null, (o, e) =>
             {
-                MessageBus.Send(new UnfocusedMovementChangedMessage { Enabled = !unfocusedMovementEnabled });
+                MessageBus.Send(new UnfocusedMovementChangedMessage { Enabled = !target.Properties.UnfocusedInputEnabled, Target = target});
             });
-            unfocusedMovementItem.Checked = unfocusedMovementEnabled;
+            unfocusedMovementItem.Checked = target.Properties.UnfocusedInputEnabled;
             settingsItem.DropDownItems.Add(unfocusedMovementItem);
 
             ToolStripMenuItem stayInWindowItem = new ToolStripMenuItem("Stay in Window", null, (o, e) => { });
@@ -161,7 +152,8 @@ namespace Desktoptale
             {
                 MessageBus.Send(new ChangeContainingWindowMessage() { Window = null, Target = target });
             });
-            noneItem.Checked = currentContainingWindow == null;
+            
+            noneItem.Checked = target.TrackedWindow == null;
             parent.DropDownItems.Add(noneItem);
             
             IList<WindowInfo> windows = WindowsUtils.GetOpenWindows();
@@ -181,7 +173,7 @@ namespace Desktoptale
                 {
                     MessageBus.Send(new ChangeContainingWindowMessage() { Window = windowInfo, Target = target });
                 });
-                item.Checked = currentContainingWindow != null && currentContainingWindow.hWnd == windowInfo.hWnd;
+                item.Checked = target.TrackedWindow != null && target.TrackedWindow.Window.hWnd == windowInfo.hWnd;
                 parent.DropDownItems.Add(item);
             }
         }
@@ -194,21 +186,6 @@ namespace Desktoptale
         private void OnCharacterChangeSuccessMessage(CharacterChangeSuccessMessage message)
         {
             currentCharacter = message.Character;
-        }
-        
-        private void OnIdleMovementChangeRequestedMessage(IdleRoamingChangedMessage message)
-        {
-            idleMovementEnabled = message.Enabled;
-        }
-        
-        private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangedMessage message)
-        {
-            unfocusedMovementEnabled = message.Enabled;
-        }
-        
-        private void OnChangeContainingWindowMessage(ChangeContainingWindowMessage message)
-        {
-            currentContainingWindow = message.Window;
         }
 
         private void ShowInfoScreen()

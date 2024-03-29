@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Desktoptale.Messages;
+using Desktoptale.Messaging;
 using Microsoft.Xna.Framework;
 
 namespace Desktoptale
@@ -26,6 +28,11 @@ namespace Desktoptale
             
             if(inputManager.LeftClickJustPressed) PhysicsObjectUnderCursor?.OnLeftClicked();
             if(inputManager.RightClickJustPressed) PhysicsObjectUnderCursor?.OnRightClicked();
+
+            if (inputManager.LeftClickJustPressed && PhysicsObjectUnderCursor == null)
+            {
+                MessageBus.Send(new UnfocusAllCharactersMessage());
+            }
         }
 
         public void AddCollider(IPhysicsObject physicsObject)

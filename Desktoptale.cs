@@ -25,6 +25,7 @@ namespace Desktoptale
         private InputManager inputManager;
         private PresetManager presetManager;
         private MonitorManager monitorManager;
+        private WindowTracker windowTracker;
         private ContextMenu contextMenu;
         private Physics physics;
         
@@ -60,6 +61,7 @@ namespace Desktoptale
             
             characterRegistry = new CharacterRegistry();
             monitorManager = new MonitorManager();
+            windowTracker = new WindowTracker(monitorManager);
             
             IsFixedTimeStep = true;
             TargetElapsedTime = TimeSpan.FromSeconds(1d/60d);
@@ -75,7 +77,6 @@ namespace Desktoptale
             MessageBus.Subscribe<AddCharacterMessage>(OnAddCharacterMessage);
             MessageBus.Subscribe<RemoveCharacterMessage>(OnRemoveCharacterMessage);
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
-            MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
             MessageBus.Subscribe<DisplaySettingsChangedMessage>(OnDisplaySettingsChangedMessage);
             
             // Keep settings object up-to-date
@@ -84,12 +85,12 @@ namespace Desktoptale
             // MessageBus.Subscribe<IdleRoamingChangedMessage>(msg => settings.IdleRoaming = msg.Enabled);
             // MessageBus.Subscribe<UnfocusedMovementChangedMessage>(msg => settings.UnfocusedInput = msg.Enabled);
             // MessageBus.Subscribe<ChangeContainingWindowMessage>(msg => settings.Window = msg.Window?.ProcessName);
-            
+
             inputManager = new InputManager(this, GraphicsDevice, monitorManager);
             presetManager = new PresetManager(characterRegistry);
             physics = new Physics(inputManager);
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            contextMenu = new ContextMenu(Window, inputManager, GraphicsDevice, characterRegistry);
+            contextMenu = new ContextMenu(inputManager, characterRegistry);
             
             characters = new HashSet<ICharacter>();
             
@@ -202,6 +203,7 @@ namespace Desktoptale
             }
             
             inputManager.Update();
+            windowTracker.Update();
             
             foreach (var gameObject in characters)
             {
@@ -224,8 +226,6 @@ namespace Desktoptale
             if (windowStateUpdateCounter >= WINDOW_STATE_UPDATE_INTERVAL)
             {
                 WindowsUtils.MakeTopmostWindow(Window);
-                if(containingWindow != null) UpdateBounds();
-                
                 windowStateUpdateCounter = 0;
             }
 
@@ -246,8 +246,6 @@ namespace Desktoptale
             spriteBatch.End();
 
             base.Draw(gameTime);
-            
-            if(gameTime.ElapsedGameTime.Milliseconds > 0) Console.WriteLine($"FPS: {1/(gameTime.ElapsedGameTime.Milliseconds / 1000f)}");
         }
 
         private void UpdateWindow()
@@ -272,7 +270,7 @@ namespace Desktoptale
             try
             {
                 character = message.Properties.Type.FactoryFunction
-                    .Invoke(new CharacterCreationContext(message.Properties, spriteBatch, inputManager, monitorManager));
+                    .Invoke(new CharacterCreationContext(message.Properties, spriteBatch, inputManager, monitorManager, windowTracker));
 
                 character.LoadContent(Content);
             }
@@ -309,7 +307,7 @@ namespace Desktoptale
             try
             {
                 newCharacter = message.Character.FactoryFunction
-                    .Invoke(new CharacterCreationContext(new CharacterProperties(oldCharacter.Properties), spriteBatch, inputManager, monitorManager));
+                    .Invoke(new CharacterCreationContext(new CharacterProperties(oldCharacter.Properties), spriteBatch, inputManager, monitorManager, windowTracker));
 
                 newCharacter.LoadContent(Content);
             }
@@ -333,35 +331,7 @@ namespace Desktoptale
             MessageBus.Send(new CharacterChangeSuccessMessage { Character = message.Character });
             MessageBus.Send(new FocusCharacterMessage() {Character = newCharacter });
         }
-
-        private void OnChangeContainingWindowMessage(ChangeContainingWindowMessage message)
-        {
-            containingWindow = message.Window;
-            if (message.Window != null)
-            {
-                Rectangle bounds = WindowsUtils.GetWindowRect(message.Window.hWnd);
-                MessageBus.Send(new UpdateBoundaryMessage() { Boundary = bounds });
-            }
-            else
-            {
-                MessageBus.Send(new UpdateBoundaryMessage() {  Boundary = null });
-            }
-        }
-
-        private void UpdateBounds()
-        {
-            Rectangle bounds = WindowsUtils.GetWindowRect(containingWindow.hWnd);
-
-            if (bounds.IsEmpty)
-            {
-                MessageBus.Send(new ChangeContainingWindowMessage() { Window = null });
-            }
-            else
-            {
-                MessageBus.Send(new UpdateBoundaryMessage() { Boundary = bounds });
-            }
-        }
-
+        
         private void PrintRegistryKeys()
         {
             Console.WriteLine("Currently registered characters:");

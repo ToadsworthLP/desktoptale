@@ -261,11 +261,11 @@ namespace Desktoptale
             return null;
         }
 
-        public static Rectangle GetWindowRect(IntPtr hWnd)
+        public static Rectangle? GetWindowRect(IntPtr hWnd)
         {
             if(!GetWindowRect(hWnd, out var nativeRect))
             {
-                return Rectangle.Empty;
+                return null;
             }
             
             return new Rectangle(

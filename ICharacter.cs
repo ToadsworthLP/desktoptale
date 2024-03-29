@@ -8,6 +8,7 @@ namespace Desktoptale
     public interface ICharacter : IDisposable, IPhysicsObject
     {
         CharacterProperties Properties { get; }
+        TrackedWindow TrackedWindow { get; }
         
         Vector2 Position { get; set; }
         Vector2 Velocity { get; set; }
