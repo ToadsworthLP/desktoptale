@@ -119,6 +119,12 @@ namespace Desktoptale.Characters
         
             StateMachine = new StateMachine<Character>(this, InitialState);
             StateMachine.StateChanged += (state, newState) => UpdateOrientation();
+
+            if (properties.StayInsideWindow != null)
+            {
+                trackedWindow = WindowTracker.Subscribe(properties.StayInsideWindow);
+                trackedWindow.WindowDestroyed += OnContainingWindowDestroyed;
+            }
         }
 
         public virtual void LoadContent(ContentManager contentManager) { }
@@ -254,11 +260,13 @@ namespace Desktoptale.Characters
                 WindowTracker.Unsubscribe(trackedWindow.Window);
                 trackedWindow.WindowDestroyed -= OnContainingWindowDestroyed;
                 trackedWindow = null;
+                properties.StayInsideWindow = null;
             }
             else
             {
                 trackedWindow = WindowTracker.Subscribe(message.Window);
                 trackedWindow.WindowDestroyed += OnContainingWindowDestroyed;
+                properties.StayInsideWindow = message.Window;
             }
         }
 
@@ -267,6 +275,7 @@ namespace Desktoptale.Characters
             WindowTracker.Unsubscribe(trackedWindow.Window);
             trackedWindow.WindowDestroyed -= OnContainingWindowDestroyed;
             trackedWindow = null;
+            properties.StayInsideWindow = null;
         }
 
         private void UpdateOrientation()

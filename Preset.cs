@@ -40,7 +40,7 @@ namespace Desktoptale
             Scale = (int)properties.Scale.X;
             IdleRoaming = properties.IdleRoamingEnabled;
             UnfocusedInput = properties.UnfocusedInputEnabled;
-            Window = properties.StayInsideWindow == null ? "" : properties.StayInsideWindow.ProcessName;
+            Window = properties.StayInsideWindow?.ProcessName;
         }
         
         public void Apply(Settings settings)
