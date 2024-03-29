@@ -264,6 +264,12 @@ namespace Desktoptale.Characters
             }
             else
             {
+                if (trackedWindow != null)
+                {
+                    WindowTracker.Unsubscribe(trackedWindow.Window);
+                    trackedWindow.WindowDestroyed -= OnContainingWindowDestroyed;
+                }
+                
                 trackedWindow = WindowTracker.Subscribe(message.Window);
                 trackedWindow.WindowDestroyed += OnContainingWindowDestroyed;
                 properties.StayInsideWindow = message.Window;

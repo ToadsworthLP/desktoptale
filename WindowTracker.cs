@@ -12,6 +12,8 @@ namespace Desktoptale
         private MonitorManager monitorManager;
         private bool changed = false;
         
+        private IEnumerator<TrackedWindow> windowUpdateEnumerator;
+        
         public WindowTracker(MonitorManager monitorManager)
         {
             this.monitorManager = monitorManager;
@@ -22,20 +24,33 @@ namespace Desktoptale
         
         public void Update()
         {
-            foreach (var window in trackedWindows.Values)
+            if (trackedWindows.Count == 0)
             {
-                UpdateWindow(window);
-
-                if (changed)
-                {
-                    break;
-                }
+                windowUpdateEnumerator?.Dispose();
+                return;
             }
-            
+
             if (changed)
             {
+                windowUpdateEnumerator?.Dispose();
+                windowUpdateEnumerator = null;
                 changed = false;
             }
+            
+            if (windowUpdateEnumerator == null)
+            {
+                windowUpdateEnumerator = trackedWindows.Values.GetEnumerator();
+            }
+
+            bool last = !windowUpdateEnumerator.MoveNext();
+            if (last)
+            {
+                windowUpdateEnumerator.Reset();
+                windowUpdateEnumerator.MoveNext();
+            }
+            
+            TrackedWindow current = windowUpdateEnumerator.Current;
+            UpdateWindow(current);
         }
 
         public TrackedWindow Subscribe(WindowInfo window)
@@ -44,6 +59,7 @@ namespace Desktoptale
             {
                 trackedWindows.Add(window.hWnd, new TrackedWindow(window));
                 usages.Add(window.hWnd, 0);
+                changed = true;
             }
 
             usages[window.hWnd]++;
@@ -58,6 +74,7 @@ namespace Desktoptale
             {
                 trackedWindows.Remove(window.hWnd);
                 usages.Remove(window.hWnd);
+                changed = true;
             }
         }
 
