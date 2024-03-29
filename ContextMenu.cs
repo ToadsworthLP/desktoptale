@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 using Desktoptale.Characters;
 using Desktoptale.Messages;
@@ -99,6 +101,15 @@ namespace Desktoptale
             ToolStripMenuItem stayInWindowItem = new ToolStripMenuItem("Stay in Window", null, (o, e) => { });
             settingsItem.DropDownItems.Add(stayInWindowItem);
             SetupWindowSelectItems(stayInWindowItem, target);
+            
+            settingsItem.DropDownItems.Add(new ToolStripSeparator());
+            
+            ToolStripMenuItem openCustomCharacterFolderItem = new ToolStripMenuItem("Custom Character Folder", null,
+            (o, e) =>
+            {
+                Process.Start(new ProcessStartInfo(Path.GetFullPath( Desktoptale.CustomCharacterPath )) { UseShellExecute = true });
+            });
+            settingsItem.DropDownItems.Add(openCustomCharacterFolderItem);
             
             ToolStripMenuItem associatePresetItem = new ToolStripMenuItem("Associate Preset Files", null, (o, e) => { MessageBus.Send(new SetPresetFileAssociationRequestedMessage()); });
             settingsItem.DropDownItems.Add(associatePresetItem);

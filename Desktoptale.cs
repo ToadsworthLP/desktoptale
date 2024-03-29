@@ -17,6 +17,9 @@ namespace Desktoptale
 {
     public class Desktoptale : Game
     {
+        public static string ApplicationPath { get; private set; }
+        public static string CustomCharacterPath { get; private set; }
+        
         private Settings settings;
         private IRegistry<CharacterType, string> characterRegistry { get; }
         
@@ -35,7 +38,6 @@ namespace Desktoptale
         private int windowStateUpdateCounter = 0;
         private bool firstFrame = true;
         private WindowInfo containingWindow;
-        private string applicationPath;
         private Point defaultCharacterStartPosition;
         private Random rng = new Random();
 
@@ -45,7 +47,8 @@ namespace Desktoptale
 
         public Desktoptale(Settings settings)
         {
-            applicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            ApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            CustomCharacterPath = Path.Combine(ApplicationPath, "Content/Custom/");
             
             this.settings = settings;
             
@@ -170,7 +173,7 @@ namespace Desktoptale
 
         protected override void LoadContent()
         {
-            ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory(Path.Combine(applicationPath, "Content/Custom/"), graphics.GraphicsDevice);
+            ExternalCharacterFactory externalCharacterFactory = new ExternalCharacterFactory(CustomCharacterPath, graphics.GraphicsDevice);
             externalCharacterFactory.AddAllToRegistry(characterRegistry);
             
             if(settings.PrintRegistryKeys) PrintRegistryKeys();
@@ -374,7 +377,7 @@ namespace Desktoptale
 
         private void FirstStartCheck()
         {
-            string path = Path.Combine(applicationPath, ".desktoptale");
+            string path = Path.Combine(ApplicationPath, ".desktoptale");
             if (!File.Exists(path))
             {
                 DisplayWelcomeMessage();
