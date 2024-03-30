@@ -1,5 +1,4 @@
 ﻿using Desktoptale.States.Common;
-using Desktoptale.States.Soul;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,8 +7,6 @@ namespace Desktoptale.Characters
 {
     public class Soul : Character
     {
-        protected override IState<Character> InitialState => new SoulIdleState();
-        
         private Color color;
         private bool flip;
         
@@ -33,9 +30,9 @@ namespace Desktoptale.Characters
         {
             base.Initialize();
             
-            IdleState = InitialState;
             WalkState = new WalkState(100f, false);
             RunState = new RunState(50f, false);
+            RandomMovementState = new RandomMovementState(100f);
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
