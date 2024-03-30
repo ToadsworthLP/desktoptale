@@ -1,5 +1,4 @@
 ﻿using Desktoptale.States.Common;
-using Desktoptale.States.Soul;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,8 +7,6 @@ namespace Desktoptale.Characters
 {
     public class Soul : Character
     {
-        protected override IState<Character> InitialState => new SoulIdleState();
-        
         private Color color;
         private bool flip;
         
@@ -33,18 +30,15 @@ namespace Desktoptale.Characters
         {
             base.Initialize();
             
-            IdleState = InitialState;
             WalkState = new WalkState(100f, false);
             RunState = new RunState(50f, false);
+            RandomMovementState = new RandomMovementState(100f);
         }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            Vector2 center = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height);
-            Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2f, CurrentSprite.FrameSize.Y);
-            CurrentSprite.Draw(spriteBatch, center, color, 0, origin, Scale, flip ? SpriteEffects.FlipVertically : SpriteEffects.None, 0);
-            spriteBatch.End();
+            Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2f, CurrentSprite.FrameSize.Y / 2f);
+            CurrentSprite.Draw(spriteBatch, Position, color, 0, origin, Scale, flip ? SpriteEffects.FlipVertically : SpriteEffects.None, MathF.Clamp(Depth, 0, 1));
         }
     }
 }

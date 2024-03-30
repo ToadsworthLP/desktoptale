@@ -5,19 +5,19 @@ namespace Desktoptale.Characters
 {
     public class CharacterCreationContext
     {
-        public CharacterCreationContext(GraphicsDeviceManager graphics, GameWindow window, SpriteBatch spriteBatch, InputManager inputManager, MonitorManager monitorManager)
+        public CharacterCreationContext(CharacterProperties properties, SpriteBatch spriteBatch, InputManager inputManager, MonitorManager monitorManager, WindowTracker windowTracker)
         {
-            Graphics = graphics;
-            Window = window;
+            Properties = properties;
             SpriteBatch = spriteBatch;
             InputManager = inputManager;
             MonitorManager = monitorManager;
+            WindowTracker = windowTracker;
         }
-
-        public GraphicsDeviceManager Graphics { get; private set; }
-        public GameWindow Window { get; private set; }
+        
+        public CharacterProperties Properties { get; private set; }
         public SpriteBatch SpriteBatch { get; private set; }
         public InputManager InputManager { get; private set; }
         public MonitorManager MonitorManager { get; private set; }
+        public WindowTracker WindowTracker { get; private set; }
     }
 }

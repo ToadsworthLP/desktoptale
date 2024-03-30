@@ -27,13 +27,13 @@ namespace Desktoptale.States.Common
 
         public virtual void Update(StateUpdateContext<Character> context)
         {
-            if (context.Target.InputManager.DirectionalInput.LengthSquared() > float.Epsilon)
+            if (context.Target.IsActive && context.Target.InputManager.DirectionalInput.LengthSquared() > float.Epsilon)
             {
                 context.StateMachine.ChangeState(context.Target.WalkState);
                 return;
             }
         
-            if (context.Target.EnableIdleMovement && context.StateTime > idleAnimationTime && !context.Target.IsBeingDragged)
+            if (context.Target.IdleRoamingEnabled && context.StateTime > idleAnimationTime && !context.Target.IsBeingDragged)
             {
                 context.StateMachine.ChangeState(context.Target.RandomMovementWaitState);
                 return;

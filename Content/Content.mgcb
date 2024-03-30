@@ -304,7 +304,6 @@
 /processorParam:TextureFormat=Color
 /build:Included/Ceroba/Spr_Ceroba_Idle_Down.png
 
-
 #begin Included/Ceroba/Spr_Ceroba_Idle_Left.png
 /importer:TextureImporter
 /processor:TextureProcessor

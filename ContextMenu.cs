@@ -1,142 +1,128 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 using Desktoptale.Characters;
 using Desktoptale.Messages;
 using Desktoptale.Messaging;
 using Desktoptale.Registry;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Desktoptale
 {
-    public class ContextMenu : IGameObject
+    public class ContextMenu
     {
-        private GameWindow window;
         private InputManager inputManager;
-        private GraphicsDevice graphicsDevice;
         private IRegistry<CharacterType, string> characterRegistry;
-        
-        private int currentScaleFactor;
-        private CharacterType currentCharacter;
-        private bool idleMovementEnabled = true;
-        private bool unfocusedMovementEnabled = false;
-        private WindowsUtils.WindowInfo currentContainingWindow;
-        private bool alwaysOnTopEnabled = false;
 
-        private bool open = false;
+        private ContextMenuStrip currentContextMenuStrip = null;
 
-        public ContextMenu(GameWindow window, InputManager inputManager, GraphicsDevice graphicsDevice, IRegistry<CharacterType, string> characterRegistry)
+        public ContextMenu(InputManager inputManager, IRegistry<CharacterType, string> characterRegistry)
         {
-            this.window = window;
             this.inputManager = inputManager;
-            this.graphicsDevice = graphicsDevice;
             this.characterRegistry = characterRegistry;
+            
+            MessageBus.Subscribe<OpenContextMenuRequestedMessage>(OnOpenContextMenuRequested);
         }
         
-        public void Initialize()
+        private void OnOpenContextMenuRequested(OpenContextMenuRequestedMessage message)
         {
-            MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
-            MessageBus.Subscribe<CharacterChangeSuccessMessage>(OnCharacterChangeSuccessMessage);
-            MessageBus.Subscribe<IdleMovementChangeRequestedMessage>(OnIdleMovementChangeRequestedMessage);
-            MessageBus.Subscribe<UnfocusedMovementChangeRequestedMessage>(OnUnfocusedMovementChangeRequestedMessage);
-            MessageBus.Subscribe<AlwaysOnTopChangeRequestedMessage>(OnAlwaysOnTopChangeRequestedMessage);
-            MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
-        }
-        
-        public void Update(GameTime gameTime)
-        {
-            if (inputManager.RightClickJustPressed &&
-                graphicsDevice.Viewport.Bounds.Contains(inputManager.PointerPosition))
+            if (currentContextMenuStrip != null)
             {
-                OpenContextMenu(window.Position + inputManager.PointerPosition);
+                currentContextMenuStrip.Close();
             }
+
+            OpenContextMenu(inputManager.VirtualScreenPointerPosition, message.Target);
         }
 
-        private void OpenContextMenu(Point mousePosition)
+        private void OpenContextMenu(Point mousePosition, ICharacter target)
         {
-            if (open) return;
-            
             ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
             
-            ToolStripMenuItem characterItem = new ToolStripMenuItem("Character");
-            contextMenuStrip.Items.Add(characterItem);
+            ToolStripMenuItem switchCharacterItem = new ToolStripMenuItem("Character");
+            contextMenuStrip.Items.Add(switchCharacterItem);
 
-            SetupCharacterItems(characterItem);
+            SetupSwitchCharacterItems(switchCharacterItem, target);
 
             ToolStripMenuItem scaleItem = new ToolStripMenuItem("Scale");
             contextMenuStrip.Items.Add(scaleItem);
 
-            SetupScaleOptions(scaleItem);
+            SetupScaleOptions(scaleItem, target);
             
             ToolStripMenuItem settingsItem = new ToolStripMenuItem("Settings");
             contextMenuStrip.Items.Add(settingsItem);
             
-            SetupSettingsItems(settingsItem);
+            SetupSettingsItems(settingsItem, target);
             
-            ToolStripMenuItem savePresetItem = new ToolStripMenuItem("Save Preset...", null, (o, e) => { MessageBus.Send(new SavePresetRequestedMessage()); });
+            ToolStripMenuItem savePresetItem = new ToolStripMenuItem("Save Preset...", null, (o, e) => { MessageBus.Send(new SavePresetRequestedMessage() { Target = target }); });
             contextMenuStrip.Items.Add(savePresetItem);
+            
+            ToolStripMenuItem removeItem = new ToolStripMenuItem("Remove", null, (o, e) => { MessageBus.Send(new RemoveCharacterMessage() { Target = target }); });
+            contextMenuStrip.Items.Add(removeItem);
+
+            contextMenuStrip.Items.Add(new ToolStripSeparator());
+            
+            ToolStripMenuItem addCharacterItem = new ToolStripMenuItem("Add New");
+            contextMenuStrip.Items.Add(addCharacterItem);
+            
+            SetupAddCharacterItems(addCharacterItem, target);
             
             ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (o, e) => ShowInfoScreen());
             contextMenuStrip.Items.Add(infoItem);
 
             contextMenuStrip.Closed += (o, e) =>
             {
-                open = false;
-                MessageBus.Send(new ContextMenuStateChangedMessage() { Open = open });
+                currentContextMenuStrip = null;
+                MessageBus.Send(new ContextMenuStateChangedMessage() { Open = false });
             };
             
             contextMenuStrip.Opened += (o, e) =>
             {
-                open = true;
-                MessageBus.Send(new ContextMenuStateChangedMessage() { Open = open });
+                currentContextMenuStrip = contextMenuStrip;
+                MessageBus.Send(new ContextMenuStateChangedMessage() { Open = true });
             };
+            
             contextMenuStrip.Show(mousePosition.X, mousePosition.Y);
         }
 
-        private void SetupSettingsItems(ToolStripMenuItem settingsItem)
+        private void SetupSettingsItems(ToolStripMenuItem settingsItem, ICharacter target)
         {
-            ToolStripMenuItem idleMovementItem = new ToolStripMenuItem($"Idle Roaming", null, (o, e) => MessageBus.Send(new IdleMovementChangeRequestedMessage { Enabled = !idleMovementEnabled}));
-            idleMovementItem.Checked = idleMovementEnabled;
+            ToolStripMenuItem idleMovementItem = new ToolStripMenuItem($"Idle Roaming", null, (o, e) => MessageBus.Send(new IdleRoamingChangedMessage { Enabled = !target.Properties.IdleRoamingEnabled, Target = target}));
+            idleMovementItem.Checked = target.Properties.IdleRoamingEnabled;
             settingsItem.DropDownItems.Add(idleMovementItem);
             
             ToolStripMenuItem unfocusedMovementItem = new ToolStripMenuItem($"Unfocused Input", null, (o, e) =>
             {
-                MessageBus.Send(new UnfocusedMovementChangeRequestedMessage { Enabled = !unfocusedMovementEnabled });
-                MessageBus.Send(new AlwaysOnTopChangeRequestedMessage { Enabled = true });
+                MessageBus.Send(new UnfocusedMovementChangedMessage { Enabled = !target.Properties.UnfocusedInputEnabled, Target = target});
             });
-            unfocusedMovementItem.Checked = unfocusedMovementEnabled;
+            unfocusedMovementItem.Checked = target.Properties.UnfocusedInputEnabled;
             settingsItem.DropDownItems.Add(unfocusedMovementItem);
-
-            ToolStripMenuItem alwaysOnTopItem = new ToolStripMenuItem($"Force Always on Top", null, (o, e) =>
-            {
-                if (unfocusedMovementEnabled && alwaysOnTopEnabled)
-                {
-                    WindowsUtils.ShowMessageBox("The Unfocused Input option requires Force Always on Top to be enabled. To disable Force Always on Top, please disable Unfocused Input first.", "Desktoptale", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-                
-                MessageBus.Send(new AlwaysOnTopChangeRequestedMessage { Enabled = !alwaysOnTopEnabled });
-            });
-            alwaysOnTopItem.Checked = alwaysOnTopEnabled;
-            settingsItem.DropDownItems.Add(alwaysOnTopItem);
 
             ToolStripMenuItem stayInWindowItem = new ToolStripMenuItem("Stay in Window", null, (o, e) => { });
             settingsItem.DropDownItems.Add(stayInWindowItem);
-            SetupWindowSelectItems(stayInWindowItem);
+            SetupWindowSelectItems(stayInWindowItem, target);
+            
+            settingsItem.DropDownItems.Add(new ToolStripSeparator());
+            
+            ToolStripMenuItem openCustomCharacterFolderItem = new ToolStripMenuItem("Custom Character Folder", null,
+            (o, e) =>
+            {
+                Process.Start(new ProcessStartInfo(Path.GetFullPath( Desktoptale.CustomCharacterPath )) { UseShellExecute = true });
+            });
+            settingsItem.DropDownItems.Add(openCustomCharacterFolderItem);
             
             ToolStripMenuItem associatePresetItem = new ToolStripMenuItem("Associate Preset Files", null, (o, e) => { MessageBus.Send(new SetPresetFileAssociationRequestedMessage()); });
             settingsItem.DropDownItems.Add(associatePresetItem);
         }
 
-        private void SetupCharacterItems(ToolStripMenuItem characterItem)
+        private void SetupSwitchCharacterItems(ToolStripMenuItem characterItem, ICharacter target)
         {
             IDictionary<string, ToolStripMenuItem> categoryItems = new Dictionary<string, ToolStripMenuItem>();
 
             foreach (CharacterType character in characterRegistry.GetAll())
             {
-                ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(character.Name, null, (o, e) => MessageBus.Send(new CharacterChangeRequestedMessage { Character = character }));
-                characterSelectItem.Checked = currentCharacter == character;
+                ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(character.Name, null, (o, e) => MessageBus.Send(new CharacterChangeRequestedMessage { Character = character, Target = target}));
+                characterSelectItem.Checked = target.Properties.Type == character;
                 
                 ToolStripMenuItem parent;
                 if (character.Category == null)
@@ -159,28 +145,58 @@ namespace Desktoptale
             }
         }
 
-        private void SetupScaleOptions(ToolStripMenuItem scaleItem)
+        private void SetupAddCharacterItems(ToolStripMenuItem characterItem, ICharacter target)
+        {
+            IDictionary<string, ToolStripMenuItem> categoryItems = new Dictionary<string, ToolStripMenuItem>();
+
+            foreach (CharacterType character in characterRegistry.GetAll())
+            {
+                ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(character.Name, null, (o, e) => MessageBus.Send(new AddCharacterRequestedMessage { Character = character, Target = target}));
+                
+                ToolStripMenuItem parent;
+                if (character.Category == null)
+                {
+                    parent = characterItem;
+                }
+                else
+                {
+                    if (!categoryItems.ContainsKey(character.Category))
+                    {
+                        ToolStripMenuItem categoryItem = new ToolStripMenuItem(character.Category);
+                        characterItem.DropDownItems.Add(categoryItem);
+                        categoryItems.Add(character.Category, categoryItem);
+                    }
+
+                    parent = categoryItems[character.Category];
+                }
+
+                parent.DropDownItems.Add(characterSelectItem);
+            }
+        }
+        
+        private void SetupScaleOptions(ToolStripMenuItem scaleItem, ICharacter target)
         {
             for (int i = 1; i < 9; i++)
             {
                 var scaleFactor = i;
-                ToolStripMenuItem scaleSelectItem = new ToolStripMenuItem($"{i}x", null, (o, e) => MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = scaleFactor }));
-                scaleSelectItem.Checked = currentScaleFactor == i;
+                ToolStripMenuItem scaleSelectItem = new ToolStripMenuItem($"{i}x", null, (o, e) => MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = scaleFactor, Target = target }));
+                scaleSelectItem.Checked = (int)target.Scale.X == i;
                 scaleItem.DropDownItems.Add(scaleSelectItem);
             }
         }
 
-        private void SetupWindowSelectItems(ToolStripMenuItem parent)
+        private void SetupWindowSelectItems(ToolStripMenuItem parent, ICharacter target)
         {
             ToolStripMenuItem noneItem = new ToolStripMenuItem("None", null, (o, e) =>
             {
-                MessageBus.Send(new ChangeContainingWindowMessage() { Window = null });
+                MessageBus.Send(new ChangeContainingWindowMessage() { Window = null, Target = target });
             });
-            noneItem.Checked = currentContainingWindow == null;
+            
+            noneItem.Checked = target.TrackedWindow == null;
             parent.DropDownItems.Add(noneItem);
             
-            IList<WindowsUtils.WindowInfo> windows = WindowsUtils.GetOpenWindows();
-            foreach (WindowsUtils.WindowInfo windowInfo in windows)
+            IList<WindowInfo> windows = WindowsUtils.GetOpenWindows();
+            foreach (WindowInfo windowInfo in windows)
             {
                 string title;
                 if (windowInfo.Title.Length > 50)
@@ -194,50 +210,16 @@ namespace Desktoptale
                 
                 ToolStripMenuItem item = new ToolStripMenuItem(title, null, (o, e) =>
                 {
-                    MessageBus.Send(new ChangeContainingWindowMessage() {Window = windowInfo});
+                    MessageBus.Send(new ChangeContainingWindowMessage() { Window = windowInfo, Target = target });
                 });
-                item.Checked = currentContainingWindow != null && currentContainingWindow.hWnd == windowInfo.hWnd;
+                item.Checked = target.TrackedWindow != null && target.TrackedWindow.Window.hWnd == windowInfo.hWnd;
                 parent.DropDownItems.Add(item);
             }
-        }
-        
-        private void OnScaleChangeRequestedMessage(ScaleChangeRequestedMessage message)
-        {
-            currentScaleFactor = (int)message.ScaleFactor;
-        }
-
-        private void OnCharacterChangeSuccessMessage(CharacterChangeSuccessMessage message)
-        {
-            currentCharacter = message.Character;
-        }
-        
-        private void OnIdleMovementChangeRequestedMessage(IdleMovementChangeRequestedMessage message)
-        {
-            idleMovementEnabled = message.Enabled;
-        }
-        
-        private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangeRequestedMessage message)
-        {
-            unfocusedMovementEnabled = message.Enabled;
-        }
-        
-        private void OnChangeContainingWindowMessage(ChangeContainingWindowMessage message)
-        {
-            currentContainingWindow = message.Window;
-        }
-
-        private void OnAlwaysOnTopChangeRequestedMessage(AlwaysOnTopChangeRequestedMessage message)
-        {
-            alwaysOnTopEnabled = message.Enabled;
         }
 
         private void ShowInfoScreen()
         {
             WindowsUtils.ShowMessageBox($"{ProgramInfo.NAME} {ProgramInfo.VERSION}\nCreated by {ProgramInfo.AUTHOR}\n\n{ProgramInfo.CREDITS}\n{ProgramInfo.DISCLAIMER}", "About", MessageBoxButtons.OK, MessageBoxIcon.None);
         }
-
-        public void LoadContent(ContentManager contentManager) {}
-        public void Draw(GameTime gameTime) {}
-        public void Dispose() {}
     }
 }

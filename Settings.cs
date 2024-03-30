@@ -18,9 +18,6 @@ namespace Desktoptale
         
         [Option("unfocused-input", HelpText = "Whether to enable the Unfocused Input option", Default = false)]
         public bool UnfocusedInput { get; set; }
-
-        [Option("always-on-top", HelpText = "Whether to continuously force the character to be on top of everything else", Default = false)]
-        public bool AlwaysOnTop { get; set; }
         
         [Option("window", HelpText = "The window the character should stay in", Default = null)]
         public string Window { get; set; }
@@ -31,7 +28,6 @@ namespace Desktoptale
         public void Validate()
         {
             if (Scale < 1) Scale = 1;
-            if (UnfocusedInput) AlwaysOnTop = true;
         }
     }
 }
