@@ -14,8 +14,9 @@ namespace Desktoptale
     {
         private InputManager inputManager;
         private IRegistry<CharacterType, string> characterRegistry;
-
         private ContextMenuStrip currentContextMenuStrip = null;
+
+        private bool clickThrough = false;
 
         public ContextMenu(InputManager inputManager, IRegistry<CharacterType, string> characterRegistry)
         {
@@ -23,6 +24,7 @@ namespace Desktoptale
             this.characterRegistry = characterRegistry;
             
             MessageBus.Subscribe<OpenContextMenuRequestedMessage>(OnOpenContextMenuRequested);
+            MessageBus.Subscribe<ClickThroughChangedMessage>(OnClickThroughChangedMessage);
         }
         
         private void OnOpenContextMenuRequested(OpenContextMenuRequestedMessage message)
@@ -49,10 +51,10 @@ namespace Desktoptale
 
             SetupScaleOptions(scaleItem, target);
             
-            ToolStripMenuItem settingsItem = new ToolStripMenuItem("Settings");
-            contextMenuStrip.Items.Add(settingsItem);
+            ToolStripMenuItem behaviorSettingsItem = new ToolStripMenuItem("Behavior");
+            contextMenuStrip.Items.Add(behaviorSettingsItem);
             
-            SetupSettingsItems(settingsItem, target);
+            SetupBehaviorSettingsItems(behaviorSettingsItem, target);
             
             ToolStripMenuItem savePresetItem = new ToolStripMenuItem("Save Preset...", null, (o, e) => { MessageBus.Send(new SavePresetRequestedMessage() { Target = target }); });
             contextMenuStrip.Items.Add(savePresetItem);
@@ -66,6 +68,11 @@ namespace Desktoptale
             contextMenuStrip.Items.Add(addCharacterItem);
             
             SetupAddCharacterItems(addCharacterItem, target);
+            
+            ToolStripMenuItem globalSettingsItem = new ToolStripMenuItem("Settings");
+            contextMenuStrip.Items.Add(globalSettingsItem);
+            
+            SetupGlobalSettingsItems(globalSettingsItem, target);
             
             ToolStripMenuItem infoItem = new ToolStripMenuItem("About", null, (o, e) => ShowInfoScreen());
             contextMenuStrip.Items.Add(infoItem);
@@ -85,7 +92,7 @@ namespace Desktoptale
             contextMenuStrip.Show(mousePosition.X, mousePosition.Y);
         }
 
-        private void SetupSettingsItems(ToolStripMenuItem settingsItem, ICharacter target)
+        private void SetupBehaviorSettingsItems(ToolStripMenuItem settingsItem, ICharacter target)
         {
             ToolStripMenuItem idleMovementItem = new ToolStripMenuItem($"Idle Roaming", null, (o, e) => MessageBus.Send(new IdleRoamingChangedMessage { Enabled = !target.Properties.IdleRoamingEnabled, Target = target}));
             idleMovementItem.Checked = target.Properties.IdleRoamingEnabled;
@@ -101,14 +108,19 @@ namespace Desktoptale
             ToolStripMenuItem stayInWindowItem = new ToolStripMenuItem("Stay in Window", null, (o, e) => { });
             settingsItem.DropDownItems.Add(stayInWindowItem);
             SetupWindowSelectItems(stayInWindowItem, target);
+        }
+        
+        private void SetupGlobalSettingsItems(ToolStripMenuItem settingsItem, ICharacter target)
+        {
+            ToolStripMenuItem clickThroughItem = new ToolStripMenuItem("Make Click-Through", null, (o, e) => { MessageBus.Send(new ClickThroughChangedMessage() { Enabled = !clickThrough }); });
+            clickThroughItem.Checked = clickThrough;
+            settingsItem.DropDownItems.Add(clickThroughItem);
             
-            settingsItem.DropDownItems.Add(new ToolStripSeparator());
-            
-            ToolStripMenuItem openCustomCharacterFolderItem = new ToolStripMenuItem("Custom Character Folder", null,
-            (o, e) =>
-            {
-                Process.Start(new ProcessStartInfo(Path.GetFullPath( Desktoptale.CustomCharacterPath )) { UseShellExecute = true });
-            });
+            ToolStripMenuItem openCustomCharacterFolderItem = new ToolStripMenuItem("Open Custom Character Folder", null,
+                (o, e) =>
+                {
+                    Process.Start(new ProcessStartInfo(Path.GetFullPath( Desktoptale.CustomCharacterPath )) { UseShellExecute = true });
+                });
             settingsItem.DropDownItems.Add(openCustomCharacterFolderItem);
             
             ToolStripMenuItem associatePresetItem = new ToolStripMenuItem("Associate Preset Files", null, (o, e) => { MessageBus.Send(new SetPresetFileAssociationRequestedMessage()); });
@@ -214,6 +226,20 @@ namespace Desktoptale
                 });
                 item.Checked = target.TrackedWindow != null && target.TrackedWindow.Window.hWnd == windowInfo.hWnd;
                 parent.DropDownItems.Add(item);
+            }
+        }
+
+        private void OnClickThroughChangedMessage(ClickThroughChangedMessage message)
+        {
+            clickThrough = message.Enabled;
+
+            if (clickThrough)
+            {
+                var result = WindowsUtils.ShowMessageBox("Characters will not react to the mouse in this mode unless CTRL is held down. Do you want to enable Click-Through Mode?", "Desktoptale", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                if (result == DialogResult.Cancel)
+                {
+                    MessageBus.Send(new ClickThroughChangedMessage() { Enabled = !clickThrough });
+                }
             }
         }
 

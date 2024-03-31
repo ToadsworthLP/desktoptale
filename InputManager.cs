@@ -17,6 +17,7 @@ namespace Desktoptale
         public bool RightClickPressed { get; private set; }
         public bool RightClickJustPressed { get; private set; }
         public bool RunButtonPressed { get; private set; }
+        public bool ClickThroughTogglePressed { get; private set; }
 
         private bool previousFrameLeftClick, previousFrameRightClick;
         private Game game;
@@ -62,6 +63,8 @@ namespace Desktoptale
             DirectionalInput = input;
 
             RunButtonPressed = keyboardState.IsKeyDown(Keys.X) || keyboardState.IsKeyDown(Keys.LeftShift);
+
+            ClickThroughTogglePressed = keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl);
         }
 
         private void UpdateMouseInput()

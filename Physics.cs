@@ -12,17 +12,29 @@ namespace Desktoptale
         
         private ISet<IPhysicsObject> colliders;
         private InputManager inputManager;
+        private bool clickThrough;
 
         public Physics(InputManager inputManager)
         {
             this.inputManager = inputManager;
             
             colliders = new HashSet<IPhysicsObject>();
+
+            MessageBus.Subscribe<ClickThroughChangedMessage>(OnClickThroughChangedMessage);
         }
 
         public void Update()
         {
-            IPhysicsObject physicsObject = GetColliderAtPosition(inputManager.PointerPosition.ToVector2());
+            IPhysicsObject physicsObject;
+            if (clickThrough && !inputManager.ClickThroughTogglePressed)
+            {
+                physicsObject = null;
+            }
+            else
+            {
+               physicsObject = GetColliderAtPosition(inputManager.PointerPosition.ToVector2());
+            }
+            
             if (PhysicsObjectUnderCursor != physicsObject) HasColliderUnderCursorChanged = true;
             PhysicsObjectUnderCursor = physicsObject;
             
@@ -59,6 +71,11 @@ namespace Desktoptale
             }
             
             return result;
+        }
+        
+        private void OnClickThroughChangedMessage(ClickThroughChangedMessage message)
+        {
+            clickThrough = message.Enabled;
         }
     }
 }
