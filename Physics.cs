@@ -26,7 +26,7 @@ namespace Desktoptale
         public void Update()
         {
             IPhysicsObject physicsObject;
-            if (clickThrough && !inputManager.ClickThroughTogglePressed)
+            if (clickThrough && !inputManager.CtrlPressed)
             {
                 physicsObject = null;
             }

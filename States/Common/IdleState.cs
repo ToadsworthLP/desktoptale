@@ -12,7 +12,7 @@ namespace Desktoptale.States.Common
     
         public IdleState()
         {
-            rng = new Random();
+            rng = new Random(GetHashCode());
         }
     
         public virtual void Enter(StateEnterContext<Character> context)

@@ -17,7 +17,8 @@ namespace Desktoptale
         public bool RightClickPressed { get; private set; }
         public bool RightClickJustPressed { get; private set; }
         public bool RunButtonPressed { get; private set; }
-        public bool ClickThroughTogglePressed { get; private set; }
+        public bool ShiftPressed { get; private set; }
+        public bool CtrlPressed { get; private set; }
 
         private bool previousFrameLeftClick, previousFrameRightClick;
         private Game game;
@@ -64,7 +65,8 @@ namespace Desktoptale
 
             RunButtonPressed = keyboardState.IsKeyDown(Keys.X) || keyboardState.IsKeyDown(Keys.LeftShift);
 
-            ClickThroughTogglePressed = keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl);
+            CtrlPressed = keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl);
+            ShiftPressed = keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift);
         }
 
         private void UpdateMouseInput()
@@ -75,11 +77,9 @@ namespace Desktoptale
             MouseState mouseState = Mouse.GetState();
             
             LeftClickPressed = mouseState.LeftButton == ButtonState.Pressed;
-            //if (LeftClickPressed) LeftClickJustPressed = !previousFrameLeftClick;
             LeftClickJustPressed = LeftClickPressed && !previousFrameLeftClick;
             
             RightClickPressed = mouseState.RightButton == ButtonState.Pressed;
-            //if (RightClickPressed) RightClickJustPressed = !previousFrameRightClick;
             RightClickJustPressed = RightClickPressed && !previousFrameRightClick;
 
             PointerPosition = mouseState.Position;

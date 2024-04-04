@@ -23,7 +23,7 @@ namespace Desktoptale.States.Common
 
         public RandomMovementState(float speed)
         {
-            rng = new Random();
+            rng = new Random(GetHashCode());
             this.speed = speed;
         }
     

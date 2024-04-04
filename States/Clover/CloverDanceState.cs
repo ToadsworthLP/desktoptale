@@ -10,7 +10,7 @@ namespace Desktoptale.States.Clover
         
         public CloverDanceState()
         {
-            rng = new Random();
+            rng = new Random(GetHashCode());
         }
         
         public void Enter(StateEnterContext<Character> context)

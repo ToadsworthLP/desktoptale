@@ -116,6 +116,54 @@ namespace Desktoptale
             clickThroughItem.Checked = clickThrough;
             settingsItem.DropDownItems.Add(clickThroughItem);
             
+            ToolStripMenuItem challengeModeItem = new ToolStripMenuItem("Challenge Mode", null, (o, e) => { });
+            settingsItem.DropDownItems.Add(challengeModeItem);
+
+            if (inputManager.ShiftPressed)
+            {
+                challengeModeItem.DropDownItems.Add(new ToolStripMenuItem("1000 Characters", null, (o, e) =>
+                {
+                    ActivateChallengeMode(target, 1000);
+                }));
+            
+                challengeModeItem.DropDownItems.Add(new ToolStripMenuItem("2000 Characters", null, (o, e) =>
+                {
+                    ActivateChallengeMode(target, 2000);
+                }));
+            
+                challengeModeItem.DropDownItems.Add(new ToolStripMenuItem("5000 Characters", null, (o, e) =>
+                {
+                    ActivateChallengeMode(target, 5000);
+                }));
+            
+                challengeModeItem.DropDownItems.Add(new ToolStripMenuItem("10000 Characters", null, (o, e) =>
+                {
+                    ActivateChallengeMode(target, 10000);
+                }));
+            }
+            else
+            {
+                challengeModeItem.DropDownItems.Add(new ToolStripMenuItem("100 Characters", null, (o, e) =>
+                {
+                    ActivateChallengeMode(target, 100);
+                }));
+            
+                challengeModeItem.DropDownItems.Add(new ToolStripMenuItem("200 Characters", null, (o, e) =>
+                {
+                    ActivateChallengeMode(target, 200);
+                }));
+            
+                challengeModeItem.DropDownItems.Add(new ToolStripMenuItem("500 Characters", null, (o, e) =>
+                {
+                    ActivateChallengeMode(target, 500);
+                }));
+            
+                challengeModeItem.DropDownItems.Add(new ToolStripMenuItem("1000 Characters", null, (o, e) =>
+                {
+                    ActivateChallengeMode(target, 1000);
+                }));
+            }
+            
             ToolStripMenuItem openCustomCharacterFolderItem = new ToolStripMenuItem("Open Custom Character Folder", null,
                 (o, e) =>
                 {
@@ -235,7 +283,7 @@ namespace Desktoptale
 
             if (clickThrough)
             {
-                var result = WindowsUtils.ShowMessageBox("Characters will not react to the mouse in this mode unless CTRL is held down. Do you want to enable Click-Through Mode?", "Desktoptale", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                var result = WindowsUtils.ShowMessageBox("Characters will not react to the mouse in this mode unless CTRL is held down.\n\nDo you want to enable Click-Through Mode?", "Desktoptale", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                 if (result == DialogResult.Cancel)
                 {
                     MessageBus.Send(new ClickThroughChangedMessage() { Enabled = !clickThrough });
@@ -243,6 +291,19 @@ namespace Desktoptale
             }
         }
 
+        private void ActivateChallengeMode(ICharacter target, int count)
+        {
+            DialogResult result = WindowsUtils.ShowMessageBox($"This will duplicate the selected character {count} times. The current sprite scale as well as its behavior settings will be applied to all resulting copies.\n\nDo you want to proceed?", "Desktoptale", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+
+            if (result == DialogResult.OK)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    MessageBus.Send(new AddCharacterRequestedMessage { Character = target.Properties.Type, Target = target });
+                }
+            }
+        }
+        
         private void ShowInfoScreen()
         {
             WindowsUtils.ShowMessageBox($"{ProgramInfo.NAME} {ProgramInfo.VERSION}\nCreated by {ProgramInfo.AUTHOR}\n\n{ProgramInfo.CREDITS}\n{ProgramInfo.DISCLAIMER}", "About", MessageBoxButtons.OK, MessageBoxIcon.None);

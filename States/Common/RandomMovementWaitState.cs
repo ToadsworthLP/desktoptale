@@ -11,7 +11,7 @@ namespace Desktoptale.States.Common
     
         public RandomMovementWaitState()
         {
-            rng = new Random();
+            rng = new Random(GetHashCode());
         }
     
         public virtual void Enter(StateEnterContext<Character> context)
