@@ -19,7 +19,7 @@ namespace Desktoptale
     {
         public static string ApplicationPath { get; private set; }
         public static string CustomCharacterPath { get; private set; }
-        
+
         private Settings settings;
         private IRegistry<CharacterType, string> characterRegistry { get; }
         
@@ -40,6 +40,7 @@ namespace Desktoptale
         private WindowInfo containingWindow;
         private Point defaultCharacterStartPosition;
         private Random rng = new Random();
+        private bool globalPause = false;
 
         private readonly Color clearColor = new Color(0f, 0f, 0f, 0f);
 
@@ -83,6 +84,7 @@ namespace Desktoptale
             MessageBus.Subscribe<CharacterChangeRequestedMessage>(OnCharacterChangeRequestedMessage);
             MessageBus.Subscribe<DisplaySettingsChangedMessage>(OnDisplaySettingsChangedMessage);
             MessageBus.Subscribe<AddCharacterRequestedMessage>(OnAddCharacterRequestedMessage);
+            MessageBus.Subscribe<GlobalPauseMessage>(OnGlobalPauseMessage);
 
             inputManager = new InputManager(this, GraphicsDevice, monitorManager);
             presetManager = new PresetManager(characterRegistry);
@@ -98,6 +100,20 @@ namespace Desktoptale
             UpdateWindow();
             
             AddCharacterFromSettings(settings);
+        }
+
+        private void OnGlobalPauseMessage(GlobalPauseMessage message)
+        {
+            globalPause = message.Paused;
+
+            if (message.Paused)
+            {
+                WindowsUtils.MakeClickthrough(Window);
+            }
+            else
+            {
+                WindowsUtils.MakeTopmostWindow(Window);
+            }
         }
         
         private void OnOtherInstanceStartedMessage(OtherInstanceStartedMessage message)
@@ -186,6 +202,8 @@ namespace Desktoptale
 
         protected override void Update(GameTime gameTime)
         {
+            if (globalPause) return;
+            
             if (firstFrame)
             {
                 WindowsUtils.PrepareWindow(Window);

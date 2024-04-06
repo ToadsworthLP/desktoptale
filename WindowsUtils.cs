@@ -14,6 +14,8 @@ namespace Desktoptale
 {
     public class WindowsUtils
     {
+        public static IntPtr MainWindowHwnd { get; private set; }
+        
         #region DllImports
         [DllImport("kernel32.dll")]
         private static extern void SetLastError(uint dwErrCode);
@@ -190,6 +192,8 @@ namespace Desktoptale
             int[] margins = { -1 };
             SetLastError(0);
             DwmExtendFrameIntoClientArea(window.Handle, ref margins);
+
+            MainWindowHwnd = window.Handle;
         }
 
         public static void MakeClickable(GameWindow window)
@@ -199,7 +203,7 @@ namespace Desktoptale
         
         public static void MakeClickthrough(GameWindow window)
         {
-            SetWindowLong(window.Handle, GWL_EXSTYLE, WS_EX_TRANSPARENT |WS_EX_LAYERED | WS_EX_TOPMOST);
+            SetWindowLong(window.Handle, GWL_EXSTYLE, WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOPMOST);
         }
 
         public static void MakeTopmostWindow(GameWindow window)
@@ -305,6 +309,11 @@ namespace Desktoptale
         public static DialogResult ShowMessageBox(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
         {
             return MessageBox.Show(text, caption, buttons, icon);
+        }
+
+        public static void ShowDuplicateOptionsForm(Action<int> successAction, Action cancelAction)
+        {
+            DuplicateOptionsForm.Show(successAction, cancelAction);
         }
 
         public static SaveDialogResult OpenSaveDialog(string filter, string defaultName = "")
