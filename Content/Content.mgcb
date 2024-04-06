@@ -856,18 +856,6 @@
 /processorParam:TextureFormat=Color
 /build:Included/Flowey/Spr_Flowey_Idle_Left.png
 
-#begin Included/Flowey/Spr_Flowey_Idle_Right.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Included/Flowey/Spr_Flowey_Idle_Right.png
-
 #begin Included/Flowey/Spr_Flowey_Idle_Up.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -879,6 +867,42 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Included/Flowey/Spr_Flowey_Idle_Up.png
+
+#begin Included/Flowey/Spr_FloweyNewCut_Idle_Down.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Flowey/Spr_FloweyNewCut_Idle_Down.png
+
+#begin Included/Flowey/Spr_FloweyNewCut_Idle_Left.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Flowey/Spr_FloweyNewCut_Idle_Left.png
+
+#begin Included/Flowey/Spr_FloweyNewCut_Idle_Up.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Flowey/Spr_FloweyNewCut_Idle_Up.png
 
 #begin Included/Frisk/Spr_Frisk_Walk_Down.png
 /importer:TextureImporter
