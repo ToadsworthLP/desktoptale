@@ -178,7 +178,7 @@ namespace Desktoptale.Characters
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2f, CurrentSprite.FrameSize.Y / 2f);
+            Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2, CurrentSprite.FrameSize.Y / 2);
             CurrentSprite.Draw(spriteBatch, Position, Color.White, 0, origin, Scale, SpriteEffects.None, Depth);
         }
 
