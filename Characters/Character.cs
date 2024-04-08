@@ -83,7 +83,6 @@ namespace Desktoptale.Characters
         private Subscription focusCharacterSubscription;
         private Subscription unfocusCharacterSubscription;
         private Subscription changeContainingWindowSubscription;
-        private bool orientationLock;
 
         public Character(CharacterCreationContext characterCreationContext)
         {
@@ -296,25 +295,18 @@ namespace Desktoptale.Characters
 
         private Orientation? GetOrientationFromVelocity(Vector2 input)
         {
-			if (!orientationLock)
-			{
-				if (input.Y < -float.Epsilon) return Orientation.Up; orientationLock = true;
-				if (input.Y > float.Epsilon) return Orientation.Down; orientationLock = true;
-				if (input.X < -float.Epsilon) return Orientation.Left; orientationLock = true;
-				if (input.X > float.Epsilon) return Orientation.Right; orientationLock = true;
-			}
-			else 
-			{
-				if (
-					(Orientation == Orientation.Up && input.Y >= -float.Epsilon) ||
-					(Orientation == Orientation.Down && input.Y <= float.Epsilon) ||
-					(Orientation == Orientation.Left && input.X >= -float.Epsilon) ||
-					(Orientation == Orientation.Right && input.X <= float.Epsilon)
-				)
-				{
-					orientationLock = false;
-				}
-			}
+            bool orientationLock = !((Orientation == Orientation.Up && input.Y >= -float.Epsilon) ||
+                                    (Orientation == Orientation.Down && input.Y <= float.Epsilon) ||
+                                    (Orientation == Orientation.Left && input.X >= -float.Epsilon) ||
+                                    (Orientation == Orientation.Right && input.X <= float.Epsilon));
+            
+            if (!orientationLock)
+            {
+                if (input.Y < -float.Epsilon) return Orientation.Up;
+                if (input.Y > float.Epsilon) return Orientation.Down;
+                if (input.X < -float.Epsilon) return Orientation.Left;
+                if (input.X > float.Epsilon) return Orientation.Right;
+            }
 
             return null;
         }
