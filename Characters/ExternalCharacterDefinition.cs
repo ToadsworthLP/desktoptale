@@ -7,6 +7,8 @@
         public ExternalCharacterStateDefinition Idle { get; set; }
         public ExternalCharacterStateDefinition Walk { get; set; }
         public ExternalCharacterStateDefinition Run { get; set; }
+        public ExternalCharacterStateDefinition Drag { get; set; }
+        public ExternalCharacterStateDefinition Action { get; set; }
         
         public class ExternalCharacterStateDefinition
         {
@@ -22,6 +24,7 @@
             public double FrameRate { get; set; }
             public int FrameCount { get; set; } = 1;
             public int StartFrame { get; set; }
+            public bool Loop { get; set; } = true;
         }
     }
 }

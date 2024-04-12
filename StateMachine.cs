@@ -5,8 +5,9 @@ namespace Desktoptale
 {
     public class StateMachine<T>
     {
+        public IState<T> CurrentState { get; private set; }
+        
         private T target;
-        private IState<T> currentState;
         private TimeSpan currentTime;
         private TimeSpan lastStateChangeTime;
         private StateUpdateContext<T> lastUpdateContext;
@@ -19,10 +20,10 @@ namespace Desktoptale
         {
             this.target = target;
             
-            currentState = initialState;
+            CurrentState = initialState;
             currentTime = TimeSpan.Zero;
             
-            currentState.Enter(new StateEnterContext<T>()
+            CurrentState.Enter(new StateEnterContext<T>()
             {
                 PreviousState = null,
                 StateMachine = this,
@@ -48,24 +49,24 @@ namespace Desktoptale
                 Target = target
             };
             
-            currentState.Update(lastUpdateContext);
+            CurrentState.Update(lastUpdateContext);
         }
 
         public void ChangeState(IState<T> newState)
         {
-            IState<T> previousState = currentState;
+            IState<T> previousState = CurrentState;
             
-            currentState.Exit(new StateExitContext<T>()
+            CurrentState.Exit(new StateExitContext<T>()
             {
                 NextState = newState,
                 StateMachine = this,
                 Target = target
             });
             
-            currentState = newState;
+            CurrentState = newState;
             lastStateChangeTime = currentTime;
             
-            currentState.Enter(new StateEnterContext<T>()
+            CurrentState.Enter(new StateEnterContext<T>()
             {
                 PreviousState = previousState,
                 StateMachine = this,
@@ -74,7 +75,7 @@ namespace Desktoptale
 
             StateChanged?.Invoke(previousState, newState);
             
-            currentState.Update(new StateUpdateContext<T>
+            CurrentState.Update(new StateUpdateContext<T>
             {
                 Time = lastUpdateContext.Time,
                 LastStateChangeTime = lastStateChangeTime,

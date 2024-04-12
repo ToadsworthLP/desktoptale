@@ -23,6 +23,7 @@ namespace Desktoptale.Characters
 
             deserializer = new DeserializerBuilder()
                 .WithNamingConvention(PascalCaseNamingConvention.Instance)
+                .IgnoreUnmatchedProperties()
                 .Build();
         }
 
@@ -82,6 +83,16 @@ namespace Desktoptale.Characters
                 {
                     SetupState((s) => externalCharacter.RunSprite = s, externalCharacterDefinition.Run, basePath);
                 }
+
+                if (externalCharacterDefinition.Drag != null)
+                {
+                    SetupState((s) => externalCharacter.DragSprite = s, externalCharacterDefinition.Drag, basePath);
+                }
+                
+                if (externalCharacterDefinition.Action != null)
+                {
+                    SetupState((s) => externalCharacter.ActionSprite = s, externalCharacterDefinition.Action, basePath);
+                }
                 
                 return externalCharacter;
             });
@@ -92,7 +103,17 @@ namespace Desktoptale.Characters
         private void SetupState(Action<IAnimatedSprite> setter, ExternalCharacterDefinition.ExternalCharacterStateDefinition state, string basePath)
         {
             OrientedAnimatedSprite sprite;
-            if (state.Right == null)
+            if (state.Left == null && state.Right == null && state.Up == null && state.Down != null)
+            {
+                sprite = new OrientedAnimatedSprite(
+                    GetSpriteForOrientation(state.Down, basePath),
+                    GetSpriteForOrientation(state.Down, basePath),
+                    GetSpriteForOrientation(state.Down, basePath),
+                    GetSpriteForOrientation(state.Down, basePath),
+                    true
+                );
+            } 
+            else if (state.Right == null)
             {
                 sprite = new OrientedAnimatedSprite(
                     GetSpriteForOrientation(state.Up, basePath),
@@ -133,7 +154,7 @@ namespace Desktoptale.Characters
             
             AnimatedSprite sprite = new AnimatedSprite(texture, spriteDefinition.FrameCount);
             sprite.Framerate = spriteDefinition.FrameRate;
-            sprite.Loop = true;
+            sprite.Loop = spriteDefinition.Loop;
             sprite.StartFrame = spriteDefinition.StartFrame;
 
             return sprite;
@@ -176,6 +197,11 @@ namespace Desktoptale.Characters
 
         private bool ValidateCharacterStateDefinition(ExternalCharacterDefinition.ExternalCharacterStateDefinition state, string characterName, string stateName)
         {
+            if (state.Left == null && state.Right == null && state.Up == null && state.Down != null)
+            {
+                return ValidateCharacterSpriteDefinition(state.Down, characterName, stateName, "Down");
+            }
+            
             if (state.Down == null)
             {
                 ShowStateDefinitionError(characterName, stateName, "Orientation Down undefined.");

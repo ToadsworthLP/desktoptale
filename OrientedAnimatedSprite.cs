@@ -36,13 +36,15 @@ namespace Desktoptale
         {
             get => SpriteForOrientation(Orientation).Framerate;
             set
-        {
-            upSprite.Framerate = value;
-            downSprite.Framerate = value;
-            leftSprite.Framerate = value;
-            rightSprite.Framerate = value;
+            {
+                upSprite.Framerate = value;
+                downSprite.Framerate = value;
+                leftSprite.Framerate = value;
+                rightSprite.Framerate = value;
+            }
         }
-        }
+
+        public int FrameCount => SpriteForOrientation(Orientation).FrameCount;
     
         public int StartFrame {         
             get => SpriteForOrientation(Orientation).StartFrame;

@@ -9,6 +9,7 @@ namespace Desktoptale
         bool Playing { get;}
         bool Loop { get; set; }
         double Framerate { get; set; }
+        int FrameCount { get; }
         int StartFrame { get; set; }
         int CurrentFrameIndex { get; set; }
         Point FrameSize { get; }

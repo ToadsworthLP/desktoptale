@@ -1,4 +1,4 @@
-﻿using Desktoptale.States.Clover;
+﻿using Desktoptale.States.Common;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,17 +6,12 @@ namespace Desktoptale.Characters
 {
     public class Clover : Character
     {
-        public IState<Character> DanceState { get; protected set; }
-        public IAnimatedSprite DanceSprite { get; protected set; }
-        
         public Clover(CharacterCreationContext characterCreationContext) : base(characterCreationContext) {}
 
         public override void Initialize()
         {
             base.Initialize();
-
-            RandomMovementWaitState = new CloverRandomMovementWaitState();
-            DanceState = new CloverDanceState();
+            RandomActionState = new RandomActionState(4, 16);
         }
 
         public override void LoadContent(ContentManager contentManager)
@@ -60,7 +55,7 @@ namespace Desktoptale.Characters
             );
             danceSprite.Loop = true;
             danceSprite.Framerate = 7;
-            DanceSprite = danceSprite;
+            ActionSprite = danceSprite;
         }
     }
 }

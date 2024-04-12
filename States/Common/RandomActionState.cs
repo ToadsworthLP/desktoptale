@@ -1,26 +1,29 @@
 ﻿using System;
 using Desktoptale.Characters;
 
-namespace Desktoptale.States.Clover
+namespace Desktoptale.States.Common
 {
-    public class CloverDanceState : IState<Character>
+    public class RandomActionState : IState<Character>
     {
         private Random rng;
         private TimeSpan duration;
+        private int minLoops;
+        private int maxLoops;
         
-        public CloverDanceState()
+        public RandomActionState(int minLoops = 1, int maxLoops = 1)
         {
+            this.minLoops = minLoops;
+            this.maxLoops = maxLoops;
+            
             rng = new Random(GetHashCode());
         }
         
         public void Enter(StateEnterContext<Character> context)
         {
-            Characters.Clover clover = (Characters.Clover)context.Target;
+            int loops = rng.Next(minLoops, maxLoops + 1);
+            duration = TimeSpan.FromSeconds((1/context.Target.ActionSprite.Framerate) * context.Target.ActionSprite.FrameCount * (context.Target.ActionSprite.Loop ? loops : 1));
             
-            int loops = rng.Next(4, 17);
-            duration = TimeSpan.FromSeconds((1/clover.DanceSprite.Framerate) * 6 * loops);
-            
-            context.Target.UpdateSprite(clover.DanceSprite);
+            context.Target.UpdateSprite(context.Target.ActionSprite);
             context.Target.CurrentSprite.Play();
         }
 

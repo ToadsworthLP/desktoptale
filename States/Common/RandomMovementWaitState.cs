@@ -1,6 +1,7 @@
 ﻿using System;
 using Desktoptale.Characters;
-using Microsoft.Xna.Framework;
+using SharpDX;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Desktoptale.States.Common
 {
@@ -8,9 +9,13 @@ namespace Desktoptale.States.Common
     {
         protected TimeSpan duration;
         protected Random rng;
+
+        private float actionProbability;
     
-        public RandomMovementWaitState()
+        public RandomMovementWaitState(float actionProbability = 0.01f)
         {
+            this.actionProbability = actionProbability;
+            
             rng = new Random(GetHashCode());
         }
     
@@ -40,7 +45,23 @@ namespace Desktoptale.States.Common
             
             if (context.StateTime > duration)
             {
-                context.StateMachine.ChangeState(context.Target.RandomMovementState);
+                if (context.Target.ActionSprite == null)
+                {
+                    context.StateMachine.ChangeState(context.Target.RandomMovementState);
+                }
+                else
+                {
+                    float random = rng.NextFloat(0f, 1f);
+                    if (random <= actionProbability)
+                    {
+                        context.StateMachine.ChangeState(context.Target.RandomActionState);
+                    }
+                    else
+                    {
+                        context.StateMachine.ChangeState(context.Target.RandomMovementState);
+                    }
+                }
+                
                 return;
             }
         }

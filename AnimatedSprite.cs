@@ -9,6 +9,7 @@ namespace Desktoptale
         public bool Playing { get; private set; }
         public bool Loop { get; set; }
         public double Framerate { get; set; }
+        public int FrameCount { get; private set; }
 
         public int StartFrame
         {
@@ -24,7 +25,6 @@ namespace Desktoptale
         public Point FrameSize { get; }
 
         private Texture2D spritesheet;
-        private int frameCount;
         private bool justStarted;
         private TimeSpan nextFrameUpdate;
         private int startFrame;
@@ -32,7 +32,7 @@ namespace Desktoptale
         public AnimatedSprite(Texture2D spritesheet, int frameCount)
         {
             this.spritesheet = spritesheet;
-            this.frameCount = frameCount;
+            this.FrameCount = frameCount;
             FrameSize = new Point(spritesheet.Width / frameCount, spritesheet.Height);
         }
     
@@ -55,7 +55,7 @@ namespace Desktoptale
 
         public void Update(GameTime gameTime)
         {
-            if (Playing && frameCount > 1)
+            if (Playing && FrameCount > 1)
             {
                 if (justStarted)
                 {
@@ -69,7 +69,7 @@ namespace Desktoptale
                     TimeSpan nextScheduledUpdate = Framerate == 0 ? TimeSpan.MaxValue : gameTime.TotalGameTime + TimeSpan.FromSeconds(1 / Framerate);
                     nextFrameUpdate = nextScheduledUpdate;
 
-                    if (CurrentFrameIndex < frameCount - 1)
+                    if (CurrentFrameIndex < FrameCount - 1)
                     {
                         CurrentFrameIndex++;
                     }

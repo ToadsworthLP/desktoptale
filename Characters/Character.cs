@@ -39,11 +39,17 @@ namespace Desktoptale.Characters
         public IState<Character> RunState { get; protected set; }
         public IState<Character> RandomMovementState { get; protected set; }
         public IState<Character> RandomMovementWaitState { get; protected set; }
+        public IState<Character> DragState { get; protected set; }
+        public IState<Character> ActionState { get; protected set; }
+        public IState<Character> RandomActionState { get; protected set; }
     
         public IAnimatedSprite IdleSprite { get; set; }
         public IAnimatedSprite WalkSprite { get; set; }
         public IAnimatedSprite RunSprite { get; set; }
         public IAnimatedSprite CurrentSprite { get; set; }
+        public IAnimatedSprite DragSprite { get; set; }
+        public IAnimatedSprite ActionSprite { get; set; }
+        
         public bool IsBeingDragged => dragging;
         public bool IdleRoamingEnabled
         {
@@ -64,13 +70,16 @@ namespace Desktoptale.Characters
         protected MonitorManager MonitorManager;
         protected WindowTracker WindowTracker;
 
+        private static readonly TimeSpan dragStateTransitionDelay = TimeSpan.FromMilliseconds(100);
+        
         private CharacterProperties properties;
-
         private TrackedWindow trackedWindow;
-
+        
+        private TimeSpan time = TimeSpan.Zero;
         private bool focused;
         private bool enableDragging = true;
         private bool dragging;
+        private TimeSpan dragStateTransitionTime = TimeSpan.MinValue;
         private Vector2 previousPosition;
         private bool firstFrame = true;
         private Point maxFrameSize;
@@ -101,7 +110,7 @@ namespace Desktoptale.Characters
         public virtual void Initialize()
         {
             Random random = new Random(GetHashCode());
-            depthOffset = (float)((random.NextDouble() % 0.0001d) - 0.00005d);
+            depthOffset = (float)((random.NextDouble() % 0.0002d) - 0.0001d);
             
             scaleChangeRequestedSubscription = MessageBus.Subscribe<ScaleChangeRequestedMessage>(OnScaleChangeRequestedMessage);
             idleMovementChangeRequestedSubscription = MessageBus.Subscribe<IdleRoamingChangedMessage>(OnIdleRoamingChangedMessage);
@@ -116,6 +125,9 @@ namespace Desktoptale.Characters
             RunState = new RunState(180f, true);
             RandomMovementState = new RandomMovementState(90);
             RandomMovementWaitState = new RandomMovementWaitState();
+            DragState = new DragState();
+            ActionState = new ActionState();
+            RandomActionState = new RandomActionState();
         
             StateMachine = new StateMachine<Character>(this, InitialState);
             StateMachine.StateChanged += (state, newState) => UpdateOrientation();
@@ -131,6 +143,8 @@ namespace Desktoptale.Characters
     
         public virtual void Update(GameTime gameTime)
         {
+            time = gameTime.TotalGameTime;
+            
             if (firstFrame)
             {
                 maxFrameSize = GetMaximumFrameSize();
@@ -315,6 +329,7 @@ namespace Desktoptale.Characters
         {
             MessageBus.Send(new FocusCharacterMessage() { Character = this });
             dragging = true;
+            dragStateTransitionTime = time + dragStateTransitionDelay;
         }
 
         public void OnRightClicked()
@@ -332,6 +347,19 @@ namespace Desktoptale.Characters
             if (dragging)
             {
                 Position = InputManager.PointerPosition.ToVector2();
+            }
+
+            if (DragSprite != null)
+            {
+                if (dragging && time > dragStateTransitionTime)
+                {
+                    if(StateMachine.CurrentState != DragState) StateMachine.ChangeState(DragState);
+                }
+
+                if (!dragging && StateMachine.CurrentState == DragState)
+                {
+                    StateMachine.ChangeState(IdleState);
+                }
             }
         }
 

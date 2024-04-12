@@ -19,6 +19,7 @@ namespace Desktoptale
         public bool RunButtonPressed { get; private set; }
         public bool ShiftPressed { get; private set; }
         public bool CtrlPressed { get; private set; }
+        public bool ActionButtonPressed { get; private set; }
 
         private bool previousFrameLeftClick, previousFrameRightClick;
         private Game game;
@@ -67,6 +68,7 @@ namespace Desktoptale
 
             CtrlPressed = keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl);
             ShiftPressed = keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift);
+            ActionButtonPressed = keyboardState.IsKeyDown(Keys.C);
         }
 
         private void UpdateMouseInput()
