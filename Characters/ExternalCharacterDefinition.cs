@@ -4,6 +4,8 @@
     {
         public string Name { get; set; }
         public string Category { get; set; }
+        public float? WalkSpeed { get; set; }
+        public float? RunSpeed { get; set; }
         public ExternalCharacterStateDefinition Idle { get; set; }
         public ExternalCharacterStateDefinition Walk { get; set; }
         public ExternalCharacterStateDefinition Run { get; set; }

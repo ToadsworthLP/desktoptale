@@ -1,4 +1,5 @@
 ﻿using Desktoptale.Characters;
+using Microsoft.Xna.Framework;
 
 namespace Desktoptale.States.Common
 {
@@ -32,6 +33,15 @@ namespace Desktoptale.States.Common
             {
                 context.StateMachine.ChangeState(context.Target.WalkState);
                 return;
+            }
+            
+            if (Speed < float.Epsilon)
+            {
+                Orientation? orientation = context.Target.GetOrientationFromVelocity(context.Target.InputManager.DirectionalInput);
+                if (orientation != null)
+                {
+                    context.Target.Orientation = orientation.Value;
+                }
             }
         
             context.Target.Velocity = 

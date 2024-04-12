@@ -6,6 +6,8 @@ namespace Desktoptale.Characters
     {
         public string Name { get; set; }
         public string Category { get; set; }
+        public float WalkSpeed { get; set; } = 90f;
+        public float RunSpeed { get; set; } = 180f;
         public Func<CharacterCreationContext, Character> FactoryFunction { get; set; }
 
         public CharacterType(string name, string category, Func<CharacterCreationContext, Character> factoryFunction)

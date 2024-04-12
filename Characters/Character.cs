@@ -121,8 +121,8 @@ namespace Desktoptale.Characters
             changeContainingWindowSubscription = MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
 
             IdleState = new IdleState();
-            WalkState = new WalkState(90f, true);
-            RunState = new RunState(180f, true);
+            WalkState = new WalkState(properties.Type.WalkSpeed, true);
+            RunState = new RunState(properties.Type.RunSpeed, true);
             RandomMovementState = new RandomMovementState(90);
             RandomMovementWaitState = new RandomMovementWaitState();
             DragState = new DragState();
@@ -211,6 +211,24 @@ namespace Desktoptale.Characters
                 WindowTracker.Unsubscribe(trackedWindow.Window);
                 trackedWindow.WindowDestroyed -= OnContainingWindowDestroyed;
             }
+        }
+        
+        public Orientation? GetOrientationFromVelocity(Vector2 input)
+        {
+            bool orientationLock = !((Orientation == Orientation.Up && input.Y >= -float.Epsilon) ||
+                                     (Orientation == Orientation.Down && input.Y <= float.Epsilon) ||
+                                     (Orientation == Orientation.Left && input.X >= -float.Epsilon) ||
+                                     (Orientation == Orientation.Right && input.X <= float.Epsilon));
+            
+            if (!orientationLock)
+            {
+                if (input.Y < -float.Epsilon) return Orientation.Up;
+                if (input.Y > float.Epsilon) return Orientation.Down;
+                if (input.X < -float.Epsilon) return Orientation.Left;
+                if (input.X > float.Epsilon) return Orientation.Right;
+            }
+
+            return null;
         }
 
         private void UpdatePhysicsProperties()
@@ -305,24 +323,6 @@ namespace Desktoptale.Characters
             {
                 Orientation = updatedOrientation.Value;
             }
-        }
-
-        private Orientation? GetOrientationFromVelocity(Vector2 input)
-        {
-            bool orientationLock = !((Orientation == Orientation.Up && input.Y >= -float.Epsilon) ||
-                                    (Orientation == Orientation.Down && input.Y <= float.Epsilon) ||
-                                    (Orientation == Orientation.Left && input.X >= -float.Epsilon) ||
-                                    (Orientation == Orientation.Right && input.X <= float.Epsilon));
-            
-            if (!orientationLock)
-            {
-                if (input.Y < -float.Epsilon) return Orientation.Up;
-                if (input.Y > float.Epsilon) return Orientation.Down;
-                if (input.X < -float.Epsilon) return Orientation.Left;
-                if (input.X > float.Epsilon) return Orientation.Right;
-            }
-
-            return null;
         }
         
         public void OnLeftClicked()

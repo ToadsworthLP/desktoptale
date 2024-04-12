@@ -1,5 +1,5 @@
 ﻿using System;
-using Desktoptale.States.Flowey;
+using Desktoptale.States.Common;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -7,8 +7,6 @@ namespace Desktoptale.Characters
 {
     public class Flowey : Character
     {
-        protected override IState<Character> InitialState => new FloweyIdleState();
-
         public Flowey(CharacterCreationContext characterCreationContext) : base(characterCreationContext) {}
     
         public override void Initialize()
@@ -16,6 +14,9 @@ namespace Desktoptale.Characters
             base.Initialize();
 
             IdleState = InitialState;
+            WalkState = new WalkState(0, true);
+            RunState = new RunState(0, true);
+            RandomMovementState = new RandomMovementState(0);
             EnabledAutoOrientation = false;
         }
         
@@ -47,6 +48,8 @@ namespace Desktoptale.Characters
             idleSprite.Loop = false;
             idleSprite.Framerate = 0;
             IdleSprite = idleSprite;
+            WalkSprite = idleSprite;
+            RunSprite = idleSprite;
         }
     }
 }

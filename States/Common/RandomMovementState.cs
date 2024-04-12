@@ -57,6 +57,15 @@ namespace Desktoptale.States.Common
                 context.StateMachine.ChangeState(context.Target.RandomMovementWaitState);
                 return;
             }
+            
+            if (speed < float.Epsilon)
+            {
+                Orientation? orientation = context.Target.GetOrientationFromVelocity(context.Target.InputManager.DirectionalInput);
+                if (orientation != null)
+                {
+                    context.Target.Orientation = orientation.Value;
+                }
+            }
         
             context.Target.Velocity = 
                 direction *

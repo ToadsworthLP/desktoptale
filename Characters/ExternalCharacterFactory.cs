@@ -97,6 +97,17 @@ namespace Desktoptale.Characters
                 return externalCharacter;
             });
 
+            if (externalCharacterDefinition.WalkSpeed.HasValue)
+            {
+                characterType.WalkSpeed = externalCharacterDefinition.WalkSpeed.Value;
+                characterType.RunSpeed = externalCharacterDefinition.WalkSpeed.Value * 2f;
+            }
+            
+            if (externalCharacterDefinition.RunSpeed.HasValue)
+            {
+                characterType.RunSpeed = externalCharacterDefinition.RunSpeed.Value;
+            }
+
             registry.Add(characterType);
         }
 
