@@ -30,6 +30,7 @@ namespace Desktoptale
         private MonitorManager monitorManager;
         private WindowTracker windowTracker;
         private ContextMenu contextMenu;
+        private InteractionManager interactionManager;
         private Physics physics;
         
         private ISet<ICharacter> characters;
@@ -86,11 +87,12 @@ namespace Desktoptale
             MessageBus.Subscribe<AddCharacterRequestedMessage>(OnAddCharacterRequestedMessage);
             MessageBus.Subscribe<GlobalPauseMessage>(OnGlobalPauseMessage);
 
-            inputManager = new InputManager(this, GraphicsDevice, monitorManager);
+            inputManager = new InputManager(monitorManager);
             presetManager = new PresetManager(characterRegistry);
             physics = new Physics(inputManager);
             spriteBatch = new SpriteBatch(GraphicsDevice);
             contextMenu = new ContextMenu(inputManager, characterRegistry);
+            interactionManager = new InteractionManager(monitorManager, Window);
             
             characters = new HashSet<ICharacter>();
             

@@ -1,7 +1,6 @@
 ﻿using Desktoptale.Messages;
 using Desktoptale.Messaging;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Desktoptale
@@ -20,21 +19,15 @@ namespace Desktoptale
         public bool ShiftPressed { get; private set; }
         public bool CtrlPressed { get; private set; }
         public bool ActionButtonPressed { get; private set; }
+        public bool InteractButtonPressed { get; private set; }
+        public bool InteractButtonJustPressed { get; private set; }
 
-        private bool previousFrameLeftClick, previousFrameRightClick;
-        private Game game;
-        private GraphicsDevice graphics;
+        private bool previousFrameLeftClick, previousFrameRightClick, previousFrameInteractButtonPressed;
         private MonitorManager monitorManager;
 
-        private bool unfocusedMovementEnabled = false;
-    
-        public InputManager(Game game, GraphicsDevice graphics, MonitorManager monitorManager)
+        public InputManager(MonitorManager monitorManager)
         {
-            this.game = game;
-            this.graphics = graphics;
             this.monitorManager = monitorManager;
-
-            MessageBus.Subscribe<UnfocusedMovementChangedMessage>(OnUnfocusedMovementChangeRequestedMessage);
         }
 
         public void Update()
@@ -69,6 +62,11 @@ namespace Desktoptale
             CtrlPressed = keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl);
             ShiftPressed = keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift);
             ActionButtonPressed = keyboardState.IsKeyDown(Keys.C);
+
+            previousFrameInteractButtonPressed = InteractButtonPressed;
+            
+            InteractButtonPressed = keyboardState.IsKeyDown(Keys.Z) || keyboardState.IsKeyDown(Keys.Space);
+            InteractButtonJustPressed = InteractButtonPressed && !previousFrameInteractButtonPressed;
         }
 
         private void UpdateMouseInput()
@@ -86,11 +84,6 @@ namespace Desktoptale
 
             PointerPosition = mouseState.Position;
             VirtualScreenPointerPosition = monitorManager.ToVirtualScreenCoordinates(PointerPosition.ToVector2()).ToPoint();
-        }
-        
-        private void OnUnfocusedMovementChangeRequestedMessage(UnfocusedMovementChangedMessage message)
-        {
-            unfocusedMovementEnabled = message.Enabled;
         }
     }
 }

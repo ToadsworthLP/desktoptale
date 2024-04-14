@@ -13,7 +13,7 @@ namespace Desktoptale
         private ISet<IPhysicsObject> colliders;
         private InputManager inputManager;
         private bool clickThrough;
-
+        
         public Physics(InputManager inputManager)
         {
             this.inputManager = inputManager;

@@ -187,6 +187,8 @@ namespace Desktoptale.Characters
                 UpdatePhysicsProperties();
             }
             
+            Interact();
+            
             CurrentSprite.Update(gameTime);
         }
 
@@ -244,6 +246,14 @@ namespace Desktoptale.Characters
             else if (Depth > 1)
             {
                 Depth -= Math.Abs(depthOffset) * 2;
+            }
+        }
+
+        private void Interact()
+        {
+            if (focused && InputManager.InteractButtonJustPressed)
+            {
+                MessageBus.Send(new StartInteractionMessage() { Target = this });
             }
         }
 
@@ -334,7 +344,7 @@ namespace Desktoptale.Characters
 
         public void OnRightClicked()
         {
-            MessageBus.Send(new OpenContextMenuRequestedMessage() { Target = this});
+            MessageBus.Send(new OpenContextMenuRequestedMessage() { Target = this });
         }
 
         private void DragCharacter()

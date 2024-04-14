@@ -155,6 +155,35 @@ namespace Desktoptale
 
         [DllImport("User32.dll")]
         private static extern bool EnumDisplayDevices(byte[] lpDevice, uint iDevNum, ref DisplayDevice lpDisplayDevice, int dwFlags);
+        
+        [DllImport("User32.dll")]
+        private static extern bool SetCursorPos(int x, int y);
+        [DllImport("User32.dll")]
+        private static extern bool GetCursorPos(out NativePoint point);
+        
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MouseInput
+        {
+            public int dx;
+            public int dy;
+            public int mouseData;
+            public int dwFlags;
+            public int time;
+            public IntPtr dwExtraInfo;
+        }
+        
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Win32Input
+        {
+            public int type;
+            public MouseInput input;
+        }
+        
+        [DllImport("User32.dll", SetLastError = true)]
+        private static extern int SendInput(int nInputs, [MarshalAs(UnmanagedType.LPArray)] Win32Input[] pInput, int cbSize);
+        
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow (IntPtr hWnd);
         #endregion
         
         private const int GWL_EXSTYLE = -20;
@@ -169,6 +198,34 @@ namespace Desktoptale
         private const int SWP_NOMOVE = 0x0002;
         private const int SWP_NOSIZE = 0x0001;
         private const int S_OK = 0x00000000;
+        public const int INPUT_MOUSE = 0;
+        public const int MOUSEEVENTF_LEFTDOWN = 0x0002;
+        public const int MOUSEEVENTF_LEFTUP = 0x0004;
+
+        private static readonly Win32Input[] LeftMouseButtonDownWin32Input = new Win32Input[1]
+        {
+            new Win32Input()
+            {
+                type = INPUT_MOUSE,
+                input = new MouseInput()
+                {
+                    dwFlags = MOUSEEVENTF_LEFTDOWN
+                }
+            }
+        };
+        
+        private static readonly Win32Input[] LeftMouseButtonUpWin32Input = new Win32Input[1]
+        {
+            new Win32Input()
+            {
+                type = INPUT_MOUSE,
+                input = new MouseInput()
+                {
+                    dwFlags = MOUSEEVENTF_LEFTUP
+                }
+            }
+        };
+        
         private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
 
         public class SaveDialogResult
@@ -195,7 +252,7 @@ namespace Desktoptale
 
             MainWindowHwnd = window.Handle;
         }
-
+        
         public static void MakeClickable(GameWindow window)
         {
             SetWindowLong(window.Handle, GWL_EXSTYLE, WS_EX_LAYERED | WS_EX_TOPMOST);
@@ -206,10 +263,36 @@ namespace Desktoptale
             SetWindowLong(window.Handle, GWL_EXSTYLE, WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOPMOST);
         }
 
+        public static void SendLeftMouseButtonDown()
+        {
+            SendInput(1, LeftMouseButtonDownWin32Input, Marshal.SizeOf(LeftMouseButtonDownWin32Input[0]));
+        }
+        
+        public static void SendLeftMouseButtonUp()
+        {
+            SendInput(1, LeftMouseButtonUpWin32Input, Marshal.SizeOf(LeftMouseButtonUpWin32Input[0]));
+        }
+        
+        public static void SetCursorPosition(Point position)
+        {
+            SetCursorPos(position.X, position.Y);
+        }
+
+        public static Point GetCursorPosition()
+        {
+            GetCursorPos(out NativePoint result);
+            return new Point(result.x, result.y);
+        }
+
         public static void MakeTopmostWindow(GameWindow window)
         {
             if (!SetWindowPos(window.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        public static void MakeFocusedWindow(GameWindow window)
+        {
+            SetForegroundWindow(window.Handle);
         }
 
         public static IList<WindowInfo> GetOpenWindows()
