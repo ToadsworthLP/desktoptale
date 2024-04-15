@@ -32,6 +32,7 @@ namespace Desktoptale
         private ContextMenu contextMenu;
         private InteractionManager interactionManager;
         private Physics physics;
+        private GlobalSettingsManager globalSettingsManager;
         
         private ISet<ICharacter> characters;
         
@@ -44,6 +45,7 @@ namespace Desktoptale
         private bool globalPause = false;
 
         private readonly Color clearColor = new Color(0f, 0f, 0f, 0f);
+        private const string globalSettingsFilePath = "GlobalSettings.yaml";
 
         private ConcurrentQueue<Action> UpdateTaskQueue;
 
@@ -86,22 +88,35 @@ namespace Desktoptale
             MessageBus.Subscribe<DisplaySettingsChangedMessage>(OnDisplaySettingsChangedMessage);
             MessageBus.Subscribe<AddCharacterRequestedMessage>(OnAddCharacterRequestedMessage);
             MessageBus.Subscribe<GlobalPauseMessage>(OnGlobalPauseMessage);
-
+            
             inputManager = new InputManager(monitorManager);
             presetManager = new PresetManager(characterRegistry);
             physics = new Physics(inputManager);
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            contextMenu = new ContextMenu(inputManager, characterRegistry);
             interactionManager = new InteractionManager(monitorManager, Window);
             
             characters = new HashSet<ICharacter>();
             
-            FirstStartCheck();
-
             defaultCharacterStartPosition = monitorManager.ToMonoGameCoordinates(Window.ClientBounds.Center.ToVector2()).ToPoint();
             UpdateWindow();
             
             AddCharacterFromSettings(settings);
+            
+            globalSettingsManager = new GlobalSettingsManager(globalSettingsFilePath);
+            if (!globalSettingsManager.DoesGlobalSettingsFileExist())
+            {
+                DisplayWelcomeMessage();
+                globalSettingsManager.GlobalSettings = new GlobalSettings();
+                globalSettingsManager.SaveGlobalSettings();
+            }
+            else
+            {
+                globalSettingsManager.LoadGlobalSettings();
+            }
+            
+            globalSettingsManager.SendMessages();
+            
+            contextMenu = new ContextMenu(inputManager, characterRegistry, globalSettingsManager.GlobalSettings);
         }
 
         private void OnGlobalPauseMessage(GlobalPauseMessage message)
@@ -392,21 +407,6 @@ namespace Desktoptale
             foreach (string key in characterRegistry.GetAllIds())
             {
                 Console.WriteLine(key);
-            }
-        }
-
-        private void FirstStartCheck()
-        {
-            string path = Path.Combine(ApplicationPath, ".desktoptale");
-            if (!File.Exists(path))
-            {
-                DisplayWelcomeMessage();
-                try
-                {
-                    File.Create(path).Dispose();
-                    File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.Hidden);
-                }
-                catch (Exception e) {}
             }
         }
 

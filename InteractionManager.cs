@@ -10,18 +10,22 @@ namespace Desktoptale
         private GameWindow mainWindow;
         
         private bool clickthrough;
+        private bool interactionEnabled;
         
         public InteractionManager(MonitorManager monitorManager, GameWindow mainWindow)
         {
             this.monitorManager = monitorManager;
             this.mainWindow = mainWindow;
             
-            MessageBus.Subscribe<StartInteractionMessage>(OnInteractionStateChangedMessage);
+            MessageBus.Subscribe<StartInteractionMessage>(OnStartInteractionMessage);
             MessageBus.Subscribe<ClickThroughChangedMessage>(OnClickThroughChangedMessage);
+            MessageBus.Subscribe<InteractionButtonChangedMessage>(OnInteractionButtonChangedMessage);
         }
 
-        private void OnInteractionStateChangedMessage(StartInteractionMessage message)
+        private void OnStartInteractionMessage(StartInteractionMessage message)
         {
+            if (!interactionEnabled) return;
+            
             Point previousPosition = WindowsUtils.GetCursorPosition();
                 
             if(!clickthrough) WindowsUtils.MakeClickthrough(mainWindow);
@@ -44,6 +48,11 @@ namespace Desktoptale
         private void OnClickThroughChangedMessage(ClickThroughChangedMessage message)
         {
             clickthrough = message.Enabled;
+        }
+        
+        private void OnInteractionButtonChangedMessage(InteractionButtonChangedMessage message)
+        {
+            interactionEnabled = message.Enabled;
         }
     }
 }

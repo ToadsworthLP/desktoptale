@@ -16,15 +16,16 @@ namespace Desktoptale
         private IRegistry<CharacterType, string> characterRegistry;
         private ContextMenuStrip currentContextMenuStrip = null;
 
-        private bool clickThrough = false;
+        private GlobalSettings globalSettings;
 
-        public ContextMenu(InputManager inputManager, IRegistry<CharacterType, string> characterRegistry)
+        public ContextMenu(InputManager inputManager, IRegistry<CharacterType, string> characterRegistry, GlobalSettings globalSettings)
         {
             this.inputManager = inputManager;
             this.characterRegistry = characterRegistry;
-            
+            this.globalSettings = globalSettings;
+
             MessageBus.Subscribe<OpenContextMenuRequestedMessage>(OnOpenContextMenuRequested);
-            MessageBus.Subscribe<ClickThroughChangedMessage>(OnClickThroughChangedMessage);
+            MessageBus.Subscribe<ClickThroughChangeRequestedMessage>(OnClickThroughChangeRequestedMessage);
         }
         
         private void OnOpenContextMenuRequested(OpenContextMenuRequestedMessage message)
@@ -121,9 +122,13 @@ namespace Desktoptale
         
         private void SetupGlobalSettingsItems(ToolStripMenuItem settingsItem, ICharacter target)
         {
-            ToolStripMenuItem clickThroughItem = new ToolStripMenuItem("Make Click-Through", null, (o, e) => { MessageBus.Send(new ClickThroughChangedMessage() { Enabled = !clickThrough }); });
-            clickThroughItem.Checked = clickThrough;
+            ToolStripMenuItem clickThroughItem = new ToolStripMenuItem("Make Click-Through", null, (o, e) => { MessageBus.Send(new ClickThroughChangeRequestedMessage() { Enabled = !globalSettings.ClickThroughMode }); });
+            clickThroughItem.Checked = globalSettings.ClickThroughMode;
             settingsItem.DropDownItems.Add(clickThroughItem);
+            
+            ToolStripMenuItem interactionButtonItem = new ToolStripMenuItem("Interaction Mouse Clicks", null, (o, e) => { MessageBus.Send(new InteractionButtonChangedMessage() { Enabled = !globalSettings.EnableInteractionButton }); });
+            interactionButtonItem.Checked = globalSettings.EnableInteractionButton;
+            settingsItem.DropDownItems.Add(interactionButtonItem);
             
             ToolStripMenuItem openCustomCharacterFolderItem = new ToolStripMenuItem("Open Custom Character Folder", null,
                 (o, e) =>
@@ -238,17 +243,23 @@ namespace Desktoptale
             }
         }
 
-        private void OnClickThroughChangedMessage(ClickThroughChangedMessage message)
+        private void OnClickThroughChangeRequestedMessage(ClickThroughChangeRequestedMessage message)
         {
-            clickThrough = message.Enabled;
-
-            if (clickThrough)
+            if (message.Enabled)
             {
                 var result = WindowsUtils.ShowMessageBox("Characters will not react to the mouse in this mode unless CTRL is held down.\n\nDo you want to enable click-through mode?", "Desktoptale", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                 if (result == DialogResult.Cancel)
                 {
-                    MessageBus.Send(new ClickThroughChangedMessage() { Enabled = !clickThrough });
+                    MessageBus.Send(new ClickThroughChangedMessage() { Enabled = false });
                 }
+                else
+                {
+                    MessageBus.Send(new ClickThroughChangedMessage() { Enabled = true });
+                }
+            }
+            else
+            {
+                MessageBus.Send(new ClickThroughChangedMessage() { Enabled = false });
             }
         }
 
