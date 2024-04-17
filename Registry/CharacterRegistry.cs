@@ -8,6 +8,7 @@ namespace Desktoptale.Registry
         public static readonly CharacterType FRISK = new CharacterType("Frisk", "Undertale", ctx => new Frisk(ctx));
         public static readonly CharacterType FLOWEY = new CharacterType("Flowey", "Undertale", ctx => new Flowey(ctx));
         public static readonly CharacterType TORIEL = new CharacterType("Toriel", "Undertale", ctx => new StandardCharacter(ctx, "Toriel", false));
+        public static readonly CharacterType NAPSTABLOOK = new CharacterType("Napstablook", "Undertale", ctx => new StandardCharacter(ctx, "Napstablook", false, false, 1, 1, 1, 1, 0));
         public static readonly CharacterType PAPYRUS = new CharacterType("Papyrus", "Undertale", ctx => new StandardCharacter(ctx, "Papyrus", true));
         public static readonly CharacterType SANS = new CharacterType("Sans", "Undertale", ctx => new StandardCharacter(ctx, "Sans", false));
         public static readonly CharacterType UNDYNE = new CharacterType("Undyne", "Undertale", ctx => new Undyne(ctx));
@@ -60,6 +61,7 @@ namespace Desktoptale.Registry
             Add(FRISK);
             Add(FLOWEY);
             Add(TORIEL);
+            Add(NAPSTABLOOK);
             Add(PAPYRUS);
             Add(SANS);
             Add(UNDYNE);

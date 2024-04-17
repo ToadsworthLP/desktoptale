@@ -1456,6 +1456,42 @@
 /processorParam:TextureFormat=Color
 /build:Included/Moray/Spr_Moray_Walk_Up.png
 
+#begin Included/Napstablook/Spr_Napstablook_Walk_Down.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Napstablook/Spr_Napstablook_Walk_Down.png
+
+#begin Included/Napstablook/Spr_Napstablook_Walk_Left.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Napstablook/Spr_Napstablook_Walk_Left.png
+
+#begin Included/Napstablook/Spr_Napstablook_Walk_Up.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Napstablook/Spr_Napstablook_Walk_Up.png
+
 #begin Included/Noelle/Spr_Noelle_Walk_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
