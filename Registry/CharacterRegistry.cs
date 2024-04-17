@@ -14,13 +14,14 @@ namespace Desktoptale.Registry
         public static readonly CharacterType UNDYNE_ARMORED = new CharacterType("Undyne (Armored)", "Undertale", ctx => new StandardCharacter(ctx, "UndyneArmored", true));
         public static readonly CharacterType ALPHYS = new CharacterType("Alphys", "Undertale", ctx => new Alphys(ctx));
         public static readonly CharacterType ASGORE = new CharacterType("Asgore", "Undertale", ctx => new Asgore(ctx));
-        public static readonly CharacterType ASRIEL = new CharacterType("Asriel", "Undertale", ctx => new StandardCharacter(ctx, "Asriel", false, 4, 4, 2));
-        public static readonly CharacterType CHARA = new CharacterType("Chara", "Undertale", ctx => new StandardCharacter(ctx, "Chara", false, 4, 4, 2));
+        public static readonly CharacterType ASRIEL = new CharacterType("Asriel", "Undertale", ctx => new StandardCharacter(ctx, "Asriel", false, false, 4, 4, 2));
+        public static readonly CharacterType CHARA = new CharacterType("Chara", "Undertale", ctx => new StandardCharacter(ctx, "Chara", false, false, 4, 4, 2));
         
         public static readonly CharacterType CLOVER = new CharacterType("Clover", "Undertale Yellow", ctx => new Clover(ctx));
         public static readonly CharacterType CLOVER_VENGEANCE = new CharacterType("Clover (Vengeance)", "Undertale Yellow", ctx => new CloverVengeance(ctx));
         public static readonly CharacterType DALV = new CharacterType("Dalv", "Undertale Yellow", ctx => new Dalv(ctx));
         public static readonly CharacterType MARTLET = new CharacterType("Martlet", "Undertale Yellow", ctx => new Martlet(ctx));
+        public static readonly CharacterType MO = new CharacterType("Mo", "Undertale Yellow", ctx => new StandardCharacter(ctx, "Mo", false, true, 4, 4, 4, 4, 0));
         public static readonly CharacterType ED = new CharacterType("Ed", "Undertale Yellow", ctx => new StandardCharacter(ctx, "Ed", false));
         public static readonly CharacterType MORAY = new CharacterType("Moray", "Undertale Yellow", ctx => new Moray(ctx));
         public static readonly CharacterType ACE = new CharacterType("Ace", "Undertale Yellow", ctx => new StandardCharacter(ctx, "Ace", false));
@@ -72,6 +73,7 @@ namespace Desktoptale.Registry
             Add(CLOVER_VENGEANCE);
             Add(DALV);
             Add(MARTLET);
+            Add(MO);
             Add(ED);
             Add(MORAY);
             Add(ACE);

@@ -247,7 +247,7 @@ namespace Desktoptale
         {
             if (message.Enabled)
             {
-                var result = WindowsUtils.ShowMessageBox("Characters will not react to the mouse in this mode unless CTRL is held down.\n\nDo you want to enable click-through mode?", "Desktoptale", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                var result = WindowsUtils.ShowMessageBox("Characters will not react to the mouse in this mode unless CTRL is held down.\n\nDo you want to enable click-through mode?", ProgramInfo.NAME, MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                 if (result == DialogResult.Cancel)
                 {
                     MessageBus.Send(new ClickThroughChangedMessage() { Enabled = false });
