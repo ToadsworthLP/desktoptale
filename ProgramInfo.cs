@@ -17,7 +17,7 @@ FanFictionGamer - Custom Asriel sprites
 
         public const string WELCOME_MESSAGE = @"Welcome to Desktoptale!
 
-You can control your character by clicking it and using W/A/S/D or the arrow keys to move, X or Shift to run, Z or Space to trigger a mouse click where they are standing and C to play a special animation (if available).
+You can control your character by clicking it and using W/A/S/D or the arrow keys to move, X or Shift to run, Z or Space to trigger a mouse click where they are standing (left click by default, right click while holding Shift) and C to play a special animation (if available).
 For more options such as changing or adding characters, right click on a character to open the menu.
 
 Would you like to automatically open saved preset files (.dt) with this installation in the future? (This can be done at any time from Settings > Associate Preset Files)
