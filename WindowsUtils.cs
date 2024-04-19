@@ -201,6 +201,8 @@ namespace Desktoptale
         public const int INPUT_MOUSE = 0;
         public const int MOUSEEVENTF_LEFTDOWN = 0x0002;
         public const int MOUSEEVENTF_LEFTUP = 0x0004;
+        public const int MOUSEEVENTF_RIGHTDOWN = 0x0008;
+        public const int MOUSEEVENTF_RIGHTUP = 0x0010;
 
         private static readonly Win32Input[] LeftMouseButtonDownWin32Input = new Win32Input[1]
         {
@@ -222,6 +224,30 @@ namespace Desktoptale
                 input = new MouseInput()
                 {
                     dwFlags = MOUSEEVENTF_LEFTUP
+                }
+            }
+        };
+        
+        private static readonly Win32Input[] RightMouseButtonDownWin32Input = new Win32Input[1]
+        {
+            new Win32Input()
+            {
+                type = INPUT_MOUSE,
+                input = new MouseInput()
+                {
+                    dwFlags = MOUSEEVENTF_RIGHTDOWN
+                }
+            }
+        };
+        
+        private static readonly Win32Input[] RightMouseButtonUpWin32Input = new Win32Input[1]
+        {
+            new Win32Input()
+            {
+                type = INPUT_MOUSE,
+                input = new MouseInput()
+                {
+                    dwFlags = MOUSEEVENTF_RIGHTUP
                 }
             }
         };
@@ -271,6 +297,16 @@ namespace Desktoptale
         public static void SendLeftMouseButtonUp()
         {
             SendInput(1, LeftMouseButtonUpWin32Input, Marshal.SizeOf(LeftMouseButtonUpWin32Input[0]));
+        }
+        
+        public static void SendRightMouseButtonDown()
+        {
+            SendInput(1, RightMouseButtonDownWin32Input, Marshal.SizeOf(RightMouseButtonDownWin32Input[0]));
+        }
+        
+        public static void SendRightMouseButtonUp()
+        {
+            SendInput(1, RightMouseButtonUpWin32Input, Marshal.SizeOf(RightMouseButtonUpWin32Input[0]));
         }
         
         public static void SetCursorPosition(Point position)

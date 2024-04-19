@@ -8,15 +8,17 @@ namespace Desktoptale
     {
         private MonitorManager monitorManager;
         private GameWindow mainWindow;
+        private InputManager inputManager;
         
         private bool clickthrough;
         private bool interactionEnabled;
         
-        public InteractionManager(MonitorManager monitorManager, GameWindow mainWindow)
+        public InteractionManager(MonitorManager monitorManager, GameWindow mainWindow, InputManager inputManager)
         {
             this.monitorManager = monitorManager;
             this.mainWindow = mainWindow;
-            
+            this.inputManager = inputManager;
+
             MessageBus.Subscribe<StartInteractionMessage>(OnStartInteractionMessage);
             MessageBus.Subscribe<ClickThroughChangedMessage>(OnClickThroughChangedMessage);
             MessageBus.Subscribe<InteractionButtonChangedMessage>(OnInteractionButtonChangedMessage);
@@ -36,8 +38,18 @@ namespace Desktoptale
                 .ToPoint();
             
             WindowsUtils.SetCursorPosition(clickPosition);
-            WindowsUtils.SendLeftMouseButtonDown();
-            WindowsUtils.SendLeftMouseButtonUp();
+
+            if (inputManager.ShiftPressed)
+            {
+                WindowsUtils.SendRightMouseButtonDown();
+                WindowsUtils.SendRightMouseButtonUp();
+            }
+            else
+            {
+                WindowsUtils.SendLeftMouseButtonDown();
+                WindowsUtils.SendLeftMouseButtonUp();
+            }
+            
             WindowsUtils.SetCursorPosition(previousPosition);
                 
             if(!clickthrough) WindowsUtils.MakeClickable(mainWindow);

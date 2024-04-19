@@ -93,7 +93,7 @@ namespace Desktoptale
             presetManager = new PresetManager(characterRegistry);
             physics = new Physics(inputManager);
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            interactionManager = new InteractionManager(monitorManager, Window);
+            interactionManager = new InteractionManager(monitorManager, Window, inputManager);
             
             characters = new HashSet<ICharacter>();
             
