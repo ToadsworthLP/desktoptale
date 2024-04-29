@@ -1,4 +1,5 @@
-﻿using Desktoptale.Characters;
+﻿using System;
+using Desktoptale.Characters;
 using Microsoft.Xna.Framework;
 
 namespace Desktoptale.Registry
@@ -108,6 +109,17 @@ namespace Desktoptale.Registry
             Add(GREEN_SOUL);
             Add(YELLOW_SOUL);
             Add(MONSTER_SOUL);
+            
+            Jincident();
+        }
+
+        private void Jincident()
+        {
+            Random rng = new Random();
+            if (rng.Next(0, 100) == 0)
+            {
+                CHUJIN.Name = "the jin";
+            }
         }
     }
 }

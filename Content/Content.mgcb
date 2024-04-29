@@ -796,6 +796,66 @@
 /processorParam:TextureFormat=Color
 /build:Included/Dalv/Spr_Dalv_Walk_Up.png
 
+#begin Included/Distractions/Spr_Distraction_Bone_Long.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Distractions/Spr_Distraction_Bone_Long.png
+
+#begin Included/Distractions/Spr_Distraction_Bone_Medium.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Distractions/Spr_Distraction_Bone_Medium.png
+
+#begin Included/Distractions/Spr_Distraction_Bone_Short.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Distractions/Spr_Distraction_Bone_Short.png
+
+#begin Included/Distractions/Spr_Distraction_Bone_VeryShort.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Distractions/Spr_Distraction_Bone_VeryShort.png
+
+#begin Included/Distractions/Spr_Distraction_WhitePixel.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Distractions/Spr_Distraction_WhitePixel.png
+
 #begin Included/Ed/Spr_Ed_Walk_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
