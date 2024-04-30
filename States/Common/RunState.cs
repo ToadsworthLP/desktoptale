@@ -48,7 +48,7 @@ namespace Desktoptale.States.Common
                 (UseRawInput ? context.Target.InputManager.RawDirectionalInput : context.Target.InputManager.DirectionalInput) *
                 Speed *
                 (float)context.Time.ElapsedGameTime.TotalSeconds *
-                MathF.Min(context.Target.Scale.X, context.Target.Scale.Y);
+                MathUtilities.Min(context.Target.Scale.X, context.Target.Scale.Y);
         }
     }
 }

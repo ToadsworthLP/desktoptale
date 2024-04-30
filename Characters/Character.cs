@@ -237,7 +237,7 @@ namespace Desktoptale.Characters
         {
             HitBox = new Rectangle((int)(Position.X - maxFrameSize.X / 2f), (int)(Position.Y - maxFrameSize.Y / 2f), maxFrameSize.X, maxFrameSize.Y);
             
-            Depth = MathF.Clamp(1 - ((Position.Y + maxFrameSize.Y / 2f) / MonitorManager.BoundingRectangle.Height), 0 ,1);
+            Depth = MathUtilities.Clamp(1 - ((Position.Y + maxFrameSize.Y / 2f) / MonitorManager.BoundingRectangle.Height), 0 ,1);
             Depth += depthOffset;
             if (Depth < 0)
             {

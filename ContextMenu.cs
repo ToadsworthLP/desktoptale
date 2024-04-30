@@ -17,6 +17,8 @@ namespace Desktoptale
         private ContextMenuStrip currentContextMenuStrip = null;
 
         private GlobalSettings globalSettings;
+        
+        private static readonly string[] distractionLevelNames = new[] { "Off", "Low", "Medium", "High", "Very High", "Extreme" };
 
         public ContextMenu(InputManager inputManager, IRegistry<CharacterType, string> characterRegistry, GlobalSettings globalSettings)
         {
@@ -129,6 +131,18 @@ namespace Desktoptale
             ToolStripMenuItem interactionButtonItem = new ToolStripMenuItem("Interaction Mouse Clicks", null, (o, e) => { MessageBus.Send(new InteractionButtonChangedMessage() { Enabled = !globalSettings.EnableInteractionButton }); });
             interactionButtonItem.Checked = globalSettings.EnableInteractionButton;
             settingsItem.DropDownItems.Add(interactionButtonItem);
+            
+            ToolStripMenuItem distractionsItem = new ToolStripMenuItem("Extra Distractions");
+            settingsItem.DropDownItems.Add(distractionsItem);
+            
+            for (int i = 0; i <= DistractionManager.MaxDistractionLevel; i++)
+            {
+                int level = i;
+                
+                ToolStripMenuItem distractionLevelItem = new ToolStripMenuItem(distractionLevelNames[level], null, (o, e) => { MessageBus.Send(new SetDistractionLevelMessage() { Level = level }); });
+                distractionLevelItem.Checked = i == globalSettings.DistractionLevel;
+                distractionsItem.DropDownItems.Add(distractionLevelItem);
+            }
             
             ToolStripMenuItem openCustomCharacterFolderItem = new ToolStripMenuItem("Open Custom Character Folder", null,
                 (o, e) =>

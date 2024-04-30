@@ -43,8 +43,8 @@ namespace Desktoptale
             foreach (var monitor in ConnectedMonitors)
             {
                 Vector2 p = new Vector2(
-                    MathF.Clamp(point.X, monitor.Bounds.Left, monitor.Bounds.Right),
-                    MathF.Clamp(point.Y, monitor.Bounds.Top, monitor.Bounds.Bottom)
+                    MathUtilities.Clamp(point.X, monitor.Bounds.Left, monitor.Bounds.Right),
+                    MathUtilities.Clamp(point.Y, monitor.Bounds.Top, monitor.Bounds.Bottom)
                 );
 
                 float distance = (point - p).LengthSquared();

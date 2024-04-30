@@ -9,8 +9,9 @@ namespace Desktoptale.Characters
         private bool hasRightSprite, hasIdleSprite;
         private int walkStartFrame;
         private int upFrames, downFrames, leftFrames, rightFrames;
+        private double walkFrameRate, runFrameRate;
 
-        public StandardCharacter(CharacterCreationContext characterCreationContext, string name, bool hasRightSprite, bool hasIdleSprite = false, int upFrames = 4, int downFrames = 4, int leftFrames = 4, int rightFrames = 4, int walkStartFrame = 1) : base(characterCreationContext)
+        public StandardCharacter(CharacterCreationContext characterCreationContext, string name, bool hasRightSprite, bool hasIdleSprite = false, int upFrames = 4, int downFrames = 4, int leftFrames = 4, int rightFrames = 4, int walkStartFrame = 1, double walkFrameRate = 5f, double runFrameRate = 10f) : base(characterCreationContext)
         {
             this.name = name;
             this.hasRightSprite = hasRightSprite;
@@ -20,6 +21,8 @@ namespace Desktoptale.Characters
             this.downFrames = downFrames;
             this.leftFrames = leftFrames;
             this.rightFrames = rightFrames;
+            this.walkFrameRate = walkFrameRate;
+            this.runFrameRate = runFrameRate;
         }
     
         public override void LoadContent(ContentManager contentManager)
@@ -92,7 +95,7 @@ namespace Desktoptale.Characters
             }
             
             walkSprite.Loop = true;
-            walkSprite.Framerate = 5;
+            walkSprite.Framerate = walkFrameRate;
             walkSprite.StartFrame = walkStartFrame;
             WalkSprite = walkSprite;
 
@@ -117,7 +120,7 @@ namespace Desktoptale.Characters
             }
             
             runSprite.Loop = true;
-            runSprite.Framerate = 10;
+            runSprite.Framerate = runFrameRate;
             runSprite.StartFrame = walkStartFrame;
             RunSprite = runSprite;
         }

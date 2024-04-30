@@ -33,6 +33,7 @@ namespace Desktoptale
 
             MessageBus.Subscribe<ClickThroughChangedMessage>(OnClickThroughChangedMessage);
             MessageBus.Subscribe<InteractionButtonChangedMessage>(OnInteractionButtonChangedMessage);
+            MessageBus.Subscribe<SetDistractionLevelMessage>(OnSetDistractionLevelMessage);
         }
 
         public bool DoesGlobalSettingsFileExist()
@@ -46,6 +47,7 @@ namespace Desktoptale
             
             MessageBus.Send(new ClickThroughChangedMessage() { Enabled = GlobalSettings.ClickThroughMode });
             MessageBus.Send(new InteractionButtonChangedMessage() { Enabled = GlobalSettings.EnableInteractionButton });
+            MessageBus.Send(new SetDistractionLevelMessage() { Level = GlobalSettings.DistractionLevel });
 
             disableSaving = false;
         }
@@ -114,6 +116,15 @@ namespace Desktoptale
         {
             GlobalSettings.EnableInteractionButton = message.Enabled;
             SaveGlobalSettings();
+        }
+
+        private void OnSetDistractionLevelMessage(SetDistractionLevelMessage message)
+        {
+            if (message.Level >= 0 && message.Level <= DistractionManager.MaxDistractionLevel)
+            {
+                GlobalSettings.DistractionLevel = message.Level;
+                SaveGlobalSettings();
+            }
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Desktoptale
         private InteractionManager interactionManager;
         private Physics physics;
         private GlobalSettingsManager globalSettingsManager;
-        private DistractionsManager distractionsManager;
+        private DistractionManager distractionManager;
         
         private ISet<ICharacter> characters;
         
@@ -115,12 +115,12 @@ namespace Desktoptale
                 globalSettingsManager.LoadGlobalSettings();
             }
             
-            globalSettingsManager.SendMessages();
+            distractionManager = new DistractionManager(Content, Window);
+            distractionManager.Initialize();
             
             contextMenu = new ContextMenu(inputManager, characterRegistry, globalSettingsManager.GlobalSettings);
             
-            distractionsManager = new DistractionsManager(Content, Window);
-            distractionsManager.Initialize();
+            globalSettingsManager.SendMessages();
         }
 
         private void OnGlobalPauseMessage(GlobalPauseMessage message)
@@ -270,7 +270,7 @@ namespace Desktoptale
 
             windowStateUpdateCounter++;
             
-            distractionsManager.Update(gameTime);
+            distractionManager.Update(gameTime);
             
             base.Update(gameTime);
         }
@@ -285,7 +285,7 @@ namespace Desktoptale
                 gameObject.Draw(gameTime, spriteBatch);
             }
             
-            distractionsManager.Draw(gameTime, spriteBatch);
+            distractionManager.Draw(gameTime, spriteBatch);
             
             spriteBatch.End();
 

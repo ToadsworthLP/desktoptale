@@ -9,10 +9,11 @@ namespace Desktoptale.Distractions
         Vector2 Position { get; set; }
         float Rotation { get; set; }
         Vector2 Scale { get; set; }
+        bool Disposed { get; }
         
         void Initialize();
         void LoadContent(ContentManager contentManager);
-        void Update(GameTime gameTime);
-        void Draw(GameTime gameTime, SpriteBatch spriteBatch);
+        void Update(GameTime gameTime, Rectangle screenRectangle);
+        void Draw(GameTime gameTime, SpriteBatch spriteBatch, Rectangle screenRectangle);
     }
 }

@@ -1000,6 +1000,42 @@
 /processorParam:TextureFormat=Color
 /build:Included/Frisk/Spr_Frisk_Walk_Up.png
 
+#begin Included/Froggit/Spr_Froggit_Walk_Down.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Froggit/Spr_Froggit_Walk_Down.png
+
+#begin Included/Froggit/Spr_Froggit_Walk_Left.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Froggit/Spr_Froggit_Walk_Left.png
+
+#begin Included/Froggit/Spr_Froggit_Walk_Up.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Froggit/Spr_Froggit_Walk_Up.png
+
 #begin Included/Kanako/Spr_Kanako_Idle_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor
