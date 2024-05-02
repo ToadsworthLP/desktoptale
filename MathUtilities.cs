@@ -58,5 +58,10 @@ namespace Desktoptale
                 return dCorner;
             }
         }
+
+        public static float SignedAngleBetween(Vector2 v, Vector2 w)
+        {
+            return (float)Math.Atan2((w.Y * v.X) - (w.X * v.Y), (w.X * v.X) + (w.Y * v.Y));
+        }
     }
 }

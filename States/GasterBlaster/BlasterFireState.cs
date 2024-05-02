@@ -52,9 +52,24 @@ namespace Desktoptale.States.GasterBlaster
 
         private float GetBeamLevelAtTime(float t)
         {
-            float val = 2 * (t - 0.5f);
-            float final = 1 - (val * val * val * val);
-            return final;
+            if (t < 0.05f)
+            {
+                return 0f;
+            }
+            else if (t < 0.1f)
+            {
+                return MathHelper.Lerp(0, 1, (t - 0.05f) * 20);
+            }
+            else if (t < 0.5f)
+            {
+                return 1f;
+            }
+            else
+            {
+                float val = 2 * (t - 0.5f);
+                float final = 1 - (float)Math.Pow(val, 2);
+                return final;
+            }
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Desktoptale
             
         private const float ScaleDivisor = 500f;
 
-        private static readonly float[] DistractionSpawnDelays = new[] { 256f, 64f, 16f, 4f, 1f };
+        private static readonly float[] DistractionSpawnDelays = new[] { 128f, 32f, 8f, 2f, 0.5f };
         
         private ContentManager contentManager;
         private GameWindow window;
@@ -54,9 +54,9 @@ namespace Desktoptale
             float factor = (float)Math.Round(smallerDimension / ScaleDivisor);
             scale = new Vector2(factor, factor);
 
-            patterns.Add(new UpDownOppositeBonesPattern(10, 300f, 120f * scale.Y, 100 * scale.X));
-            patterns.Add(new LeftRightOppositeBonesPattern(10, 300f, 120f * scale.X, 100 * scale.Y));
-            patterns.Add(new GasterBlasterPattern());
+            patterns.Add(new UpDownOppositeBonesPattern(5, 300f, 120f * scale.Y, 100 * scale.X));
+            patterns.Add(new LeftRightOppositeBonesPattern(5, 300f, 120f * scale.X, 100 * scale.Y));
+            patterns.Add(new GasterBlasterPattern(5, 0.5f));
         }
         
         public void Update(GameTime gameTime)
