@@ -45,7 +45,7 @@ namespace Desktoptale.Distractions
         {
             initialDelay = delay;
             random = new Random();
-            depthOffset = random.NextFloat(0f, 0.00024f);
+            depthOffset = random.NextFloat(0f, 0.009f);
         }
         
         public void Initialize()
@@ -87,7 +87,7 @@ namespace Desktoptale.Distractions
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch, Rectangle screenRectangle)
         {
             Color blasterColor = new Color(BlasterOpacity, BlasterOpacity, BlasterOpacity, BlasterOpacity);
-            BlasterSprite.Draw(spriteBatch, Position, blasterColor, Rotation, blasterOrigin, Scale, SpriteEffects.None, 0.00025f + depthOffset);
+            BlasterSprite.Draw(spriteBatch, Position, blasterColor, Rotation, blasterOrigin, Scale, SpriteEffects.None, 0.001f + depthOffset);
 
             Vector2 beamScale = new Vector2((Scale.X * BlasterSprite.FrameSize.X) * 0.6f * BeamWidth,
                 MathHelper.Max(screenRectangle.Width, screenRectangle.Height));
