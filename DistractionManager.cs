@@ -15,7 +15,7 @@ namespace Desktoptale
     {
         public const int MaxDistractionLevel = 5;
             
-        private const float ScaleDivisor = 500f;
+        private const float ScaleDivisor = 600f;
 
         private static readonly float[] DistractionSpawnDelays = new[] { 128f, 32f, 8f, 2f, 0.5f };
         
@@ -46,17 +46,19 @@ namespace Desktoptale
             random = new Random();
 
             MessageBus.Subscribe<SetDistractionLevelMessage>(OnSetDistractionLevelMessage);
+            MessageBus.Subscribe<SetDistractionScaleMessage>(OnSetDistractionScaleMessage);
         }
         
         public void Initialize()
         {
-            int smallerDimension = Math.Min(window.ClientBounds.Width, window.ClientBounds.Height);
-            float factor = (float)Math.Round(smallerDimension / ScaleDivisor);
-            scale = new Vector2(factor, factor);
+            scale = new Vector2(2, 2);
 
-            patterns.Add(new UpDownOppositeBonesPattern(5, 300f, 120f * scale.Y, 100 * scale.X));
-            patterns.Add(new LeftRightOppositeBonesPattern(5, 300f, 120f * scale.X, 100 * scale.Y));
-            patterns.Add(new GasterBlasterPattern(5, 0.5f));
+            patterns.Add(new UpDownOppositeBonesPattern(6, 300f, 120f, 100));
+            patterns.Add(new LeftRightOppositeBonesPattern(6, 300f, 120f, 100));
+            patterns.Add(new ScreenEdgeBonesPattern(6, 250f, 120f, true));
+            patterns.Add(new ScreenEdgeBonesPattern(6, 250f, 120f, false));
+            patterns.Add(new RandomGasterBlasterPattern(5, 0.5f));
+            patterns.Add(new SideGasterBlasterPattern(10, 0.25f));
         }
         
         public void Update(GameTime gameTime)
@@ -68,7 +70,7 @@ namespace Desktoptale
                     int index = random.Next(0, patterns.Count);
                     if (index == lastDistractionIndex) index = (index + 1) % patterns.Count;
                     lastDistractionIndex = index;
-                    float waitMultiplier = patterns[index].Spawn(this, window.ClientBounds);
+                    float waitMultiplier = patterns[index].Spawn(this, window.ClientBounds, scale);
                     
                     float delay = DistractionSpawnDelays[distractionLevel - 1];
                     delay *= random.NextFloat(0.8f, 1.2f) * waitMultiplier;
@@ -136,6 +138,17 @@ namespace Desktoptale
             }
             
             distractionLevel = message.Level;
+        }
+
+        private void OnSetDistractionScaleMessage(SetDistractionScaleMessage message)
+        {
+            scale = new Vector2(message.Scale, message.Scale);
+            
+            foreach (IDistraction distraction in distractions)
+            {
+                removalScheduled.Add(distraction);
+                nextScheduledDistractionTime = TimeSpan.MinValue;
+            }
         }
     }
 }

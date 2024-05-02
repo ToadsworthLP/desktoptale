@@ -6,8 +6,8 @@ namespace Desktoptale.Distractions
     public class MovingBoneDistraction : BoneDistraction
     {
         public Vector2 Velocity;
-        
-        private bool onScreenBefore = false;
+
+        protected bool onScreenBefore = false;
         
         public MovingBoneDistraction(BoneLength length, Vector2 velocity) : base(length)
         {

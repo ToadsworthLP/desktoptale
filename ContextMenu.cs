@@ -81,6 +81,25 @@ namespace Desktoptale
             
             SetupAddCharacterItems(addCharacterItem, target);
             
+            ToolStripMenuItem distractionsItem = new ToolStripMenuItem("Distractions");
+            contextMenuStrip.Items.Add(distractionsItem);
+            
+            for (int i = 0; i <= DistractionManager.MaxDistractionLevel; i++)
+            {
+                int level = i;
+                
+                ToolStripMenuItem distractionLevelItem = new ToolStripMenuItem(distractionLevelNames[level], null, (o, e) => { MessageBus.Send(new SetDistractionLevelMessage() { Level = level }); });
+                distractionLevelItem.Checked = i == globalSettings.DistractionLevel;
+                distractionsItem.DropDownItems.Add(distractionLevelItem);
+            }
+            
+            distractionsItem.DropDownItems.Add(new ToolStripSeparator());
+            
+            ToolStripMenuItem distractionsScaleItem = new ToolStripMenuItem("Scale");
+            distractionsItem.DropDownItems.Add(distractionsScaleItem);
+            
+            SetupDistractionScaleOptions(distractionsScaleItem);
+            
             ToolStripMenuItem globalSettingsItem = new ToolStripMenuItem("Settings");
             contextMenuStrip.Items.Add(globalSettingsItem);
             
@@ -131,18 +150,6 @@ namespace Desktoptale
             ToolStripMenuItem interactionButtonItem = new ToolStripMenuItem("Interaction Mouse Clicks", null, (o, e) => { MessageBus.Send(new InteractionButtonChangedMessage() { Enabled = !globalSettings.EnableInteractionButton }); });
             interactionButtonItem.Checked = globalSettings.EnableInteractionButton;
             settingsItem.DropDownItems.Add(interactionButtonItem);
-            
-            ToolStripMenuItem distractionsItem = new ToolStripMenuItem("Extra Distractions");
-            settingsItem.DropDownItems.Add(distractionsItem);
-            
-            for (int i = 0; i <= DistractionManager.MaxDistractionLevel; i++)
-            {
-                int level = i;
-                
-                ToolStripMenuItem distractionLevelItem = new ToolStripMenuItem(distractionLevelNames[level], null, (o, e) => { MessageBus.Send(new SetDistractionLevelMessage() { Level = level }); });
-                distractionLevelItem.Checked = i == globalSettings.DistractionLevel;
-                distractionsItem.DropDownItems.Add(distractionLevelItem);
-            }
             
             ToolStripMenuItem openCustomCharacterFolderItem = new ToolStripMenuItem("Open Custom Character Folder", null,
                 (o, e) =>
@@ -221,6 +228,17 @@ namespace Desktoptale
                 var scaleFactor = i;
                 ToolStripMenuItem scaleSelectItem = new ToolStripMenuItem($"{i}x", null, (o, e) => MessageBus.Send(new ScaleChangeRequestedMessage { ScaleFactor = scaleFactor, Target = target }));
                 scaleSelectItem.Checked = (int)target.Scale.X == i;
+                scaleItem.DropDownItems.Add(scaleSelectItem);
+            }
+        }
+
+        private void SetupDistractionScaleOptions(ToolStripMenuItem scaleItem)
+        {
+            for (int i = 1; i < 9; i++)
+            {
+                var scaleFactor = i;
+                ToolStripMenuItem scaleSelectItem = new ToolStripMenuItem($"{i}x", null, (o, e) => MessageBus.Send(new SetDistractionScaleMessage() { Scale = scaleFactor }));
+                scaleSelectItem.Checked = globalSettings.DistractionScale == i;
                 scaleItem.DropDownItems.Add(scaleSelectItem);
             }
         }

@@ -6,13 +6,13 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Desktoptale.Distractions
 {
-    public class GasterBlasterPattern : IDistractionPattern
+    public class RandomGasterBlasterPattern : IDistractionPattern
     {
         private int count;
         private float interval;
         private Random random;
 
-        public GasterBlasterPattern(int count, float interval)
+        public RandomGasterBlasterPattern(int count, float interval)
         {
             this.count = count;
             this.interval = interval;
@@ -20,7 +20,7 @@ namespace Desktoptale.Distractions
             random = new Random();
         }
 
-        public float Spawn(IDistractionManager manager, Rectangle screenRectangle)
+        public float Spawn(IDistractionManager manager, Rectangle screenRectangle, Vector2 scale)
         {
             float xMin, xMax, yMin, yMax;
             xMin = screenRectangle.Width * 0.1f;

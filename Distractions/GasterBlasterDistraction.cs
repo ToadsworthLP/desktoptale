@@ -3,6 +3,10 @@ using Desktoptale.States.GasterBlaster;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX;
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Desktoptale.Distractions
 {
@@ -34,16 +38,20 @@ namespace Desktoptale.Distractions
         private IState<GasterBlasterDistraction> fireState;
 
         private TimeSpan initialDelay;
+        private Random random;
+        private float depthOffset;
 
         public GasterBlasterDistraction(TimeSpan delay)
         {
             initialDelay = delay;
+            random = new Random();
+            depthOffset = random.NextFloat(0f, 0.0005f);
         }
         
         public void Initialize()
         {
             fireState = new BlasterFireState(TimeSpan.FromSeconds(1f));
-            fireWaitState = new BlasterWaitState(fireState, TimeSpan.FromSeconds(1f));
+            fireWaitState = new BlasterWaitState(fireState, TimeSpan.FromSeconds(0.8f));
             appearState = new BlasterAppearState(fireWaitState, Rotation, TimeSpan.FromSeconds(0.25f), 100f * Scale.Y);
             initialWaitState = new BlasterWaitState(appearState, initialDelay);
             
@@ -79,7 +87,7 @@ namespace Desktoptale.Distractions
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch, Rectangle screenRectangle)
         {
             Color blasterColor = new Color(BlasterOpacity, BlasterOpacity, BlasterOpacity, BlasterOpacity);
-            BlasterSprite.Draw(spriteBatch, Position, blasterColor, Rotation, blasterOrigin, Scale, SpriteEffects.None, float.Epsilon);
+            BlasterSprite.Draw(spriteBatch, Position, blasterColor, Rotation, blasterOrigin, Scale, SpriteEffects.None, 0.001f + depthOffset);
 
             Vector2 beamScale = new Vector2((Scale.X * BlasterSprite.FrameSize.X) * 0.6f * BeamWidth,
                 MathHelper.Max(screenRectangle.Width, screenRectangle.Height));
@@ -89,8 +97,8 @@ namespace Desktoptale.Distractions
 
             Color beamColor = new Color(BeamOpacity, BeamOpacity, BeamOpacity, BeamOpacity);
             
-            spriteBatch.Draw(beamTexture, Position, null, beamColor, Rotation, beamOrigin, beamScale, SpriteEffects.None, 0f);
-            spriteBatch.Draw(beamTipTexture, Position, null, beamColor, Rotation, beamTipOrigin, beamTipScale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(beamTexture, Position, null, beamColor, Rotation, beamOrigin, beamScale, SpriteEffects.None, 0f + depthOffset);
+            spriteBatch.Draw(beamTipTexture, Position, null, beamColor, Rotation, beamTipOrigin, beamTipScale, SpriteEffects.None, 0f + depthOffset);
         }
     }
 }
