@@ -10,7 +10,7 @@
         public const string CREDITS = @"Additional Credits:
 @sdvlex, @RedCactusSound, @Comfnani, @TsukiMoonss - Testing
 @yigarjpg - Custom Starlo running animation
-@Inky_125 - Custom Chujin sprites
+@Inky_125 - Custom Chujin/Froggit sprites
 UnderFail - Custom Chara sprites
 FanFictionGamer - Custom Asriel sprites
 ";

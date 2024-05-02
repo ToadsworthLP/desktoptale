@@ -15,9 +15,9 @@ namespace Desktoptale
     {
         public const int MaxDistractionLevel = 5;
             
-        private const float ScaleDivisor = 400f;
-        private const float MinTimeBetweenDistractions = 1;
-        private const float MaxTimeBetweenDistractions = 40;
+        private const float ScaleDivisor = 500f;
+
+        private static readonly float[] DistractionSpawnDelays = new[] { 256f, 64f, 16f, 4f, 1f };
         
         private ContentManager contentManager;
         private GameWindow window;
@@ -56,6 +56,7 @@ namespace Desktoptale
 
             patterns.Add(new UpDownOppositeBonesPattern(10, 300f, 120f * scale.Y, 100 * scale.X));
             patterns.Add(new LeftRightOppositeBonesPattern(10, 300f, 120f * scale.X, 100 * scale.Y));
+            patterns.Add(new GasterBlasterPattern());
         }
         
         public void Update(GameTime gameTime)
@@ -64,14 +65,14 @@ namespace Desktoptale
             {
                 if (nextScheduledDistractionTime < gameTime.TotalGameTime)
                 {
-                    float delay = MathHelper.Lerp(MaxTimeBetweenDistractions, MinTimeBetweenDistractions, (distractionLevel - 1) / (float)(MaxDistractionLevel - 1));
-                    delay *= random.NextFloat(0.8f, 1.2f);
-                    nextScheduledDistractionTime = gameTime.TotalGameTime + TimeSpan.FromSeconds(delay);
-            
                     int index = random.Next(0, patterns.Count);
                     if (index == lastDistractionIndex) index = (index + 1) % patterns.Count;
                     lastDistractionIndex = index;
-                    patterns[index].Spawn(this, window.ClientBounds);
+                    float waitMultiplier = patterns[index].Spawn(this, window.ClientBounds);
+                    
+                    float delay = DistractionSpawnDelays[distractionLevel - 1];
+                    delay *= random.NextFloat(0.8f, 1.2f) * waitMultiplier;
+                    nextScheduledDistractionTime = gameTime.TotalGameTime + TimeSpan.FromSeconds(delay);
                 }
             }
             
@@ -105,9 +106,10 @@ namespace Desktoptale
 
         public void AddDistraction(IDistraction distraction)
         {
+            distraction.Scale *= scale;
+            
             distraction.LoadContent(contentManager);
             distraction.Initialize();
-            distraction.Scale *= scale;
             
             distractions.Add(distraction);
         }

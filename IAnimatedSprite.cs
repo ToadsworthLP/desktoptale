@@ -8,6 +8,7 @@ namespace Desktoptale
     {
         bool Playing { get;}
         bool Loop { get; set; }
+        int LoopPoint { get; set; }
         double Framerate { get; set; }
         int FrameCount { get; }
         int StartFrame { get; set; }

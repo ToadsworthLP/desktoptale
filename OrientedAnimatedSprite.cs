@@ -25,12 +25,23 @@ namespace Desktoptale
         {
             get => SpriteForOrientation(Orientation).Loop;
             set
-        {
-            upSprite.Loop = value;
-            downSprite.Loop = value;
-            leftSprite.Loop = value;
-            rightSprite.Loop = value;
+            {
+                upSprite.Loop = value;
+                downSprite.Loop = value;
+                leftSprite.Loop = value;
+                rightSprite.Loop = value;
+            }
         }
+        public int LoopPoint
+        {
+            get => SpriteForOrientation(Orientation).LoopPoint;
+            set
+            {
+                upSprite.LoopPoint = value;
+                downSprite.LoopPoint = value;
+                leftSprite.LoopPoint = value;
+                rightSprite.LoopPoint = value;
+            }
         }
         public double Framerate
         {

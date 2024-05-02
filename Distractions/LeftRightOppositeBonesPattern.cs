@@ -17,7 +17,7 @@ namespace Desktoptale.Distractions
             this.yOffset = yOffset;
         }
 
-        public void Spawn(IDistractionManager manager, Rectangle screenRectangle)
+        public float Spawn(IDistractionManager manager, Rectangle screenRectangle)
         {
             Vector2 screenCenter = new Vector2(screenRectangle.Width / 2, screenRectangle.Height / 2);
             Vector2 leftOrigin = new Vector2(0, screenCenter.Y + yOffset);
@@ -33,6 +33,8 @@ namespace Desktoptale.Distractions
                 leftBone.Position = leftOrigin + new Vector2(-spacing * (i + 1), 0);
                 manager.AddDistraction(leftBone);
             }
+
+            return 1f;
         }
     }
 }

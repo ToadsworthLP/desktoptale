@@ -17,7 +17,7 @@ namespace Desktoptale.Distractions
             this.xOffset = xOffset;
         }
 
-        public void Spawn(IDistractionManager manager, Rectangle screenRectangle)
+        public float Spawn(IDistractionManager manager, Rectangle screenRectangle)
         {
             Vector2 screenCenter = new Vector2(screenRectangle.Width / 2, screenRectangle.Height / 2);
             Vector2 upperOrigin = new Vector2(screenCenter.X + xOffset, 0);
@@ -35,6 +35,8 @@ namespace Desktoptale.Distractions
                 downBone.Rotation = MathHelper.ToRadians(90);
                 manager.AddDistraction(downBone);
             }
+
+            return 1f;
         }
     }
 }

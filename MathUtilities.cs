@@ -19,6 +19,22 @@ namespace Desktoptale
             return value;
         }
 
+        public static float InterpolateCubicGetSlowerTowardsEnd(float a, float b, float t)
+        {
+            float oneMinusT = 1 - t;
+            float progress = 1 - oneMinusT * oneMinusT * oneMinusT;
+
+            return MathHelper.Lerp(a, b, progress);
+        }
+        
+        public static float InterpolateQuadraticGetSlowerTowardsEnd(float a, float b, float t)
+        {
+            float oneMinusT = 1 - t;
+            float progress = 1 - oneMinusT * oneMinusT * oneMinusT * oneMinusT;
+
+            return MathHelper.Lerp(a, b, progress);
+        }
+
         // Adapted from https://stackoverflow.com/questions/52004232/how-to-calculate-the-distance-from-a-point-to-the-nearest-point-of-a-rectange
         public static double DistanceToNearestPointOnRectangle(Rectangle rectangle, Point point)
         {

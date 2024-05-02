@@ -796,6 +796,18 @@
 /processorParam:TextureFormat=Color
 /build:Included/Dalv/Spr_Dalv_Walk_Up.png
 
+#begin Included/Distractions/Spr_Distraction_BeamTip.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Distractions/Spr_Distraction_BeamTip.png
+
 #begin Included/Distractions/Spr_Distraction_Bone_Long.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -843,6 +855,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Included/Distractions/Spr_Distraction_Bone_VeryShort.png
+
+#begin Included/Distractions/Spr_Distraction_GasterBlaster.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Distractions/Spr_Distraction_GasterBlaster.png
 
 #begin Included/Distractions/Spr_Distraction_WhitePixel.png
 /importer:TextureImporter

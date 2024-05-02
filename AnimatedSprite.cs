@@ -8,6 +8,7 @@ namespace Desktoptale
     {
         public bool Playing { get; private set; }
         public bool Loop { get; set; }
+        public int LoopPoint { get; set; }
         public double Framerate { get; set; }
         public int FrameCount { get; private set; }
 
@@ -75,7 +76,7 @@ namespace Desktoptale
                     }
                     else
                     {
-                        if (Loop) CurrentFrameIndex = 0;
+                        if (Loop) CurrentFrameIndex = LoopPoint;
                     }
                 }
             }
