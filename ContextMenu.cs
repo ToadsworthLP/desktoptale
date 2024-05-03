@@ -103,7 +103,7 @@ namespace Desktoptale
             
             SetupDistractionScaleOptions(distractionsScaleItem);
             
-            ToolStripMenuItem distractionsWindowItem = new ToolStripMenuItem("Window");
+            ToolStripMenuItem distractionsWindowItem = new ToolStripMenuItem("Focus on Window");
             distractionsItem.DropDownItems.Add(distractionsWindowItem);
             
             SetupDistractionWindowSelectItems(distractionsWindowItem);
