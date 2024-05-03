@@ -115,7 +115,7 @@ namespace Desktoptale
                 globalSettingsManager.LoadGlobalSettings();
             }
             
-            distractionManager = new DistractionManager(Content, Window);
+            distractionManager = new DistractionManager(Content, Window, windowTracker);
             distractionManager.Initialize();
             
             contextMenu = new ContextMenu(inputManager, characterRegistry, globalSettingsManager.GlobalSettings);

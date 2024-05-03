@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
@@ -17,6 +18,7 @@ namespace Desktoptale
         private ContextMenuStrip currentContextMenuStrip = null;
 
         private GlobalSettings globalSettings;
+        private IntPtr distractionWindowHwnd;
         
         private static readonly string[] distractionLevelNames = new[] { "Off", "Low", "Medium", "High", "Very High", "Extreme" };
 
@@ -28,6 +30,7 @@ namespace Desktoptale
 
             MessageBus.Subscribe<OpenContextMenuRequestedMessage>(OnOpenContextMenuRequested);
             MessageBus.Subscribe<ClickThroughChangeRequestedMessage>(OnClickThroughChangeRequestedMessage);
+            MessageBus.Subscribe<SetDistractionTrackedWindowMessage>(OnSetDistractionTrackedWindowMessage);
         }
         
         private void OnOpenContextMenuRequested(OpenContextMenuRequestedMessage message)
@@ -99,6 +102,11 @@ namespace Desktoptale
             distractionsItem.DropDownItems.Add(distractionsScaleItem);
             
             SetupDistractionScaleOptions(distractionsScaleItem);
+            
+            ToolStripMenuItem distractionsWindowItem = new ToolStripMenuItem("Window");
+            distractionsItem.DropDownItems.Add(distractionsWindowItem);
+            
+            SetupDistractionWindowSelectItems(distractionsWindowItem);
             
             ToolStripMenuItem globalSettingsItem = new ToolStripMenuItem("Settings");
             contextMenuStrip.Items.Add(globalSettingsItem);
@@ -274,6 +282,38 @@ namespace Desktoptale
                 parent.DropDownItems.Add(item);
             }
         }
+        
+        private void SetupDistractionWindowSelectItems(ToolStripMenuItem parent)
+        {
+            ToolStripMenuItem noneItem = new ToolStripMenuItem("None", null, (o, e) =>
+            {
+                MessageBus.Send(new SetDistractionTrackedWindowMessage() { Window = null });
+            });
+            
+            noneItem.Checked = globalSettings.DistractionWindow == null;
+            parent.DropDownItems.Add(noneItem);
+            
+            IList<WindowInfo> windows = WindowsUtils.GetOpenWindows();
+            foreach (WindowInfo windowInfo in windows)
+            {
+                string title;
+                if (windowInfo.Title.Length > 50)
+                {
+                    title = $"{windowInfo.Title.Substring(0, 47)}... [{windowInfo.ProcessName}]";
+                }
+                else
+                {
+                    title = $"{windowInfo.Title} [{windowInfo.ProcessName}]";
+                }
+                
+                ToolStripMenuItem item = new ToolStripMenuItem(title, null, (o, e) =>
+                {
+                    MessageBus.Send(new SetDistractionTrackedWindowMessage() { Window = windowInfo });
+                });
+                item.Checked = globalSettings.DistractionWindow != null && distractionWindowHwnd == windowInfo.hWnd;
+                parent.DropDownItems.Add(item);
+            }
+        }
 
         private void OnClickThroughChangeRequestedMessage(ClickThroughChangeRequestedMessage message)
         {
@@ -293,6 +333,11 @@ namespace Desktoptale
             {
                 MessageBus.Send(new ClickThroughChangedMessage() { Enabled = false });
             }
+        }
+
+        private void OnSetDistractionTrackedWindowMessage(SetDistractionTrackedWindowMessage message)
+        {
+            if (message.Window != null) distractionWindowHwnd = message.Window.hWnd;
         }
 
         private void DuplicateCharacter(ICharacter target, int count)

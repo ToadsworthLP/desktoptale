@@ -38,7 +38,7 @@ namespace Desktoptale.Distractions
                 );
                 
                 GasterBlasterDistraction gasterBlaster = new GasterBlasterDistraction(TimeSpan.FromSeconds(interval * i));
-                gasterBlaster.Position = position;
+                gasterBlaster.Position = screenRectangle.Location.ToVector2() + position;
 
                 Vector2 toCenter = screenCenter - position;
                 Vector2 initialDirection = new Vector2(0, 1);

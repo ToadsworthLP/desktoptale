@@ -34,11 +34,11 @@ namespace Desktoptale.Distractions
             for (int i = 0; i < count; i++)
             {
                 MovingBoneDistraction rightBone = new MovingBoneDistraction(BoneDistraction.BoneLength.Long, new Vector2(-velocity * velocityMultiplier, 0));
-                rightBone.Position = rightOrigin + new Vector2(spacing * scale.X * (i + 1), 0);
+                rightBone.Position = screenRectangle.Location.ToVector2() + rightOrigin + new Vector2(spacing * scale.X * (i + 1), 0);
                 manager.AddDistraction(rightBone);
                 
                 MovingBoneDistraction leftBone = new MovingBoneDistraction(BoneDistraction.BoneLength.Long, new Vector2(velocity * velocityMultiplier, 0));
-                leftBone.Position = leftOrigin + new Vector2(-spacing * scale.X * (i + 1), 0);
+                leftBone.Position = screenRectangle.Location.ToVector2() + leftOrigin + new Vector2(-spacing * scale.X * (i + 1), 0);
                 manager.AddDistraction(leftBone);
             }
 

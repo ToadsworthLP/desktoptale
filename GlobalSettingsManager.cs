@@ -35,6 +35,7 @@ namespace Desktoptale
             MessageBus.Subscribe<InteractionButtonChangedMessage>(OnInteractionButtonChangedMessage);
             MessageBus.Subscribe<SetDistractionLevelMessage>(OnSetDistractionLevelMessage);
             MessageBus.Subscribe<SetDistractionScaleMessage>(OnSetDistractionScaleMessage);
+            MessageBus.Subscribe<SetDistractionTrackedWindowMessage>(OnSetDistractionTrackedWindowMessage);
         }
 
         public bool DoesGlobalSettingsFileExist()
@@ -50,6 +51,15 @@ namespace Desktoptale
             MessageBus.Send(new InteractionButtonChangedMessage() { Enabled = GlobalSettings.EnableInteractionButton });
             MessageBus.Send(new SetDistractionLevelMessage() { Level = GlobalSettings.DistractionLevel });
             MessageBus.Send(new SetDistractionScaleMessage() { Scale = GlobalSettings.DistractionScale });
+
+            if (!string.IsNullOrWhiteSpace(GlobalSettings.DistractionWindow))
+            {
+                WindowInfo target = WindowsUtils.GetWindowByName(GlobalSettings.DistractionWindow);
+                if (target != null)
+                {
+                    MessageBus.Send(new SetDistractionTrackedWindowMessage() { Window = target });
+                }
+            }
 
             disableSaving = false;
         }
@@ -132,6 +142,12 @@ namespace Desktoptale
         private void OnSetDistractionScaleMessage(SetDistractionScaleMessage message)
         {
             GlobalSettings.DistractionScale = message.Scale;
+            SaveGlobalSettings();
+        }
+
+        private void OnSetDistractionTrackedWindowMessage(SetDistractionTrackedWindowMessage message)
+        {
+            GlobalSettings.DistractionWindow = message.Window?.ProcessName ?? null;
             SaveGlobalSettings();
         }
     }

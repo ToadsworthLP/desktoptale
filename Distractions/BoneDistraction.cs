@@ -21,6 +21,7 @@ namespace Desktoptale.Distractions
 
         protected BoneLength boneLength;
         protected Texture2D boneTexture;
+        protected float opacity = 1f;
         
         private Vector2 origin;
         
@@ -50,7 +51,7 @@ namespace Desktoptale.Distractions
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch, Rectangle screenRectangle)
         {
-            spriteBatch.Draw(boneTexture, Position, null, Color.White, Rotation, origin, Scale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(boneTexture, Position, null, new Color(opacity, opacity, opacity, opacity), Rotation, origin, Scale, SpriteEffects.None, 0f);
         }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Desktoptale
@@ -32,12 +33,16 @@ namespace Desktoptale
         private Random random;
         private int lastDistractionIndex = -1;
 
+        private WindowTracker windowTracker;
+        private TrackedWindow trackedWindow;
+
         private TimeSpan nextScheduledDistractionTime = TimeSpan.MinValue;
         
-        public DistractionManager(ContentManager contentManager, GameWindow window)
+        public DistractionManager(ContentManager contentManager, GameWindow window, WindowTracker windowTracker)
         {
             this.contentManager = contentManager;
             this.window = window;
+            this.windowTracker = windowTracker;
 
             patterns = new List<IDistractionPattern>();
             distractions = new HashSet<IDistraction>();
@@ -47,6 +52,7 @@ namespace Desktoptale
 
             MessageBus.Subscribe<SetDistractionLevelMessage>(OnSetDistractionLevelMessage);
             MessageBus.Subscribe<SetDistractionScaleMessage>(OnSetDistractionScaleMessage);
+            MessageBus.Subscribe<SetDistractionTrackedWindowMessage>(OnSetDistractionTrackedWindowMessage);
         }
         
         public void Initialize()
@@ -63,6 +69,18 @@ namespace Desktoptale
         
         public void Update(GameTime gameTime)
         {
+            Rectangle bounds;
+            if (trackedWindow?.Bounds != null)
+            {
+                bounds = trackedWindow.Bounds;
+            }
+            else
+            {
+                bounds = window.ClientBounds;
+                if (bounds.X < 0) bounds.X = 0;
+                if (bounds.Y < 0) bounds.Y = 0;
+            }
+
             if (distractionLevel > 0)
             {
                 if (nextScheduledDistractionTime < gameTime.TotalGameTime)
@@ -70,7 +88,10 @@ namespace Desktoptale
                     int index = random.Next(0, patterns.Count);
                     if (index == lastDistractionIndex) index = (index + 1) % patterns.Count;
                     lastDistractionIndex = index;
-                    float waitMultiplier = patterns[index].Spawn(this, window.ClientBounds, scale);
+
+                    
+                    
+                    float waitMultiplier = patterns[index].Spawn(this, bounds, scale);
                     
                     float delay = DistractionSpawnDelays[distractionLevel - 1];
                     delay *= random.NextFloat(0.8f, 1.2f) * waitMultiplier;
@@ -94,7 +115,7 @@ namespace Desktoptale
             
             foreach (IDistraction distraction in distractions)
             {
-                distraction.Update(gameTime, window.ClientBounds);
+                distraction.Update(gameTime, bounds);
             }
         }
         
@@ -121,20 +142,22 @@ namespace Desktoptale
             removalScheduled.Add(distraction);
         }
 
+        public void RemoveAllDistractions()
+        {
+            foreach (IDistraction distraction in distractions)
+            {
+                removalScheduled.Add(distraction);
+            }
+        }
+
         private void OnSetDistractionLevelMessage(SetDistractionLevelMessage message)
         {
             if(message.Level > MaxDistractionLevel && message.Level < 0) return;
-            
-            if (message.Level > 0)
+
+            if (message.Level != distractionLevel)
             {
-                if(message.Level > distractionLevel) nextScheduledDistractionTime = TimeSpan.MinValue;
-            }
-            else
-            {
-                foreach (IDistraction distraction in distractions)
-                {
-                    removalScheduled.Add(distraction);
-                }
+                RemoveAllDistractions();
+                nextScheduledDistractionTime = TimeSpan.MinValue;
             }
             
             distractionLevel = message.Level;
@@ -143,12 +166,45 @@ namespace Desktoptale
         private void OnSetDistractionScaleMessage(SetDistractionScaleMessage message)
         {
             scale = new Vector2(message.Scale, message.Scale);
-            
-            foreach (IDistraction distraction in distractions)
+            RemoveAllDistractions();
+            nextScheduledDistractionTime = TimeSpan.MinValue;
+        }
+
+        private void OnSetDistractionTrackedWindowMessage(SetDistractionTrackedWindowMessage message)
+        {
+            if ((trackedWindow != null && message.Window != null && trackedWindow.Window.hWnd != message.Window.hWnd) ||
+                (trackedWindow == null && message.Window != null) ||
+                (trackedWindow != null && message.Window == null))
             {
-                removalScheduled.Add(distraction);
+                RemoveAllDistractions();
                 nextScheduledDistractionTime = TimeSpan.MinValue;
             }
+            
+            if (message.Window == null)
+            {
+                if (trackedWindow != null)
+                {
+                    windowTracker.Unsubscribe(trackedWindow.Window);
+                    trackedWindow.WindowDestroyed -= OnContainingWindowDestroyed;
+                    trackedWindow = null;
+                }
+            }
+            else
+            {
+                if (trackedWindow != null)
+                {
+                    windowTracker.Unsubscribe(trackedWindow.Window);
+                    trackedWindow.WindowDestroyed -= OnContainingWindowDestroyed;
+                }
+                
+                trackedWindow = windowTracker.Subscribe(message.Window);
+                trackedWindow.WindowDestroyed += OnContainingWindowDestroyed;
+            }
+        }
+        
+        private void OnContainingWindowDestroyed()
+        {
+            MessageBus.Send(new SetDistractionTrackedWindowMessage() { Window = null });
         }
     }
 }
