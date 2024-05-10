@@ -194,7 +194,7 @@ namespace Desktoptale.Characters
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2, CurrentSprite.FrameSize.Y / 2);
+            Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2, CurrentSprite.FrameSize.Y);
             CurrentSprite.Draw(spriteBatch, Position, Color.White, 0, origin, Scale, SpriteEffects.None, Depth);
         }
 
@@ -235,9 +235,9 @@ namespace Desktoptale.Characters
 
         private void UpdatePhysicsProperties()
         {
-            HitBox = new Rectangle((int)(Position.X - maxFrameSize.X / 2f), (int)(Position.Y - maxFrameSize.Y / 2f), maxFrameSize.X, maxFrameSize.Y);
+            HitBox = new Rectangle((int)(Position.X - maxFrameSize.X / 2f), (int)(Position.Y - maxFrameSize.Y), maxFrameSize.X, maxFrameSize.Y);
             
-            Depth = MathUtilities.Clamp(1 - ((Position.Y + maxFrameSize.Y / 2f) / MonitorManager.BoundingRectangle.Height), 0 ,1);
+            Depth = MathUtilities.Clamp(1 - ((Position.Y) / MonitorManager.BoundingRectangle.Height), 0 ,1);
             Depth += depthOffset;
             if (Depth < 0)
             {
@@ -358,7 +358,7 @@ namespace Desktoptale.Characters
 
             if (dragging)
             {
-                Position = InputManager.PointerPosition.ToVector2();
+                Position = InputManager.PointerPosition.ToVector2() + new Vector2(0, CurrentSprite.FrameSize.Y * Scale.X / 2f);
             }
 
             if (DragSprite != null)
@@ -385,8 +385,8 @@ namespace Desktoptale.Characters
                 Vector2 position = Position;
                 if (position.X - scaledWidth / 2 < trackedWindow.Bounds.X) position.X = trackedWindow.Bounds.X + scaledWidth / 2;
                 if (position.X + scaledWidth / 2 > trackedWindow.Bounds.X + trackedWindow.Bounds.Width) position.X = trackedWindow.Bounds.X + trackedWindow.Bounds.Width - scaledWidth / 2;
-                if (position.Y - scaledHeight / 2 < trackedWindow.Bounds.Y) position.Y = trackedWindow.Bounds.Y + scaledHeight / 2;
-                if (position.Y + scaledHeight / 2 > trackedWindow.Bounds.Y + trackedWindow.Bounds.Height) position.Y = trackedWindow.Bounds.Y + trackedWindow.Bounds.Height - scaledHeight / 2;
+                if (position.Y - scaledHeight < trackedWindow.Bounds.Y) position.Y = trackedWindow.Bounds.Y + scaledHeight;
+                if (position.Y > trackedWindow.Bounds.Y + trackedWindow.Bounds.Height) position.Y = trackedWindow.Bounds.Y + trackedWindow.Bounds.Height;
                 Position = position;
             }
             else
