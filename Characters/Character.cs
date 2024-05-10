@@ -123,7 +123,7 @@ namespace Desktoptale.Characters
             IdleState = new IdleState();
             WalkState = new WalkState(properties.Type.WalkSpeed, true);
             RunState = new RunState(properties.Type.RunSpeed, true);
-            RandomMovementState = new RandomMovementState(90);
+            RandomMovementState = new RandomMovementState(properties.Type.WalkSpeed);
             RandomMovementWaitState = new RandomMovementWaitState();
             DragState = new DragState();
             ActionState = new ActionState();
