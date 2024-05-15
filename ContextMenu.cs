@@ -14,6 +14,7 @@ namespace Desktoptale
     public class ContextMenu
     {
         private InputManager inputManager;
+        private PartyManager partyManager;
         private IRegistry<CharacterType, string> characterRegistry;
         private ContextMenuStrip currentContextMenuStrip = null;
 
@@ -22,11 +23,12 @@ namespace Desktoptale
         
         private static readonly string[] distractionLevelNames = new[] { "Off", "Low", "Medium", "High", "Very High", "Extreme" };
 
-        public ContextMenu(InputManager inputManager, IRegistry<CharacterType, string> characterRegistry, GlobalSettings globalSettings)
+        public ContextMenu(InputManager inputManager, IRegistry<CharacterType, string> characterRegistry, GlobalSettings globalSettings, PartyManager partyManager)
         {
             this.inputManager = inputManager;
             this.characterRegistry = characterRegistry;
             this.globalSettings = globalSettings;
+            this.partyManager = partyManager;
 
             MessageBus.Subscribe<OpenContextMenuRequestedMessage>(OnOpenContextMenuRequested);
             MessageBus.Subscribe<ClickThroughChangeRequestedMessage>(OnClickThroughChangeRequestedMessage);
@@ -56,6 +58,11 @@ namespace Desktoptale
             contextMenuStrip.Items.Add(scaleItem);
 
             SetupScaleOptions(scaleItem, target);
+            
+            ToolStripMenuItem partyItem = new ToolStripMenuItem("Party");
+            contextMenuStrip.Items.Add(partyItem);
+
+            SetupPartySettingsItems(partyItem, target);
             
             ToolStripMenuItem behaviorSettingsItem = new ToolStripMenuItem("Behavior");
             contextMenuStrip.Items.Add(behaviorSettingsItem);
@@ -147,6 +154,37 @@ namespace Desktoptale
             ToolStripMenuItem stayInWindowItem = new ToolStripMenuItem("Stay in Window", null, (o, e) => { });
             settingsItem.DropDownItems.Add(stayInWindowItem);
             SetupWindowSelectItems(stayInWindowItem, target);
+        }
+        
+        private void SetupPartySettingsItems(ToolStripMenuItem partyItem, ICharacter target)
+        {
+            foreach (Party party in partyManager.GetAllParties())
+            {
+                ToolStripMenuItem item = new ToolStripMenuItem(party.Name, null, (o, e) =>
+                {
+                    MessageBus.Send(new JoinPartyMessage() { Character = target, Party = party });
+                });
+
+                partyItem.DropDownItems.Add(item);
+            }
+            
+            ToolStripMenuItem createPartyItem = new ToolStripMenuItem("Create New...", null, (o, e) =>
+            {
+                WindowsUtils.ShowCreatePartyForm(name =>
+                {
+                    if (partyManager.IsNewPartyNameValid(name))
+                    {
+                        Party newParty = partyManager.GetOrCreateParty(name);
+                        MessageBus.Send(new JoinPartyMessage() { Character = target, Party = newParty });
+                    }
+                    else
+                    {
+                        WindowsUtils.ShowMessageBox("Party names have to be unique and between 1 and 50 characters in length.", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }, () => { });
+            });
+            
+            partyItem.DropDownItems.Add(createPartyItem);
         }
         
         private void SetupGlobalSettingsItems(ToolStripMenuItem settingsItem, ICharacter target)

@@ -434,6 +434,11 @@ namespace Desktoptale
         {
             DuplicateOptionsForm.Show(successAction, cancelAction);
         }
+        
+        public static void ShowCreatePartyForm(Action<string> successAction, Action cancelAction)
+        {
+            CreatePartyForm.Show(successAction, cancelAction);
+        }
 
         public static SaveDialogResult OpenSaveDialog(string filter, string defaultName = "")
         {

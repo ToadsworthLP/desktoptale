@@ -74,6 +74,8 @@ namespace Desktoptale.Characters
         
         private CharacterProperties properties;
         private TrackedWindow trackedWindow;
+
+        private Party currentParty;
         
         private TimeSpan time = TimeSpan.Zero;
         private bool focused;

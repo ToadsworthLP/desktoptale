@@ -29,6 +29,7 @@ namespace Desktoptale
         private PresetManager presetManager;
         private MonitorManager monitorManager;
         private WindowTracker windowTracker;
+        private PartyManager partyManager;
         private ContextMenu contextMenu;
         private InteractionManager interactionManager;
         private Physics physics;
@@ -95,6 +96,7 @@ namespace Desktoptale
             physics = new Physics(inputManager);
             spriteBatch = new SpriteBatch(GraphicsDevice);
             interactionManager = new InteractionManager(monitorManager, Window, inputManager);
+            partyManager = new PartyManager();
             
             characters = new HashSet<ICharacter>();
             
@@ -118,7 +120,7 @@ namespace Desktoptale
             distractionManager = new DistractionManager(Content, Window, windowTracker);
             distractionManager.Initialize();
             
-            contextMenu = new ContextMenu(inputManager, characterRegistry, globalSettingsManager.GlobalSettings);
+            contextMenu = new ContextMenu(inputManager, characterRegistry, globalSettingsManager.GlobalSettings, partyManager);
             
             globalSettingsManager.SendMessages();
         }
