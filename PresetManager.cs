@@ -5,7 +5,6 @@ using Desktoptale.Characters;
 using Desktoptale.Messages;
 using Desktoptale.Messaging;
 using Desktoptale.Registry;
-using Microsoft.Xna.Framework;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -18,11 +17,13 @@ namespace Desktoptale
         private ISerializer serializer;
         private IDeserializer deserializer;
         private IRegistry<CharacterType, string> characterRegistry;
+        private PartyManager partyManager;
 
-        public PresetManager(IRegistry<CharacterType, string> characterRegistry)
+        public PresetManager(IRegistry<CharacterType, string> characterRegistry, PartyManager partyManager)
         {
             this.characterRegistry = characterRegistry;
-            
+            this.partyManager = partyManager;
+
             serializer = new SerializerBuilder()
                 .WithNamingConvention(PascalCaseNamingConvention.Instance)
                 .Build();
@@ -62,6 +63,10 @@ namespace Desktoptale
                     }
                     
                     return null;
+                }, partyName =>
+                {
+                    Party party = partyManager.GetOrCreateParty(partyName);
+                    return party;
                 });
             }
             catch (Exception e)

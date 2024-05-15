@@ -12,6 +12,7 @@ namespace Desktoptale
         public bool IdleRoamingEnabled { get; set; }
         public bool UnfocusedInputEnabled { get; set; }
         public WindowInfo StayInsideWindow { get; set; }
+        public Party Party { get; set; }
 
         public CharacterProperties()
         {
@@ -21,9 +22,10 @@ namespace Desktoptale
             IdleRoamingEnabled = true;
             UnfocusedInputEnabled = false;
             StayInsideWindow = null;
+            Party = null;
         }
         
-        public CharacterProperties(CharacterType type, Vector2 position, Vector2 scale, bool idleRoamingEnabled, bool unfocusedInputEnabled, WindowInfo stayInsideWindow = null)
+        public CharacterProperties(CharacterType type, Vector2 position, Vector2 scale, bool idleRoamingEnabled, bool unfocusedInputEnabled, WindowInfo stayInsideWindow = null, Party party = null)
         {
             Type = type;
             Position = position;
@@ -31,6 +33,7 @@ namespace Desktoptale
             IdleRoamingEnabled = idleRoamingEnabled;
             UnfocusedInputEnabled = unfocusedInputEnabled;
             StayInsideWindow = stayInsideWindow;
+            Party = party;
         }
         
         public CharacterProperties(CharacterProperties source)
@@ -41,6 +44,7 @@ namespace Desktoptale
             IdleRoamingEnabled = source.IdleRoamingEnabled;
             UnfocusedInputEnabled = source.UnfocusedInputEnabled;
             StayInsideWindow = source.StayInsideWindow;
+            Party = source.Party;
         }
     }
 }

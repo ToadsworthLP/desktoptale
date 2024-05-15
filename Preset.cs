@@ -16,6 +16,7 @@ namespace Desktoptale
         public bool IdleRoaming { get; set; }
         public bool UnfocusedInput { get; set; }
         public string Window { get; set; }
+        public string Party { get; set; }
 
         public Preset()
         {
@@ -30,6 +31,7 @@ namespace Desktoptale
             IdleRoaming = settings.IdleRoaming;
             UnfocusedInput = settings.UnfocusedInput;
             Window = settings.Window;
+            Party = settings.Party;
         }
 
         public Preset(CharacterProperties properties, Func<CharacterType, string> idResolver)
@@ -41,6 +43,7 @@ namespace Desktoptale
             IdleRoaming = properties.IdleRoamingEnabled;
             UnfocusedInput = properties.UnfocusedInputEnabled;
             Window = properties.StayInsideWindow?.ProcessName;
+            Party = properties.Party?.Name;
         }
         
         public void Apply(Settings settings)
@@ -50,11 +53,12 @@ namespace Desktoptale
             settings.IdleRoaming = IdleRoaming;
             settings.UnfocusedInput = UnfocusedInput;
             settings.Window = Window;
+            settings.Party = Party;
             
             settings.Validate();
         }
 
-        public CharacterProperties ToCharacterProperties(Func<string, CharacterType> typeResolver, Func<string, WindowInfo> windowResolver)
+        public CharacterProperties ToCharacterProperties(Func<string, CharacterType> typeResolver, Func<string, WindowInfo> windowResolver, Func<string, Party> partyResolver)
         {
             CharacterProperties result = new CharacterProperties(
                 typeResolver.Invoke(Character),
@@ -62,7 +66,8 @@ namespace Desktoptale
                 new Vector2(Scale),
                 IdleRoaming,
                 UnfocusedInput,
-                windowResolver.Invoke(Window)
+                windowResolver.Invoke(Window),
+                partyResolver.Invoke(Party)
             );
             
             return result;

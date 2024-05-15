@@ -12,7 +12,7 @@ namespace Desktoptale.Characters
     {
         public CharacterProperties Properties => properties;
         public TrackedWindow TrackedWindow => trackedWindow;
-
+        
         public Vector2 Position
         {
             get => properties.Position;
@@ -74,8 +74,6 @@ namespace Desktoptale.Characters
         
         private CharacterProperties properties;
         private TrackedWindow trackedWindow;
-
-        private Party currentParty;
         
         private TimeSpan time = TimeSpan.Zero;
         private bool focused;
@@ -94,6 +92,8 @@ namespace Desktoptale.Characters
         private Subscription focusCharacterSubscription;
         private Subscription unfocusCharacterSubscription;
         private Subscription changeContainingWindowSubscription;
+        private Subscription joinPartySubscription;
+        private Subscription leavePartySubscription;
 
         public Character(CharacterCreationContext characterCreationContext)
         {
@@ -121,7 +121,9 @@ namespace Desktoptale.Characters
             focusCharacterSubscription = MessageBus.Subscribe<FocusCharacterMessage>(OnFocusCharacterMessage);
             unfocusCharacterSubscription = MessageBus.Subscribe<UnfocusAllCharactersMessage>(OnUnfocusCharacterMessage);
             changeContainingWindowSubscription = MessageBus.Subscribe<ChangeContainingWindowMessage>(OnChangeContainingWindowMessage);
-
+            joinPartySubscription = MessageBus.Subscribe<JoinPartyMessage>(OnJoinPartyMessage);
+            leavePartySubscription = MessageBus.Subscribe<LeavePartyMessage>(OnLeavePartyMessage);
+            
             IdleState = new IdleState();
             WalkState = new WalkState(properties.Type.WalkSpeed, true);
             RunState = new RunState(properties.Type.RunSpeed, true);
@@ -138,6 +140,11 @@ namespace Desktoptale.Characters
             {
                 trackedWindow = WindowTracker.Subscribe(properties.StayInsideWindow);
                 trackedWindow.WindowDestroyed += OnContainingWindowDestroyed;
+            }
+
+            if (properties.Party != null)
+            {
+                properties.Party.Add(this);
             }
         }
 
@@ -209,11 +216,18 @@ namespace Desktoptale.Characters
             MessageBus.Unsubscribe(focusCharacterSubscription);
             MessageBus.Unsubscribe(unfocusCharacterSubscription);
             MessageBus.Unsubscribe(changeContainingWindowSubscription);
+            MessageBus.Unsubscribe(joinPartySubscription);
+            MessageBus.Unsubscribe(leavePartySubscription);
 
             if (trackedWindow != null)
             {
                 WindowTracker.Unsubscribe(trackedWindow.Window);
                 trackedWindow.WindowDestroyed -= OnContainingWindowDestroyed;
+            }
+
+            if (properties.Party != null)
+            {
+                properties.Party.Remove(this);
             }
         }
         
@@ -469,6 +483,22 @@ namespace Desktoptale.Characters
         private void OnContextMenuStateChangedMessage(ContextMenuStateChangedMessage message)
         {
             enableDragging = !message.Open;
+        }
+
+        private void OnJoinPartyMessage(JoinPartyMessage message)
+        {
+            if (message.Character != this) return;
+            
+            message.Party?.Add(this);
+            properties.Party = message.Party;
+        }
+
+        private void OnLeavePartyMessage(LeavePartyMessage message)
+        {
+            if (message.Character != this) return;
+            
+            message.Party?.Remove(this);
+            properties.Party = null;
         }
     }
 }

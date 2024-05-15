@@ -19,6 +19,7 @@ namespace Desktoptale
             this.Name = name;
 
             members = new Dictionary<ICharacter, int>();
+            reverseMapping = new Dictionary<int, ICharacter>();
         }
 
         public void Add(ICharacter character)
@@ -32,20 +33,23 @@ namespace Desktoptale
         {
             int removedIndex = members[character];
             members.Remove(character);
+            reverseMapping.Remove(removedIndex);
 
-            IEnumerable<ICharacter> allMembers = members.Keys;
+            ICollection<ICharacter> allMembers = members.Keys;
+            IList<ICharacter> affectedMembers = new List<ICharacter>();
+            
             foreach (ICharacter member in allMembers)
             {
                 int memberIndex = members[member];
-                int updatedIndex = memberIndex;
-                if (memberIndex > removedIndex)
-                {
-                    updatedIndex = memberIndex--;
-                    members[member] = updatedIndex;
-                }
+                if (memberIndex > removedIndex) affectedMembers.Add(member);
+            }
 
-                reverseMapping.Remove(memberIndex);
-                reverseMapping.Add(updatedIndex, character);
+            foreach (ICharacter affectedMember in affectedMembers)
+            {
+                int updatedIndex = members[affectedMember] - 1;
+                members[affectedMember] = updatedIndex;
+                reverseMapping.Remove(updatedIndex + 1);
+                reverseMapping[updatedIndex] = affectedMember;
             }
 
             nextIndex--;

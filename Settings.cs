@@ -22,6 +22,9 @@ namespace Desktoptale
         [Option("window", HelpText = "The window the character should stay in", Default = null)]
         public string Window { get; set; }
         
+        [Option("party", HelpText = "The party that the character should join", Default = null)]
+        public string Party { get; set; }
+        
         [Option("print-registry-keys", HelpText = "Lists the registry keys of all currently available characters", Default = false)]
         public bool PrintRegistryKeys { get; set; }
 

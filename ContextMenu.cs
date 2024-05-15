@@ -158,13 +158,23 @@ namespace Desktoptale
         
         private void SetupPartySettingsItems(ToolStripMenuItem partyItem, ICharacter target)
         {
+            ToolStripMenuItem noneItem = new ToolStripMenuItem("None", null, (o, e) =>
+            {
+                MessageBus.Send(new LeavePartyMessage() { Character = target, Party = target.Properties.Party });
+            });
+
+            noneItem.Checked = target.Properties.Party == null;
+            partyItem.DropDownItems.Add(noneItem);
+            
             foreach (Party party in partyManager.GetAllParties())
             {
                 ToolStripMenuItem item = new ToolStripMenuItem(party.Name, null, (o, e) =>
                 {
+                    MessageBus.Send(new LeavePartyMessage() { Character = target, Party = target.Properties.Party });
                     MessageBus.Send(new JoinPartyMessage() { Character = target, Party = party });
                 });
 
+                item.Checked = target.Properties.Party == party;
                 partyItem.DropDownItems.Add(item);
             }
             
@@ -175,6 +185,7 @@ namespace Desktoptale
                     if (partyManager.IsNewPartyNameValid(name))
                     {
                         Party newParty = partyManager.GetOrCreateParty(name);
+                        MessageBus.Send(new LeavePartyMessage() { Character = target, Party = target.Properties.Party });
                         MessageBus.Send(new JoinPartyMessage() { Character = target, Party = newParty });
                     }
                     else

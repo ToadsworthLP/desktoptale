@@ -92,7 +92,7 @@ namespace Desktoptale
             MessageBus.Subscribe<GlobalPauseMessage>(OnGlobalPauseMessage);
             
             inputManager = new InputManager(monitorManager);
-            presetManager = new PresetManager(characterRegistry);
+            presetManager = new PresetManager(characterRegistry, partyManager);
             physics = new Physics(inputManager);
             spriteBatch = new SpriteBatch(GraphicsDevice);
             interactionManager = new InteractionManager(monitorManager, Window, inputManager);
@@ -197,13 +197,20 @@ namespace Desktoptale
                     }
                 }
 
+                Party party = null;
+                if (!string.IsNullOrWhiteSpace(settings.Party))
+                {
+                    party = partyManager.GetOrCreateParty(settings.Party);
+                }
+
                 characterProperties = new CharacterProperties(
                     initialCharacter,
                     defaultCharacterStartPosition.ToVector2(),
                     new Vector2(sourceSettings.Scale),
                     sourceSettings.IdleRoaming,
                     sourceSettings.UnfocusedInput,
-                    stayInsideWindow
+                    stayInsideWindow,
+                    party
                 );
             }
             
@@ -354,7 +361,8 @@ namespace Desktoptale
                 message.Target.Properties.Scale,
                 message.Target.Properties.IdleRoamingEnabled,
                 message.Target.Properties.UnfocusedInputEnabled,
-                message.Target.TrackedWindow?.Window
+                message.Target.TrackedWindow?.Window,
+                message.Target.Properties.Party
             );
             
             Character newCharacter;
