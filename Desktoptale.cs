@@ -92,11 +92,11 @@ namespace Desktoptale
             MessageBus.Subscribe<GlobalPauseMessage>(OnGlobalPauseMessage);
             
             inputManager = new InputManager(monitorManager);
+            partyManager = new PartyManager();
             presetManager = new PresetManager(characterRegistry, partyManager);
             physics = new Physics(inputManager);
             spriteBatch = new SpriteBatch(GraphicsDevice);
             interactionManager = new InteractionManager(monitorManager, Window, inputManager);
-            partyManager = new PartyManager();
             
             characters = new HashSet<ICharacter>();
             
