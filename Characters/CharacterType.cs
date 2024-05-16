@@ -16,6 +16,15 @@ namespace Desktoptale.Characters
             Category = category;
             FactoryFunction = factoryFunction;
         }
+        
+        public CharacterType(string name, string category, Func<CharacterCreationContext, Character> factoryFunction, float walkSpeed, float runSpeed)
+        {
+            Name = name;
+            Category = category;
+            FactoryFunction = factoryFunction;
+            WalkSpeed = walkSpeed;
+            RunSpeed = runSpeed;
+        }
 
         public override string ToString()
         {

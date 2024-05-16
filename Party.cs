@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Desktoptale
 {
@@ -29,11 +30,10 @@ namespace Desktoptale
             nextIndex++;
         }
 
-        public void Remove(ICharacter character)
+        public void Remove(ICharacter character, bool skipPartyCleanup = false)
         {
             int removedIndex = members[character];
             members.Remove(character);
-            reverseMapping.Remove(removedIndex);
 
             ICollection<ICharacter> allMembers = members.Keys;
             IList<ICharacter> affectedMembers = new List<ICharacter>();
@@ -48,27 +48,61 @@ namespace Desktoptale
             {
                 int updatedIndex = members[affectedMember] - 1;
                 members[affectedMember] = updatedIndex;
-                reverseMapping.Remove(updatedIndex + 1);
-                reverseMapping[updatedIndex] = affectedMember;
             }
 
             nextIndex--;
 
-            if (members.Count == 0)
+            reverseMapping = members.ToDictionary(e => e.Value, e => e.Key);
+
+            if (!skipPartyCleanup)
             {
-                PartyDissolved?.Invoke();
+                if (members.Count == 0 && reverseMapping.Count == 0)
+                {
+                    PartyDissolved?.Invoke();
+                }
             }
+        }
+
+        public void RemoveWithFreeSpace(ICharacter character)
+        {
+            int removedIndex = members[character];
+            members.Remove(character);
+            reverseMapping[removedIndex] = null;
+        }
+        
+        public void InsertIntoFreeSpace(ICharacter character)
+        {
+            int freeSpaceIndex = -1;
+            foreach (KeyValuePair<int, ICharacter> entry in reverseMapping)
+            {
+                if (entry.Value == null) freeSpaceIndex = entry.Key;
+            }
+            
+            members.Add(character, freeSpaceIndex);
+            reverseMapping[freeSpaceIndex] = character;
         }
 
         public void MakeLeader(ICharacter character)
         {
-            // TODO implement this
+            Remove(character, true);
+            
+            IList<ICharacter> affectedMembers = new List<ICharacter>(members.Keys);
+            foreach (ICharacter member in affectedMembers)
+            {
+                int updatedIndex = members[member] + 1;
+                members[member] = updatedIndex;
+            }
+            
+            members.Add(character, 0);
+            reverseMapping = members.ToDictionary(e => e.Value, e => e.Key);
+
+            nextIndex++;
         }
 
         public ICharacter GetCharacterInFront(ICharacter character)
         {
             int charIndex = members[character];
-            if (reverseMapping.TryGetValue(charIndex + 1, out var inFront))
+            if (reverseMapping.TryGetValue(charIndex - 1, out var inFront))
             {
                 return inFront;
             }

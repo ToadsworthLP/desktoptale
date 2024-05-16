@@ -26,9 +26,9 @@ namespace Desktoptale.Characters
             RunSprite = idleSprite;
         }
 
-        public override void Initialize()
+        public override void Initialize(CharacterCreationReason reason)
         {
-            base.Initialize();
+            base.Initialize(reason);
             
             WalkState = new WalkState(100f, false);
             RunState = new RunState(50f, false);

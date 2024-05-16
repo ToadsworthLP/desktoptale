@@ -10,6 +10,9 @@ namespace Desktoptale.Characters
 {
     public abstract class Character : ICharacter
     {
+        public enum CharacterCreationReason { NewCharacter, ChangeCharacter }
+        public enum CharacterRemovalReason { RemoveCharacter, ChangeCharacter }
+        
         public CharacterProperties Properties => properties;
         public TrackedWindow TrackedWindow => trackedWindow;
         
@@ -42,6 +45,9 @@ namespace Desktoptale.Characters
         public IState<Character> DragState { get; protected set; }
         public IState<Character> ActionState { get; protected set; }
         public IState<Character> RandomActionState { get; protected set; }
+        public IState<Character> PartyIdleState { get; protected set; }
+        public IState<Character> PartyWalkState { get; protected set; }
+        public IState<Character> PartyRunState { get; protected set; }
     
         public IAnimatedSprite IdleSprite { get; set; }
         public IAnimatedSprite WalkSprite { get; set; }
@@ -109,7 +115,7 @@ namespace Desktoptale.Characters
             CurrentSprite = sprite;
         }
 
-        public virtual void Initialize()
+        public virtual void Initialize(CharacterCreationReason reason)
         {
             Random random = new Random(GetHashCode());
             depthOffset = (float)((random.NextDouble() % 0.0002d) - 0.0001d);
@@ -132,6 +138,9 @@ namespace Desktoptale.Characters
             DragState = new DragState();
             ActionState = new ActionState();
             RandomActionState = new RandomActionState();
+            PartyIdleState = new PartyIdleState(40f);
+            PartyWalkState = new PartyWalkState(properties.Type.WalkSpeed, 25f, 60f);
+            PartyRunState = new PartyRunState(properties.Type.RunSpeed, 45f);
         
             StateMachine = new StateMachine<Character>(this, InitialState);
             StateMachine.StateChanged += (state, newState) => UpdateOrientation();
@@ -144,7 +153,19 @@ namespace Desktoptale.Characters
 
             if (properties.Party != null)
             {
-                properties.Party.Add(this);
+                if (reason == CharacterCreationReason.NewCharacter)
+                {
+                    properties.Party.Add(this);
+                }
+                else
+                {
+                    properties.Party.InsertIntoFreeSpace(this);
+                }
+                
+                if (properties.Party.GetLeader() != this)
+                {
+                    StateMachine.ChangeState(PartyIdleState);
+                }
             }
         }
 
@@ -188,6 +209,16 @@ namespace Desktoptale.Characters
                 UpdatePhysicsProperties();
             }
 
+            if (properties.Party != null && properties.Party.GetLeader() != this)
+            {
+                if (StateMachine.CurrentState != PartyIdleState &&
+                    StateMachine.CurrentState != PartyWalkState &&
+                    StateMachine.CurrentState != PartyRunState)
+                {
+                    StateMachine.ChangeState(PartyIdleState);
+                }
+            }
+
             Vector2 beforeCorrection = Position;
             PreventLeavingScreenArea();
             
@@ -207,7 +238,7 @@ namespace Desktoptale.Characters
             CurrentSprite.Draw(spriteBatch, Position, Color.White, 0, origin, Scale, SpriteEffects.None, Depth);
         }
 
-        public virtual void Dispose()
+        public virtual void Dispose(CharacterRemovalReason reason)
         {
             MessageBus.Unsubscribe(scaleChangeRequestedSubscription);
             MessageBus.Unsubscribe(idleMovementChangeRequestedSubscription);
@@ -227,7 +258,14 @@ namespace Desktoptale.Characters
 
             if (properties.Party != null)
             {
-                properties.Party.Remove(this);
+                if (reason == CharacterRemovalReason.RemoveCharacter)
+                {
+                    properties.Party.Remove(this);
+                }
+                else
+                {
+                    properties.Party.RemoveWithFreeSpace(this);
+                }
             }
         }
         
@@ -304,6 +342,7 @@ namespace Desktoptale.Characters
         private void OnFocusCharacterMessage(FocusCharacterMessage message)
         {
             focused = message.Character == this;
+            if(focused && properties.Party != null) properties.Party.MakeLeader(this);
         }
 
         private void OnUnfocusCharacterMessage(UnfocusAllCharactersMessage message)
@@ -488,9 +527,18 @@ namespace Desktoptale.Characters
         private void OnJoinPartyMessage(JoinPartyMessage message)
         {
             if (message.Character != this) return;
-            
-            message.Party?.Add(this);
+
             properties.Party = message.Party;
+
+            if (message.Party != null)
+            {
+                message.Party.Add(this);
+                
+                if (message.Party.GetLeader() != this)
+                {
+                    StateMachine.ChangeState(PartyIdleState);
+                }
+            }
         }
 
         private void OnLeavePartyMessage(LeavePartyMessage message)
@@ -499,6 +547,13 @@ namespace Desktoptale.Characters
             
             message.Party?.Remove(this);
             properties.Party = null;
+
+            if (StateMachine.CurrentState == PartyIdleState ||
+                StateMachine.CurrentState == PartyWalkState ||
+                StateMachine.CurrentState == PartyRunState)
+            {
+                StateMachine.ChangeState(IdleState);
+            }
         }
     }
 }

@@ -8,9 +8,9 @@ namespace Desktoptale.Characters
     {
         public Clover(CharacterCreationContext characterCreationContext) : base(characterCreationContext) {}
 
-        public override void Initialize()
+        public override void Initialize(CharacterCreationReason reason)
         {
-            base.Initialize();
+            base.Initialize(reason);
             RandomActionState = new RandomActionState(4, 16);
         }
 

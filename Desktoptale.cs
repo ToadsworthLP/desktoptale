@@ -334,7 +334,7 @@ namespace Desktoptale
                 return;
             }
             
-            character.Initialize();
+            character.Initialize(Character.CharacterCreationReason.NewCharacter);
             characters.Add(character);
             physics.AddCollider(character);
             
@@ -345,7 +345,7 @@ namespace Desktoptale
         {
             physics.RemoveCollider(message.Target);
             characters.Remove(message.Target);
-            message.Target.Dispose();
+            message.Target.Dispose(Character.CharacterRemovalReason.RemoveCharacter);
 
             if (characters.Count == 0)
             {
@@ -381,7 +381,7 @@ namespace Desktoptale
             }
 
             newCharacter.Properties.Type = message.Character;
-            newCharacter.Initialize();
+            newCharacter.Initialize(Character.CharacterCreationReason.NewCharacter);
             characters.Add(newCharacter);
             physics.AddCollider(newCharacter);
             
@@ -409,10 +409,10 @@ namespace Desktoptale
             
             physics.RemoveCollider(oldCharacter);
             characters.Remove(oldCharacter);
-            oldCharacter.Dispose();
+            oldCharacter.Dispose(Character.CharacterRemovalReason.ChangeCharacter);
 
             newCharacter.Properties.Type = message.Character;
-            newCharacter.Initialize();
+            newCharacter.Initialize(Character.CharacterCreationReason.ChangeCharacter);
             characters.Add(newCharacter);
             physics.AddCollider(newCharacter);
             

@@ -13,7 +13,7 @@ namespace Desktoptale
 
         public bool IsNewPartyNameValid(string name)
         {
-            bool valid = !string.IsNullOrWhiteSpace(name) && name.Length <= 50;
+            bool valid = !string.IsNullOrWhiteSpace(name);
 
             if (valid)
             {
@@ -31,7 +31,10 @@ namespace Desktoptale
             }
 
             Party party = new Party(this, name);
-            party.PartyDissolved += () => { parties.Remove(name); };
+            party.PartyDissolved += () =>
+            {
+                parties.Remove(name);
+            };
             parties.Add(name, party);
 
             return party;

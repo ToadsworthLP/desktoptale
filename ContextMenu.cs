@@ -190,7 +190,7 @@ namespace Desktoptale
                     }
                     else
                     {
-                        WindowsUtils.ShowMessageBox("Party names have to be unique and between 1 and 50 characters in length.", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        WindowsUtils.ShowMessageBox("Party names have to be unique and cannot consist of only white space.", ProgramInfo.NAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }, () => { });
             });

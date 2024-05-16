@@ -9,14 +9,9 @@ namespace Desktoptale.Characters
     {
         public Flowey(CharacterCreationContext characterCreationContext) : base(characterCreationContext) {}
     
-        public override void Initialize()
+        public override void Initialize(CharacterCreationReason reason)
         {
-            base.Initialize();
-
-            IdleState = InitialState;
-            WalkState = new WalkState(0, true);
-            RunState = new RunState(0, true);
-            RandomMovementState = new RandomMovementState(0);
+            base.Initialize(reason);
             EnabledAutoOrientation = false;
         }
         
