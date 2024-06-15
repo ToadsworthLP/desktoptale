@@ -36,6 +36,7 @@ namespace Desktoptale
 
         public Preset(CharacterProperties properties, Func<CharacterType, string> idResolver)
         {
+            Version  = FILE_FORMAT_VERSION;
             Character = idResolver.Invoke(properties.Type);
             XPosition = properties.Position.X;
             YPosition = properties.Position.Y;

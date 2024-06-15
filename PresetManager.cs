@@ -65,6 +65,8 @@ namespace Desktoptale
                     return null;
                 }, partyName =>
                 {
+                    if (partyName == null) return null;
+                    
                     Party party = partyManager.GetOrCreateParty(partyName);
                     return party;
                 });
