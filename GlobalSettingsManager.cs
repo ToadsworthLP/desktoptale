@@ -20,7 +20,7 @@ namespace Desktoptale
 
         public GlobalSettingsManager(string path)
         {
-            this.path = path;
+            this.path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path);
             
             serializer = new SerializerBuilder()
                 .WithNamingConvention(PascalCaseNamingConvention.Instance)
