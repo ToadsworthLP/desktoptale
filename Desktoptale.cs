@@ -207,7 +207,7 @@ namespace Desktoptale
                     initialCharacter,
                     defaultCharacterStartPosition.ToVector2(),
                     new Vector2(sourceSettings.Scale),
-                    sourceSettings.IdleRoaming,
+                    !sourceSettings.DisableIdleRoaming,
                     sourceSettings.UnfocusedInput,
                     stayInsideWindow,
                     party

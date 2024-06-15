@@ -13,8 +13,8 @@ namespace Desktoptale
         [Option("scale", HelpText = "Scale of the character (must be greater than 1)", Default = 2)]
         public int Scale { get; set; } = 2;
 
-        [Option("idle-roaming", HelpText = "Whether to enable the Idle Roaming option", Default = true)]
-        public bool IdleRoaming { get; set; } = true;
+        [Option("no-idle-roaming", HelpText = "Whether to disable the Idle Roaming option", Default = false)]
+        public bool DisableIdleRoaming { get; set; }
         
         [Option("unfocused-input", HelpText = "Whether to enable the Unfocused Input option", Default = false)]
         public bool UnfocusedInput { get; set; }

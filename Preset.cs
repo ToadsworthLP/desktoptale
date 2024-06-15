@@ -28,7 +28,7 @@ namespace Desktoptale
             Version  = FILE_FORMAT_VERSION;
             Character = settings.Character;
             Scale = settings.Scale;
-            IdleRoaming = settings.IdleRoaming;
+            IdleRoaming = !settings.DisableIdleRoaming;
             UnfocusedInput = settings.UnfocusedInput;
             Window = settings.Window;
             Party = settings.Party;
@@ -51,7 +51,7 @@ namespace Desktoptale
         {
             settings.Character = Character;
             settings.Scale = Scale;
-            settings.IdleRoaming = IdleRoaming;
+            settings.DisableIdleRoaming = IdleRoaming;
             settings.UnfocusedInput = UnfocusedInput;
             settings.Window = Window;
             settings.Party = Party;
