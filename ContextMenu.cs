@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 using Desktoptale.Characters;
 using Desktoptale.Messages;
@@ -29,7 +30,7 @@ namespace Desktoptale
             this.characterRegistry = characterRegistry;
             this.globalSettings = globalSettings;
             this.partyManager = partyManager;
-
+            
             MessageBus.Subscribe<OpenContextMenuRequestedMessage>(OnOpenContextMenuRequested);
             MessageBus.Subscribe<ClickThroughChangeRequestedMessage>(OnClickThroughChangeRequestedMessage);
             MessageBus.Subscribe<SetDistractionTrackedWindowMessage>(OnSetDistractionTrackedWindowMessage);
@@ -237,9 +238,40 @@ namespace Desktoptale
                 {
                     if (!categoryItems.ContainsKey(character.Category))
                     {
-                        ToolStripMenuItem categoryItem = new ToolStripMenuItem(character.Category);
-                        characterItem.DropDownItems.Add(categoryItem);
-                        categoryItems.Add(character.Category, categoryItem);
+                        void MakeCategoriesRecursive(string[] splitCategory, int depth)
+                        {
+                            if (depth >= splitCategory.Length) return;
+                            
+                            StringBuilder sb = new StringBuilder();
+                            for (int i = 0; i < depth; i++)
+                            {
+                                sb.Append(splitCategory[i]);
+                                sb.Append("\\");
+                            }
+                            
+                            string catString = depth > 0 ? sb.ToString(0, sb.Length - 1) : "";
+                            string catStringWithCurrent = depth > 0 ? $"{catString}\\{splitCategory[depth]}" : splitCategory[depth];
+
+                            if (!categoryItems.ContainsKey(catStringWithCurrent))
+                            {
+                                ToolStripMenuItem categoryItem = new ToolStripMenuItem(splitCategory[depth]);
+                                categoryItems.Add(catStringWithCurrent, categoryItem);
+
+                                if (depth == 0)
+                                {
+                                    characterItem.DropDownItems.Add(categoryItem);
+                                }
+                                else
+                                {
+                                    ToolStripMenuItem categoryParent = categoryItems[catString];
+                                    categoryParent.DropDownItems.Add(categoryItem);
+                                }
+                            }
+
+                            MakeCategoriesRecursive(splitCategory, depth + 1);
+                        }
+                        
+                        MakeCategoriesRecursive(character.Category.Split('\\'), 0);
                     }
 
                     parent = categoryItems[character.Category];
@@ -266,9 +298,40 @@ namespace Desktoptale
                 {
                     if (!categoryItems.ContainsKey(character.Category))
                     {
-                        ToolStripMenuItem categoryItem = new ToolStripMenuItem(character.Category);
-                        characterItem.DropDownItems.Add(categoryItem);
-                        categoryItems.Add(character.Category, categoryItem);
+                        void MakeCategoriesRecursive(string[] splitCategory, int depth)
+                        {
+                            if (depth >= splitCategory.Length) return;
+                            
+                            StringBuilder sb = new StringBuilder();
+                            for (int i = 0; i < depth; i++)
+                            {
+                                sb.Append(splitCategory[i]);
+                                sb.Append("\\");
+                            }
+                            
+                            string catString = depth > 0 ? sb.ToString(0, sb.Length - 1) : "";
+                            string catStringWithCurrent = depth > 0 ? $"{catString}\\{splitCategory[depth]}" : splitCategory[depth];
+
+                            if (!categoryItems.ContainsKey(catStringWithCurrent))
+                            {
+                                ToolStripMenuItem categoryItem = new ToolStripMenuItem(splitCategory[depth]);
+                                categoryItems.Add(catStringWithCurrent, categoryItem);
+
+                                if (depth == 0)
+                                {
+                                    characterItem.DropDownItems.Add(categoryItem);
+                                }
+                                else
+                                {
+                                    ToolStripMenuItem categoryParent = categoryItems[catString];
+                                    categoryParent.DropDownItems.Add(categoryItem);
+                                }
+                            }
+
+                            MakeCategoriesRecursive(splitCategory, depth + 1);
+                        }
+                        
+                        MakeCategoriesRecursive(character.Category.Split('\\'), 0);
                     }
 
                     parent = categoryItems[character.Category];
