@@ -372,27 +372,37 @@ namespace Desktoptale
             
             noneItem.Checked = target.TrackedWindow == null;
             parent.DropDownItems.Add(noneItem);
-            
-            IList<WindowInfo> windows = WindowsUtils.GetOpenWindows();
-            foreach (WindowInfo windowInfo in windows)
+
+            parent.DropDownOpened += (sender, args) =>
             {
-                string title;
-                if (windowInfo.Title.Length > 50)
+                currentContextMenuStrip.SuspendLayout();
+                
+                parent.DropDownItems.Clear();
+                parent.DropDownItems.Add(noneItem);
+                
+                IList<WindowInfo> windows = WindowsUtils.GetOpenWindows();
+                foreach (WindowInfo windowInfo in windows)
                 {
-                    title = $"{windowInfo.Title.Substring(0, 47)}... [{windowInfo.ProcessName}]";
-                }
-                else
-                {
-                    title = $"{windowInfo.Title} [{windowInfo.ProcessName}]";
+                    string title;
+                    if (windowInfo.Title.Length > 50)
+                    {
+                        title = $"{windowInfo.Title.Substring(0, 47)}... [{windowInfo.ProcessName}]";
+                    }
+                    else
+                    {
+                        title = $"{windowInfo.Title} [{windowInfo.ProcessName}]";
+                    }
+                
+                    ToolStripMenuItem item = new ToolStripMenuItem(title, null, (o, e) =>
+                    {
+                        MessageBus.Send(new ChangeContainingWindowMessage() { Window = windowInfo, Target = target });
+                    });
+                    item.Checked = target.TrackedWindow != null && target.TrackedWindow.Window.hWnd == windowInfo.hWnd;
+                    parent.DropDownItems.Add(item);
                 }
                 
-                ToolStripMenuItem item = new ToolStripMenuItem(title, null, (o, e) =>
-                {
-                    MessageBus.Send(new ChangeContainingWindowMessage() { Window = windowInfo, Target = target });
-                });
-                item.Checked = target.TrackedWindow != null && target.TrackedWindow.Window.hWnd == windowInfo.hWnd;
-                parent.DropDownItems.Add(item);
-            }
+                currentContextMenuStrip.ResumeLayout(true);
+            };
         }
         
         private void SetupDistractionWindowSelectItems(ToolStripMenuItem parent)
@@ -404,27 +414,37 @@ namespace Desktoptale
             
             noneItem.Checked = globalSettings.DistractionWindow == null;
             parent.DropDownItems.Add(noneItem);
-            
-            IList<WindowInfo> windows = WindowsUtils.GetOpenWindows();
-            foreach (WindowInfo windowInfo in windows)
+
+            parent.DropDownOpened += (sender, args) =>
             {
-                string title;
-                if (windowInfo.Title.Length > 50)
+                currentContextMenuStrip.SuspendLayout();
+             
+                parent.DropDownItems.Clear();
+                parent.DropDownItems.Add(noneItem);
+                
+                IList<WindowInfo> windows = WindowsUtils.GetOpenWindows();
+                foreach (WindowInfo windowInfo in windows)
                 {
-                    title = $"{windowInfo.Title.Substring(0, 47)}... [{windowInfo.ProcessName}]";
-                }
-                else
-                {
-                    title = $"{windowInfo.Title} [{windowInfo.ProcessName}]";
+                    string title;
+                    if (windowInfo.Title.Length > 50)
+                    {
+                        title = $"{windowInfo.Title.Substring(0, 47)}... [{windowInfo.ProcessName}]";
+                    }
+                    else
+                    {
+                        title = $"{windowInfo.Title} [{windowInfo.ProcessName}]";
+                    }
+
+                    ToolStripMenuItem item = new ToolStripMenuItem(title, null, (o, e) =>
+                    {
+                        MessageBus.Send(new SetDistractionTrackedWindowMessage() { Window = windowInfo });
+                    });
+                    item.Checked = globalSettings.DistractionWindow != null && distractionWindowHwnd == windowInfo.hWnd;
+                    parent.DropDownItems.Add(item);
                 }
                 
-                ToolStripMenuItem item = new ToolStripMenuItem(title, null, (o, e) =>
-                {
-                    MessageBus.Send(new SetDistractionTrackedWindowMessage() { Window = windowInfo });
-                });
-                item.Checked = globalSettings.DistractionWindow != null && distractionWindowHwnd == windowInfo.hWnd;
-                parent.DropDownItems.Add(item);
-            }
+                currentContextMenuStrip.ResumeLayout(true);
+            };
         }
 
         private void OnClickThroughChangeRequestedMessage(ClickThroughChangeRequestedMessage message)
