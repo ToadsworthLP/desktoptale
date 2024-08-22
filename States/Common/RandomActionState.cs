@@ -21,7 +21,7 @@ namespace Desktoptale.States.Common
         public void Enter(StateEnterContext<Character> context)
         {
             int loops = rng.Next(minLoops, maxLoops + 1);
-            duration = TimeSpan.FromSeconds((1/context.Target.ActionSprite.Framerate) * context.Target.ActionSprite.FrameCount * (context.Target.ActionSprite.Loop ? loops : 1));
+            duration = TimeSpan.FromSeconds((1/(context.Target.ActionSprite.Framerate > 0 ? context.Target.ActionSprite.Framerate : 1)) * context.Target.ActionSprite.FrameCount * (context.Target.ActionSprite.Loop ? loops : 1));
             
             context.Target.UpdateSprite(context.Target.ActionSprite);
             context.Target.CurrentSprite.Play();
