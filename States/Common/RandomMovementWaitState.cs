@@ -43,7 +43,7 @@ namespace Desktoptale.States.Common
                 return;
             }
             
-            if (context.StateTime > duration)
+            if (context.Time != null && context.StateTime > duration)
             {
                 if (context.Target.ActionSprite == null)
                 {

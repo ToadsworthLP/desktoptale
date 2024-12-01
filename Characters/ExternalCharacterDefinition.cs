@@ -4,13 +4,18 @@
     {
         public string Name { get; set; }
         public string Category { get; set; }
+        public int? Order { get; set; }
+        public bool? Hidden { get; set; }
         public float? WalkSpeed { get; set; }
         public float? RunSpeed { get; set; }
+        public bool? Teleport { get; set; }
         public ExternalCharacterStateDefinition Idle { get; set; }
         public ExternalCharacterStateDefinition Walk { get; set; }
         public ExternalCharacterStateDefinition Run { get; set; }
         public ExternalCharacterStateDefinition Drag { get; set; }
         public ExternalCharacterStateDefinition Action { get; set; }
+        public ExternalCharacterStateDefinition Disappear { get; set; }
+        public ExternalCharacterStateDefinition Appear { get; set; }
         
         public class ExternalCharacterStateDefinition
         {
@@ -27,6 +32,7 @@
             public int FrameCount { get; set; } = 1;
             public int StartFrame { get; set; }
             public bool Loop { get; set; } = true;
+            public int LoopPoint { get; set; } = 0;
         }
     }
 }

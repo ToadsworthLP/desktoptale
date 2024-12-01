@@ -10,12 +10,14 @@ namespace Desktoptale.States.Common
         private float runTriggerDistance;
 
         private float speed;
+        private TimeSpan teleportDelay;
         
-        public PartyWalkState(float speed, float idleTriggerDistance, float runTriggerDistance)
+        public PartyWalkState(float speed, float idleTriggerDistance, float runTriggerDistance, TimeSpan teleportDelay)
         {
             this.speed = speed;
             this.idleTriggerDistance = idleTriggerDistance;
             this.runTriggerDistance = runTriggerDistance;
+            this.teleportDelay = teleportDelay;
         }
 
         public virtual void Enter(StateEnterContext<Character> context)
@@ -50,23 +52,34 @@ namespace Desktoptale.States.Common
                 context.StateMachine.ChangeState(context.Target.PartyIdleState);
                 return;
             }
-            
-            if (distanceToInFront > runTriggerDistance  * scaleFactor)
-            {
-                context.StateMachine.ChangeState(context.Target.PartyRunState);
-                return;
-            }
-            
+
             Vector2 direction = toInFront;
             direction.Normalize();
             
-            context.Target.Velocity = 
-                direction *
-                speed *
-                (context.Target.InputManager.RawDirectionalInput.X != 0 && context.Target.InputManager.RawDirectionalInput.Y != 0 ? 1.4142135624f : 1f) *
-                (float)(context.Time != null ? context.Time.ElapsedGameTime.TotalSeconds : 0)  *
-                MathUtilities.Min(context.Target.Scale.X, context.Target.Scale.Y);
+            if (context.Target.Properties.Type.Teleport && context.Target.DisappearSprite != null && context.Target.AppearSprite != null)
+            {
+                if (context.Time != null && context.StateTime >= teleportDelay)
+                {
+                    context.StateMachine.ChangeState(context.Target.PartyTeleportDisappearState);
+                }
+            }
+            else
+            {
+                if (distanceToInFront > runTriggerDistance  * scaleFactor)
+                {
+                    context.StateMachine.ChangeState(context.Target.PartyRunState);
+                    return;
+                }
+                
+                context.Target.Velocity = 
+                    direction *
+                    speed *
+                    (context.Target.InputManager.RawDirectionalInput.X != 0 && context.Target.InputManager.RawDirectionalInput.Y != 0 ? 1.4142135624f : 1f) *
+                    (float)(context.Time != null ? context.Time.ElapsedGameTime.TotalSeconds : 0)  *
+                    MathUtilities.Min(context.Target.Scale.X, context.Target.Scale.Y);
 
+            }
+            
             context.Target.Orientation = MathUtilities.GetClosestOrientation(direction);
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using Desktoptale.States.Common;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -45,6 +44,26 @@ namespace Desktoptale.Characters
             IdleSprite = idleSprite;
             WalkSprite = idleSprite;
             RunSprite = idleSprite;
+            
+            AppearSprite = new OrientedAnimatedSprite(
+                contentManager.Load<Texture2D>("Included/Flowey/Spr_Flowey_Appear"),    
+                contentManager.Load<Texture2D>("Included/Flowey/Spr_Flowey_Appear"),    
+                contentManager.Load<Texture2D>("Included/Flowey/Spr_Flowey_Appear"),    
+                4
+            );
+
+            AppearSprite.Framerate = 15;
+            AppearSprite.Loop = false;
+            
+            DisappearSprite = new OrientedAnimatedSprite(
+                contentManager.Load<Texture2D>("Included/Flowey/Spr_Flowey_Disappear"),    
+                contentManager.Load<Texture2D>("Included/Flowey/Spr_Flowey_Disappear"),    
+                contentManager.Load<Texture2D>("Included/Flowey/Spr_Flowey_Disappear"),    
+                4
+            );
+            
+            DisappearSprite.Framerate = 15;
+            DisappearSprite.Loop = false;
         }
     }
 }

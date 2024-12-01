@@ -39,7 +39,7 @@ namespace Desktoptale.States.Common
                 return;
             }
         
-            if (context.Target.IdleRoamingEnabled && context.StateTime > idleAnimationTime && !context.Target.IsBeingDragged)
+            if (context.Target.IdleRoamingEnabled && context.Time != null && context.StateTime > idleAnimationTime && !context.Target.IsBeingDragged)
             {
                 context.StateMachine.ChangeState(context.Target.RandomMovementWaitState);
                 return;

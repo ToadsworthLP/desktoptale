@@ -48,6 +48,12 @@ namespace Desktoptale.Characters
         public IState<Character> PartyIdleState { get; protected set; }
         public IState<Character> PartyWalkState { get; protected set; }
         public IState<Character> PartyRunState { get; protected set; }
+        public IState<Character> PartyTeleportDisappearState { get; protected set; }
+        public IState<Character> PartyTeleportFollowState { get; protected set; }
+        public IState<Character> PartyTeleportAppearState { get; protected set; }
+        public IState<Character> AppearState { get; protected set; }
+        public IState<Character> PartyAppearState { get; protected set; }
+
     
         public IAnimatedSprite IdleSprite { get; set; }
         public IAnimatedSprite WalkSprite { get; set; }
@@ -55,6 +61,8 @@ namespace Desktoptale.Characters
         public IAnimatedSprite CurrentSprite { get; set; }
         public IAnimatedSprite DragSprite { get; set; }
         public IAnimatedSprite ActionSprite { get; set; }
+        public IAnimatedSprite DisappearSprite { get; set; }
+        public IAnimatedSprite AppearSprite { get; set; }
         
         public bool IsBeingDragged => dragging;
         public bool IdleRoamingEnabled
@@ -70,8 +78,10 @@ namespace Desktoptale.Characters
         }
 
         public bool EnabledAutoOrientation { get; set; } = true;
-
-        protected virtual IState<Character> InitialState => IdleState;
+        
+        public bool IsVisible { get; set; } = true;
+        
+        protected virtual IState<Character> InitialState => AppearSprite != null ? AppearState : IdleState;
         
         protected MonitorManager MonitorManager;
         protected WindowTracker WindowTracker;
@@ -139,8 +149,13 @@ namespace Desktoptale.Characters
             ActionState = new ActionState();
             RandomActionState = new RandomActionState();
             PartyIdleState = new PartyIdleState(40f);
-            PartyWalkState = new PartyWalkState(properties.Type.WalkSpeed, 25f, 60f);
+            PartyWalkState = new PartyWalkState(properties.Type.WalkSpeed, 25f, 60f, TimeSpan.FromSeconds(0.2f));
             PartyRunState = new PartyRunState(properties.Type.RunSpeed, 45f);
+            PartyTeleportDisappearState = new PartyTeleportDisappearState();
+            PartyTeleportFollowState = new PartyTeleportFollowState(25f, TimeSpan.FromSeconds(0.1f));
+            PartyTeleportAppearState = new PartyTeleportAppearState();
+            AppearState = new AppearState();
+            PartyAppearState = new PartyAppearState();
         
             StateMachine = new StateMachine<Character>(this, InitialState);
             StateMachine.StateChanged += (state, newState) => UpdateOrientation();
@@ -164,7 +179,14 @@ namespace Desktoptale.Characters
                 
                 if (properties.Party.GetLeader() != this)
                 {
-                    StateMachine.ChangeState(PartyIdleState);
+                    if (AppearSprite != null)
+                    {
+                        StateMachine.ChangeState(PartyAppearState);
+                    }
+                    else
+                    {
+                        StateMachine.ChangeState(PartyIdleState);
+                    }
                 }
             }
         }
@@ -213,7 +235,11 @@ namespace Desktoptale.Characters
             {
                 if (StateMachine.CurrentState != PartyIdleState &&
                     StateMachine.CurrentState != PartyWalkState &&
-                    StateMachine.CurrentState != PartyRunState)
+                    StateMachine.CurrentState != PartyRunState &&
+                    StateMachine.CurrentState != PartyTeleportDisappearState &&
+                    StateMachine.CurrentState != PartyTeleportFollowState &&
+                    StateMachine.CurrentState != PartyTeleportAppearState &&
+                    StateMachine.CurrentState != PartyAppearState)
                 {
                     StateMachine.ChangeState(PartyIdleState);
                 }
@@ -234,8 +260,11 @@ namespace Desktoptale.Characters
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2, CurrentSprite.FrameSize.Y);
-            CurrentSprite.Draw(spriteBatch, Position, Color.White, 0, origin, Scale, SpriteEffects.None, Depth);
+            if (IsVisible)
+            {
+                Vector2 origin = new Vector2(CurrentSprite.FrameSize.X / 2, CurrentSprite.FrameSize.Y);
+                CurrentSprite.Draw(spriteBatch, Position, Color.White, 0, origin, Scale, SpriteEffects.None, Depth);
+            }
         }
 
         public virtual void Dispose(CharacterRemovalReason reason)

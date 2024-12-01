@@ -916,6 +916,30 @@
 /processorParam:TextureFormat=Color
 /build:Included/Ed/Spr_Ed_Walk_Up.png
 
+#begin Included/Flowey/Spr_Flowey_Appear.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Flowey/Spr_Flowey_Appear.png
+
+#begin Included/Flowey/Spr_Flowey_Disappear.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Included/Flowey/Spr_Flowey_Disappear.png
+
 #begin Included/Flowey/Spr_Flowey_Idle_Down.png
 /importer:TextureImporter
 /processor:TextureProcessor

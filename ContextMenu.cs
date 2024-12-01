@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Desktoptale.Characters;
@@ -224,7 +225,8 @@ namespace Desktoptale
         {
             IDictionary<string, ToolStripMenuItem> categoryItems = new Dictionary<string, ToolStripMenuItem>();
 
-            foreach (CharacterType character in characterRegistry.GetAll())
+            IEnumerable<CharacterType> displayedCharacterTypes = GetDisplayedCharacterTypes(characterRegistry.GetAll());
+            foreach (CharacterType character in displayedCharacterTypes)
             {
                 ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(character.Name, null, (o, e) => MessageBus.Send(new CharacterChangeRequestedMessage { Character = character, Target = target}));
                 characterSelectItem.Checked = target.Properties.Type == character;
@@ -285,7 +287,8 @@ namespace Desktoptale
         {
             IDictionary<string, ToolStripMenuItem> categoryItems = new Dictionary<string, ToolStripMenuItem>();
 
-            foreach (CharacterType character in characterRegistry.GetAll())
+            IEnumerable<CharacterType> displayedCharacterTypes = GetDisplayedCharacterTypes(characterRegistry.GetAll());
+            foreach (CharacterType character in displayedCharacterTypes)
             {
                 ToolStripMenuItem characterSelectItem = new ToolStripMenuItem(character.Name, null, (o, e) => MessageBus.Send(new AddCharacterRequestedMessage { Character = character, Target = target}));
                 
@@ -483,6 +486,11 @@ namespace Desktoptale
         private void ShowInfoScreen()
         {
             WindowsUtils.ShowMessageBox($"{ProgramInfo.NAME} {ProgramInfo.VERSION}\nCreated by {ProgramInfo.AUTHOR}\n\n{ProgramInfo.CREDITS}\n{ProgramInfo.DISCLAIMER}", "About", MessageBoxButtons.OK, MessageBoxIcon.None);
+        }
+
+        private IEnumerable<CharacterType> GetDisplayedCharacterTypes(IEnumerable<CharacterType> source)
+        {
+            return source.Where(t => !t.Hidden).OrderBy(t => t.Order);
         }
     }
 }

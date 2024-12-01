@@ -94,6 +94,16 @@ namespace Desktoptale.Characters
                     SetupState((s) => externalCharacter.ActionSprite = s, externalCharacterDefinition.Action, basePath);
                 }
                 
+                if (externalCharacterDefinition.Disappear != null)
+                {
+                    SetupState((s) => externalCharacter.DisappearSprite = s, externalCharacterDefinition.Disappear, basePath);
+                }
+                
+                if (externalCharacterDefinition.Appear != null)
+                {
+                    SetupState((s) => externalCharacter.AppearSprite = s, externalCharacterDefinition.Appear, basePath);
+                }
+                
                 return externalCharacter;
             });
 
@@ -108,6 +118,21 @@ namespace Desktoptale.Characters
                 characterType.RunSpeed = externalCharacterDefinition.RunSpeed.Value;
             }
 
+            if (externalCharacterDefinition.Order.HasValue)
+            {
+                characterType.Order = externalCharacterDefinition.Order.Value;
+            }
+            
+            if (externalCharacterDefinition.Hidden.HasValue)
+            {
+                characterType.Hidden = externalCharacterDefinition.Hidden.Value;
+            }
+            
+            if (externalCharacterDefinition.Teleport.HasValue)
+            {
+                characterType.Teleport = externalCharacterDefinition.Teleport.Value;
+            }
+            
             registry.Add(characterType);
         }
 
@@ -167,6 +192,7 @@ namespace Desktoptale.Characters
             sprite.Framerate = spriteDefinition.FrameRate;
             sprite.Loop = spriteDefinition.Loop;
             sprite.StartFrame = spriteDefinition.StartFrame;
+            sprite.LoopPoint = spriteDefinition.LoopPoint;
 
             return sprite;
         }
