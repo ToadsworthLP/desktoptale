@@ -6,6 +6,7 @@
         public string Category { get; set; }
         public int? Order { get; set; }
         public bool? Hidden { get; set; }
+        public bool? Override { get; set; }
         public float? WalkSpeed { get; set; }
         public float? RunSpeed { get; set; }
         public bool? Teleport { get; set; }
@@ -30,7 +31,7 @@
             public string Sprite { get; set; }
             public double FrameRate { get; set; }
             public int FrameCount { get; set; } = 1;
-            public int StartFrame { get; set; }
+            public int StartFrame { get; set; } = 0;
             public bool Loop { get; set; } = true;
             public int LoopPoint { get; set; } = 0;
         }

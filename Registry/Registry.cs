@@ -23,6 +23,16 @@ namespace Desktoptale.Registry
 
             return key;
         }
+        
+        public string Add(TElement entry, bool overrideExistingEntry)
+        {
+            string key = overrideExistingEntry ? entry.ToString() : FindKeyForNewElement(entry);
+            
+            elements[key] = entry;
+            reverseMapping[entry] = key;
+
+            return key;
+        }
 
         public TElement Get(string id)
         {

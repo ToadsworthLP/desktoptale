@@ -169,7 +169,7 @@ namespace Desktoptale
             // If no preset had been loaded, create a character according to the CLI settings
             if (characterProperties == null)
             {
-                CharacterType initialCharacter = CharacterRegistry.FRISK;
+                CharacterType initialCharacter = characterRegistry.Get("Undertale/Frisk");
                 if (!string.IsNullOrWhiteSpace(sourceSettings.Character))
                 {
                     try

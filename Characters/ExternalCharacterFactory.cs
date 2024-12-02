@@ -133,7 +133,7 @@ namespace Desktoptale.Characters
                 characterType.Teleport = externalCharacterDefinition.Teleport.Value;
             }
             
-            registry.Add(characterType);
+            registry.Add(characterType, externalCharacterDefinition.Override.GetValueOrDefault(false));
         }
 
         private void SetupState(Action<IAnimatedSprite> setter, ExternalCharacterDefinition.ExternalCharacterStateDefinition state, string basePath)
