@@ -490,7 +490,18 @@ namespace Desktoptale
 
         private IEnumerable<CharacterType> GetDisplayedCharacterTypes(IEnumerable<CharacterType> source)
         {
-            return source.Where(t => !t.Hidden).OrderBy(t => t.Order);
+            IEnumerable<CharacterType> shownCharacters = source.Where(t => !t.Hidden).ToList();
+
+            IEnumerable<CharacterType> builtInCharacters = shownCharacters
+                .Where(t => t.BuiltIn);
+            
+            IEnumerable<CharacterType> customCharacters = shownCharacters
+                .Where(t => !t.BuiltIn)
+                .OrderBy(t => t.Category)
+                .ThenBy(t => t.Order)
+                .ThenBy(t => t.Name);
+
+            return builtInCharacters.Concat(customCharacters);
         }
     }
 }

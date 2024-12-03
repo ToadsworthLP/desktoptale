@@ -34,6 +34,11 @@ namespace Desktoptale.Registry
             return key;
         }
 
+        public bool Contains(string id)
+        {
+            return elements.ContainsKey(id);
+        }
+
         public TElement Get(string id)
         {
             if (!elements.ContainsKey(id)) throw new IndexOutOfRangeException($"Registry element lookup failed: No element with ID {id} found in registry.");

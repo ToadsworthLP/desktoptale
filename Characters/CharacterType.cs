@@ -11,6 +11,7 @@ namespace Desktoptale.Characters
         public float WalkSpeed { get; set; } = 90f;
         public float RunSpeed { get; set; } = 180f;
         public bool Teleport { get; set; } = false;
+        public bool BuiltIn { get; set; } = true;
 
         public Func<CharacterCreationContext, Character> FactoryFunction { get; set; }
 

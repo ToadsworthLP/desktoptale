@@ -111,7 +111,7 @@ namespace Desktoptale.Characters
                 
                 return externalCharacter;
             });
-
+            
             if (externalCharacterDefinition.WalkSpeed.HasValue)
             {
                 characterType.WalkSpeed = externalCharacterDefinition.WalkSpeed.Value;
@@ -136,6 +136,15 @@ namespace Desktoptale.Characters
             if (externalCharacterDefinition.Teleport.HasValue)
             {
                 characterType.Teleport = externalCharacterDefinition.Teleport.Value;
+            }
+            
+            if (externalCharacterDefinition.Override == true && registry.Contains(characterType.ToString()) && registry.Get(characterType.ToString()).BuiltIn)
+            {
+                characterType.BuiltIn = true;
+            }
+            else
+            {
+                characterType.BuiltIn = false;
             }
             
             registry.Add(characterType, externalCharacterDefinition.Override.GetValueOrDefault(false));
