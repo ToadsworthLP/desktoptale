@@ -4,15 +4,15 @@ using Microsoft.Xna.Framework;
 
 namespace Desktoptale.States.Common
 {
-    public class PartyAppearState : IState<Character>
+    public class PartySpawnState : IState<Character>
     {
         private TimeSpan duration;
 
         public void Enter(StateEnterContext<Character> context)
         {
-            duration = TimeSpan.FromSeconds((1/(context.Target.AppearSprite.Framerate > 0 ? context.Target.AppearSprite.Framerate : 1)) * context.Target.AppearSprite.FrameCount);
+            duration = TimeSpan.FromSeconds((1/(context.Target.SpawnSprite.Framerate > 0 ? context.Target.SpawnSprite.Framerate : 1)) * context.Target.SpawnSprite.FrameCount);
             
-            context.Target.UpdateSprite(context.Target.AppearSprite);
+            context.Target.UpdateSprite(context.Target.SpawnSprite);
             context.Target.CurrentSprite.Play();
             
             context.Target.Velocity = Vector2.Zero;

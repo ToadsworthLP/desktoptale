@@ -15,6 +15,8 @@
         public ExternalCharacterStateDefinition Run { get; set; }
         public ExternalCharacterStateDefinition Drag { get; set; }
         public ExternalCharacterStateDefinition Action { get; set; }
+        public ExternalCharacterStateDefinition Spawn { get; set; }
+
         public ExternalCharacterStateDefinition Disappear { get; set; }
         public ExternalCharacterStateDefinition Appear { get; set; }
         

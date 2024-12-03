@@ -51,7 +51,7 @@ namespace Desktoptale.Characters
         public IState<Character> PartyTeleportDisappearState { get; protected set; }
         public IState<Character> PartyTeleportFollowState { get; protected set; }
         public IState<Character> PartyTeleportAppearState { get; protected set; }
-        public IState<Character> AppearState { get; protected set; }
+        public IState<Character> SpawnState { get; protected set; }
         public IState<Character> PartyAppearState { get; protected set; }
 
     
@@ -61,6 +61,7 @@ namespace Desktoptale.Characters
         public IAnimatedSprite CurrentSprite { get; set; }
         public IAnimatedSprite DragSprite { get; set; }
         public IAnimatedSprite ActionSprite { get; set; }
+        public IAnimatedSprite SpawnSprite { get; set; }
         public IAnimatedSprite DisappearSprite { get; set; }
         public IAnimatedSprite AppearSprite { get; set; }
         
@@ -81,7 +82,7 @@ namespace Desktoptale.Characters
         
         public bool IsVisible { get; set; } = true;
         
-        protected virtual IState<Character> InitialState => AppearSprite != null ? AppearState : IdleState;
+        protected virtual IState<Character> InitialState => SpawnSprite != null ? SpawnState : IdleState;
         
         protected MonitorManager MonitorManager;
         protected WindowTracker WindowTracker;
@@ -154,8 +155,8 @@ namespace Desktoptale.Characters
             PartyTeleportDisappearState = new PartyTeleportDisappearState();
             PartyTeleportFollowState = new PartyTeleportFollowState(25f, TimeSpan.FromSeconds(0.1f));
             PartyTeleportAppearState = new PartyTeleportAppearState();
-            AppearState = new AppearState();
-            PartyAppearState = new PartyAppearState();
+            SpawnState = new SpawnState();
+            PartyAppearState = new PartySpawnState();
         
             StateMachine = new StateMachine<Character>(this, InitialState);
             StateMachine.StateChanged += (state, newState) => UpdateOrientation();
@@ -179,7 +180,7 @@ namespace Desktoptale.Characters
                 
                 if (properties.Party.GetLeader() != this)
                 {
-                    if (AppearSprite != null)
+                    if (SpawnSprite != null)
                     {
                         StateMachine.ChangeState(PartyAppearState);
                     }

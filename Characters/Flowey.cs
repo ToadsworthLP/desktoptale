@@ -64,6 +64,8 @@ namespace Desktoptale.Characters
             
             DisappearSprite.Framerate = 15;
             DisappearSprite.Loop = false;
+            
+            SpawnSprite = AppearSprite;
         }
     }
 }

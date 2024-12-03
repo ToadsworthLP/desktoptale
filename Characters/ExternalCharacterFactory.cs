@@ -104,6 +104,11 @@ namespace Desktoptale.Characters
                     SetupState((s) => externalCharacter.AppearSprite = s, externalCharacterDefinition.Appear, basePath);
                 }
                 
+                if (externalCharacterDefinition.Spawn != null)
+                {
+                    SetupState((s) => externalCharacter.SpawnSprite = s, externalCharacterDefinition.Spawn, basePath);
+                }
+                
                 return externalCharacter;
             });
 
