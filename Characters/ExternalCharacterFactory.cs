@@ -17,7 +17,7 @@ namespace Desktoptale.Characters
 
         public ExternalCharacterFactory(string rootPath, GraphicsDevice graphicsDevice)
         {
-            this.rootPath = rootPath;
+            this.rootPath = Path.GetFullPath(rootPath);
             this.graphicsDevice = graphicsDevice;
             spriteCache = new SpriteCache(this.graphicsDevice);
 
@@ -34,7 +34,7 @@ namespace Desktoptale.Characters
                 return;
             }
             
-            foreach (string definitionPath in Directory.EnumerateFiles(rootPath, "*.yaml", SearchOption.AllDirectories))
+            foreach (string definitionPath in FileEnumerator.EnumerateFilesRecursive(rootPath, "*.yaml"))
             {
                 string definitionString;
                 try
@@ -121,11 +121,6 @@ namespace Desktoptale.Characters
             if (externalCharacterDefinition.RunSpeed.HasValue)
             {
                 characterType.RunSpeed = externalCharacterDefinition.RunSpeed.Value;
-            }
-
-            if (externalCharacterDefinition.Order.HasValue)
-            {
-                characterType.Order = externalCharacterDefinition.Order.Value;
             }
             
             if (externalCharacterDefinition.Hidden.HasValue)

@@ -4,7 +4,6 @@
     {
         public string Name { get; set; }
         public string Category { get; set; }
-        public int? Order { get; set; }
         public bool? Hidden { get; set; }
         public bool? Override { get; set; }
         public float? WalkSpeed { get; set; }

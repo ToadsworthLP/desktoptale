@@ -6,7 +6,6 @@ namespace Desktoptale.Characters
     {
         public string Name { get; set; }
         public string Category { get; set; }
-        public int Order { get; set; } = 0;
         public bool Hidden { get; set; } = false;
         public float WalkSpeed { get; set; } = 90f;
         public float RunSpeed { get; set; } = 180f;

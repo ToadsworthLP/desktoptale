@@ -485,23 +485,13 @@ namespace Desktoptale
         
         private void ShowInfoScreen()
         {
-            WindowsUtils.ShowMessageBox($"{ProgramInfo.NAME} {ProgramInfo.VERSION}\nCreated by {ProgramInfo.AUTHOR}\n\n{ProgramInfo.CREDITS}\n{ProgramInfo.DISCLAIMER}", "About", MessageBoxButtons.OK, MessageBoxIcon.None);
+            WindowsUtils.ShowMessageBox($"{ProgramInfo.NAME} {ProgramInfo.VERSION}{ProgramInfo.VERSION_SUFFIX}\nCreated by {ProgramInfo.AUTHOR}\n\n{ProgramInfo.CREDITS}\n{ProgramInfo.DISCLAIMER}", "About", MessageBoxButtons.OK, MessageBoxIcon.None);
         }
 
         private IEnumerable<CharacterType> GetDisplayedCharacterTypes(IEnumerable<CharacterType> source)
         {
-            IEnumerable<CharacterType> shownCharacters = source.Where(t => !t.Hidden).ToList();
-
-            IEnumerable<CharacterType> builtInCharacters = shownCharacters
-                .Where(t => t.BuiltIn);
-            
-            IEnumerable<CharacterType> customCharacters = shownCharacters
-                .Where(t => !t.BuiltIn)
-                .OrderBy(t => t.Category)
-                .ThenBy(t => t.Order)
-                .ThenBy(t => t.Name);
-
-            return builtInCharacters.Concat(customCharacters);
+            IEnumerable<CharacterType> shownCharacters = source.Where(t => !t.Hidden);
+            return shownCharacters;
         }
     }
 }
