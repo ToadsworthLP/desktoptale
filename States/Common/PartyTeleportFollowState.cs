@@ -51,7 +51,7 @@ namespace Desktoptale.States.Common
             
             context.Target.Velocity = 
                 direction *
-                (distanceToInFront > 200f * scaleFactor ? 300f : (context.Target.InputManager.RunButtonPressed ? Math.Max(inFront.Properties.Type.RunSpeed, 180f) : Math.Max(inFront.Properties.Type.WalkSpeed, 90f))) *
+                (distanceToInFront > 200f * scaleFactor ? 500f : (context.Target.InputManager.RunButtonPressed ? Math.Max(inFront.Properties.Type.RunSpeed, 180f) : Math.Max(inFront.Properties.Type.WalkSpeed, 90f))) *
                 (context.Target.InputManager.RawDirectionalInput.X != 0 && context.Target.InputManager.RawDirectionalInput.Y != 0 ? 1.4142135624f : 1f) *
                 (float)(context.Time != null ? context.Time.ElapsedGameTime.TotalSeconds : 0)  *
                 MathUtilities.Min(context.Target.Scale.X, context.Target.Scale.Y);
